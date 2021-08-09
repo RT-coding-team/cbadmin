@@ -5,7 +5,13 @@ export function get(url, token, callback, callbackError = console.log) {
     oReq.onload = () => {
         if (oReq.status !== 201 && oReq.status !== 200)
             callbackError(oReq.status, oReq.responseText);
-        else callback(JSON.parse(oReq.responseText))
+        else {
+            try {
+                callback(JSON.parse(oReq.responseText).result[0])
+            } catch (e) {
+                callbackError(oReq.status, oReq.responseText);
+            }
+        }
     }
     oReq.open("get", url, true);
     oReq.setRequestHeader('Authorization', `Basic ${token}`);

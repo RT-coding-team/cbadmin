@@ -1,0 +1,22 @@
+.alert{
+  position: fixed;
+  width: 100%;
+  transition: all 0.5s ease-in-out;
+
+  .alert-inner{
+    max-width: 600px;
+    margin: auto;
+    width: 90%;
+    padding: 1rem;
+    background-color: #e56d78;
+    border-radius: 5px;
+    border: solid 1px $danger;
+    color: #f6f6f6;
+  }
+}
+.alert--hidden{
+  bottom: -70px;
+}
+.alert--shown{
+  bottom: 20px;
+}
