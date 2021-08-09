@@ -1,0 +1,19 @@
+extends ../../../layout/section
+
+mixin script(name)
+    div.mt-3
+        include  ../../../icons/settings
+        = name
+        .float-end
+            button.bg-transparent.border-0.text-primary.p-0
+                include  ../../../icons/play
+
+block title
+    include ../../../icons/settings
+    | System
+
+block content
+    +script('Unmount USB')
+    +script('Shutdown')
+    +script('Reboot')
+    +script('Reset')

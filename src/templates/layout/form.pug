@@ -1,0 +1,15 @@
+block variables
+    - var id=null
+
+form.form-accordion.mb-3
+    div
+        block icon
+        label(for=id)
+            block title
+        .float-end
+            a.btn-open-form(id="btn-open-form-"+id, data-input-name=id)
+                include ../icons/chevron-down
+            a.hidden.btn-close-form(id="btn-close-form-"+id, data-input-name=id)
+                include ../icons/chevron-up
+    .hidden.mt-3.mb-4.ms-15-icon.me-5(id=id)
+        block form

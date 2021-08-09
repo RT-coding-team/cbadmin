@@ -1,0 +1,17 @@
+extends ../../../layout/form
+include ../../../mixins/button-done
+
+block variables
+    - var id = 'wpa-passphrase'
+
+block icon
+    include ../../../icons/key
+
+block title
+    | WPA Passphrase
+
+block form
+    div.position-relative
+        input.w-100.input-text#wpa-passphrase(placeholder='WPA Passphrase', name='wpa-passphrase')
+        +button-done
+

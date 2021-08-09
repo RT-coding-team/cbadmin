@@ -1,0 +1,25 @@
+extends ../layout.pug
+
+block content
+    .jump
+    .appBar.elevation-2
+        h1.mx-2.mx-md-5 ConnectBox Admin Area
+        .top-left-action#logout
+            include ../icons/logout
+
+    .my-5.mx-2.mx-md-5
+        .container-fluid.p-0.m-0
+            .row.row-cols-1.row-cols-xl-3
+                .col
+                    include ../parts/admin/sections/wireless_access_point
+                    include ../parts/admin/sections/web_server
+                .col
+                    include ../parts/admin/sections/user_interface
+                    include  ../parts/admin/sections/password
+                    include  ../parts/admin/sections/system
+                .col
+                    include  ../parts/admin/sections/reports
+                    include  ../parts/admin/sections/about
+
+block scripts
+    script(src='./admin.bundle.js')

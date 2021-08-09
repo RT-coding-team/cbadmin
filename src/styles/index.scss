@@ -1,0 +1,36 @@
+
+@import "~@fontsource/roboto/300.css";
+@import "~bootstrap/scss/functions";
+
+$h1-font-size:  '1.3rem';
+$h2-font-size:  '1.2rem';
+$primary: #486da4;
+$secondary: #b1c8ef;
+$dark: #3b6a8a;
+
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/utilities/api";
+@import "~bootstrap/scss/reboot";
+
+@import "material";
+@import "switch";
+@import "appBar";
+@import "inputText";
+@import "windowCentral";
+@import "utils";
+@import "icons";
+
+html, body{
+  background-color: #f6f6f6;
+  font-family: Roboto;
+}
+
+
+
+
+

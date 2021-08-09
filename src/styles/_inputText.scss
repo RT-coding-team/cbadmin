@@ -1,0 +1,12 @@
+.input-text{
+  border: none;
+  border-bottom: solid 1px #000;
+  padding-bottom: 5px;
+  border-radius: 0;
+}
+.input-text:focus{
+  border-bottom: solid 3px $primary;
+  padding-bottom: 3px;
+  box-shadow: none !important;
+  outline: none !important;
+}

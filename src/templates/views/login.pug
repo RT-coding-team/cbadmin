@@ -1,0 +1,19 @@
+extends ../layout.pug
+
+block content
+    .jump
+    .appBar.elevation-2
+        h1.mx-2.mx-md-5 ConnectBox Login
+
+    .window-central.elevation-1
+            h2 Login
+            p Access to this connectBox administration interface. Default password is 'connectbox'
+            form#loginForm(action='/admin.html')
+                div
+                    label.m-3(for='password') Password:
+                    input.input-text#password(name='password', placeholder='Password')
+                    .text-danger.small.mx-3.mb-3#message-error
+                div.mb-5
+                    input.bg-primary.px-5.py-2.border-0.float-end.rounded-3.text-light(type='submit', value='Login')
+block scripts
+    script(src='./login.bundle.js')

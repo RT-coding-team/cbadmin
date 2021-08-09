@@ -1,0 +1,17 @@
+extends ../../../layout/section
+
+mixin link(name)
+    div.mt-3
+        include  ../../../icons/chart
+        = name
+        .float-end
+            a.text-primary.p-0(href='#')
+                include  ../../../icons/link
+
+block title
+    include ../../../icons/chart
+    | Reports
+
+block content
+    +link('Top 10 Requests')
+    +link('All Requests')

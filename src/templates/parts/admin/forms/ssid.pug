@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-done
+
+block variables
+    - var id = 'ssid'
+
+block icon
+    include ../../../icons/wifi
+
+block title
+    | SSID
+
+block form
+    div.position-relative
+        input.w-100.input-text#ssid(placeholder='SSID', name='ssid')
+        +button-done

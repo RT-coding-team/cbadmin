@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-done
+
+block variables
+    - var id = 'banner-message'
+
+block icon
+    include ../../../icons/blockquote
+
+block title
+    | Banner message
+
+block form
+    div.position-relative
+        textarea.w-100.input-text#banner-message(placeholder='Banner message', name='banner-message')
+        +button-done

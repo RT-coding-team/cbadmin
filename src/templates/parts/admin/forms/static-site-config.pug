@@ -1,0 +1,18 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+include ../../../mixins/button-done
+
+block variables
+    - var id = 'static-site-config'
+
+block icon
+    include ../../../icons/key
+
+block title
+    | Static site configuration
+
+block form
+    div.position-relative
+        +switch(id, 'Enable')
+        +button-done
+

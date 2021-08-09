@@ -1,0 +1,25 @@
+.jump{
+  height: 56px;
+}
+.appBar{
+  background-color: $primary;
+  height: 56px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  h1{
+    height: 56px;
+    line-height: 56px;
+    color: #f6f6f6;
+    font-weight: bold;
+  }
+  .top-left-action{
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 16px;
+    color: #f6f6f6;
+    z-index: 10000;
+  }
+}

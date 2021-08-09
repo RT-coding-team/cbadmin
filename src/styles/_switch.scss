@@ -1,0 +1,37 @@
+.form-checkbox-div
+{
+  display: inline-block;
+  width: 32px;
+  height: 16px;
+  border-radius: 8px;
+  position: relative;
+  div{
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 2px;
+    border-radius: 5px;
+  }
+}
+
+.form-checkbox-div--checked
+{
+  background-color: #87a7d7;
+  border: solid 1px #87a7d7;
+  div{
+    background-color: #fff;
+    left: auto;
+    right: 2px;
+  }
+}
+
+.form-checkbox-div--unchecked
+{
+  background-color: #ffffff;
+  border: solid 1px #aaa;
+  div{
+    background-color: #aaa;
+    left: 2px;
+    right: auto;
+  }
+}

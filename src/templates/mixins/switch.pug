@@ -1,0 +1,6 @@
+mixin switch(id, title)
+    div
+        = title
+        div.ms-5.form-checkbox-div.form-checkbox-div--unchecked(data-input-name=id + '-input')
+            div
+        input.d-none(type="checkbox",id=id + '-input',name=id,autocomplete='off')
