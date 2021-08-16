@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "rm -r dist && pug src/templates/views --out dist && webpack",
+    "build": "rm -rf dist && pug src/templates/views --out dist && webpack",
     "deploy": "npm run build && rm -rf /var/www/html/* && cp -r dist/* /var/www/html"
   },
   "main": "src/js/index.js",

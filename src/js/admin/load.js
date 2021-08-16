@@ -1,15 +1,11 @@
 import {API_URL, get} from "../api/api";
+import openSnackBar from "../components/snackbar";
 
 /**
  * When there is an error, show a message in the top
  */
-function errorCallback () {
-    const errorAlert = document.getElementById('message-error');
-    errorAlert.children[0].innerText = 'Unknown error occurred. Please try later'
-    errorAlert.className = 'alert alert--shown'
-    setTimeout(() => {
-        errorAlert.className = 'alert alert--hidden'
-    }, 3000)
+function errorCallback() {
+    openSnackBar('Unknown error occurred. Please try later', 'error');
 }
 
 /**
@@ -46,12 +42,12 @@ export default function (token) {
     getProperty('ssid-input', 'ssid', token);
     getProperty('channel-input', 'channel', token);
     getProperty('static-site-config-input', 'staticsite', token, (element, value) => {
-        element.checked = value
+        element.checked = value === 'true'
     });
     getProperty('hostname-input', 'hostname', token);
     getProperty('banner-message-input', 'ui-config', token, (element, value) => {
         element.value = JSON.parse(value)?.Client?.banner || "";
-        errorCallback();
+        element.setAttribute('data-ui-config', value);
     });
 }
 

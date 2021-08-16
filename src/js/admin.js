@@ -3,6 +3,7 @@ import './components/custom-switch'
 
 import logout from "./admin/logout";
 import load from "./admin/load";
+import attachUpdateCallbacks from "./admin/update";
 
 /**
  * State
@@ -27,5 +28,9 @@ document.getElementById('logout').addEventListener('click', () => logout(setToke
 
 /**
  * Load current configuration when loaded
+ * Attach callbacks to send modifications
  */
-window.addEventListener('load', () => load(token))
+window.addEventListener('load', () => {
+    load(token);
+    attachUpdateCallbacks(token);
+})
