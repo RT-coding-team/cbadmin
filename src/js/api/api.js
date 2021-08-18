@@ -16,7 +16,7 @@ function analyseResponse(req, callbackSuccess, callbackError) {
         const res = JSON.parse(req.responseText);
         if (res.code && res.code !== 0) return callbackError(req.status, req.responseText);
 
-        callbackSuccess(res?.result?.[0] !== undefined || res);
+        callbackSuccess(res?.result?.[0] !== undefined ? res.result[0] : res);
     } catch (e) {
         console.error(e)
         callbackError(req.status, req.responseText);
