@@ -22,6 +22,12 @@ if (!storedToken) window.location = "/login.html";
 else setToken(storedToken);
 
 /**
+ * Display title of the page
+ */
+document.getElementById('title').innerText = `Admin: ${window.location.hostname}`;
+document.title = `Admin: ${window.location.hostname}`;
+
+/**
  * Attach logout to its button
  */
 document.getElementById('logout').addEventListener('click', () => logout(setToken))
