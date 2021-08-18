@@ -18,7 +18,7 @@ function setToken(nToken) {
  * Store token in memory or redirect
  */
 const storedToken = localStorage.getItem('admin-authorization')
-if (!storedToken) window.location = "/login.html";
+if (!storedToken) window.location = "/admin/login.html";
 else setToken(storedToken);
 
 /**

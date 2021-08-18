@@ -8,7 +8,7 @@ function login(e) {
 
     const successCallback = () => {
         localStorage.setItem('admin-authorization', token);
-        window.location = '/admin.html';
+        window.location = '/admin';
     }
     const errorCallback = (status) => {
         const errorMessage = document.getElementById('message-error')
