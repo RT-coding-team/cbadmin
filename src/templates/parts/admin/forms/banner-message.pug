@@ -1,5 +1,5 @@
 extends ../../../layout/form
-include ../../../mixins/button-done
+include ../../../mixins/button-save
 
 block variables
     - var id = 'banner-message'
@@ -13,4 +13,4 @@ block title
 block form
     div.position-relative
         textarea.w-100.input-text#banner-message-input(placeholder='Banner message', name='banner-message')
-        +button-done(id)
+        +button-save(id)

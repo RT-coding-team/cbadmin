@@ -1,6 +1,6 @@
 extends ../../../layout/form
 include ../../../mixins/switch
-include ../../../mixins/button-done
+include ../../../mixins/button-save
 
 block variables
     - var id = 'static-site-config'
@@ -14,5 +14,5 @@ block title
 block form
     div.position-relative
         +switch(id, 'Enable')
-        +button-done(id)
+        +button-save(id)
 
