@@ -46,7 +46,8 @@ export default function (token) {
     });
     getProperty('hostname-input', 'hostname', token);
     getProperty('banner-message-input', 'ui-config', token, (element, value) => {
-        element.value = JSON.parse(value)?.Client?.banner || "";
+        const uiConfig = JSON.parse(value);
+        element.value = uiConfig?.Client?.banner || "";
         element.setAttribute('data-ui-config', value);
     });
 }

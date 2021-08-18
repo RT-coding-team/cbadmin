@@ -1,0 +1,20 @@
+extends ../../../layout/form
+
+block variables
+    - var id = 'top10'
+
+block icon
+    include ../../../icons/chart
+
+block title
+    | Top 10 Requests
+
+block form
+    div
+        select.input-text(name="top10-period" id="top10-period")
+            option(value="year") Year
+            option(value="month") Month
+            option(value="week") Week
+            option(value="day") Day
+            option(value="hour") Hour
+    div.report-list#top10-list

@@ -1,4 +1,5 @@
 export const API_URL = `http://dev-apps.thewellcloud.cloud/admin/api/`;
+export const ASSETS_URL = `http://dev-apps.thewellcloud.cloud/__connectbox_assets__/`;
 
 /**
  * Analyse a completed request to detect errors (and call error callback), or continue (and call success callback)
@@ -13,10 +14,11 @@ function analyseResponse(req, callbackSuccess, callbackError) {
         return callbackError(req.status, req.responseText);
     try {
         const res = JSON.parse(req.responseText);
-        if(res.code !== 0) return callbackError(req.status, req.responseText);
+        if (res.code && res.code !== 0) return callbackError(req.status, req.responseText);
 
-        callbackSuccess(res.result[0])
+        callbackSuccess(res?.result?.[0] !== undefined || res);
     } catch (e) {
+        console.error(e)
         callbackError(req.status, req.responseText);
     }
 }
@@ -28,13 +30,14 @@ function analyseResponse(req, callbackSuccess, callbackError) {
  * @param callback the callback if request succeed
  * @param callbackError the callback if request (or parsing) fail
  */
-export function get(url, token, callback, callbackError = console.log) {
+export function get(url, token, callback, callbackError = console.error) {
     const oReq = new XMLHttpRequest();
     oReq.onload = () => {
         analyseResponse(oReq, callback, callbackError)
     }
     oReq.open("get", url, true);
-    oReq.setRequestHeader('Authorization', `Basic ${token}`);
+    if (token)
+        oReq.setRequestHeader('Authorization', `Basic ${token}`);
     oReq.send();
 }
 
@@ -47,7 +50,7 @@ export function get(url, token, callback, callbackError = console.log) {
  * @param callback the callback if request succeed
  * @param callbackError the callback if request (or parsing) fail
  */
-export function put(url, token, payload, callback, callbackError = console.log) {
+export function put(url, token, payload, callback, callbackError = console.error) {
     const oReq = new XMLHttpRequest();
     oReq.onload = () => {
         analyseResponse(oReq, callback, callbackError);

@@ -1,0 +1,32 @@
+extends ../../../layout/form
+
+block variables
+    - var id = 'stats'
+
+block icon
+    include ../../../icons/chart
+
+block title
+    | All Requests
+
+block form
+    div.report-controls
+        select.input-text(name="stats-period-type", id="stats-period-type")
+            option(value="year") Year
+            option(value="month") Month
+            option(value="week") Week
+        select.input-text(name="stats-period", id="stats-period")
+        div
+            button.bg-transparent.border-0#stats-controls-previous(type='button')
+                include ../../../icons/chevron-left
+            #stats-controls-start
+                | 0
+            | -
+            #stats-controls-end
+                | 0
+            | /
+            #stats-controls-total
+                | 0
+            button.bg-transparent.border-0#stats-controls-next(type='button')
+                include ../../../icons/chevron-right
+    div.report-list#stats-list
