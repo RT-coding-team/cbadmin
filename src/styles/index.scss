@@ -2,11 +2,8 @@
 @import "~@fontsource/roboto/300.css";
 @import "~bootstrap/scss/functions";
 
-$h1-font-size:  '1.3rem';
-$h2-font-size:  '1.2rem';
-$primary: #486da4;
-$secondary: #b1c8ef;
-$dark: #3b6a8a;
+// In this file override variables, colors, ...
+@import "config";
 
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
@@ -25,41 +22,13 @@ $dark: #3b6a8a;
 @import "utils";
 @import "icons";
 @import "snackbar";
+@import "reports";
 
 html, body{
   background-color: #f6f6f6;
   font-family: Roboto;
 }
 
-.report-list{
-  margin-top: 10px;
-  div{
-    position: relative;
-    :last-child{
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-  }
-}
-
-.report-controls{
-  * {
-    margin-right: 5px;
-    margin-left: 5px;
-  }
-  div{
-    display: inline-block;
-  }
-  >:last-child{
-    float: right;
-  }
-  svg{
-    width: 16px;
-    height: 16px;
-    margin-left: 12px;
-  }
-}
 
 
 

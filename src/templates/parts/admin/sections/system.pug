@@ -1,11 +1,11 @@
 extends ../../../layout/section
 
-mixin script(name)
+mixin script(name, id)
     div.mt-3
         include  ../../../icons/settings
         = name
         .float-end
-            button.bg-transparent.border-0.text-primary.p-0
+            button.bg-transparent.border-0.text-primary.p-0(id=`${id}-button`)
                 include  ../../../icons/play
 
 block title
@@ -13,7 +13,7 @@ block title
     | System
 
 block content
-    +script('Unmount USB')
-    +script('Shutdown')
-    +script('Reboot')
-    +script('Reset')
+    +script('Unmount USB', 'unmountusb')
+    +script('Shutdown', 'shutdown')
+    +script('Reboot', 'reboot')
+    +script('Reset', 'reset')

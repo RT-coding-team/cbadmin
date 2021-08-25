@@ -5,6 +5,7 @@ import logout from "./admin/logout";
 import load from "./admin/load";
 import attachUpdateCallbacks from "./admin/update";
 import initReports from "./admin/reports";
+import attachSystemScripts from "./admin/scripts";
 
 /**
  * State
@@ -41,4 +42,5 @@ window.addEventListener('load', () => {
     load(token);
     attachUpdateCallbacks(token);
     initReports(token)
+    attachSystemScripts(token);
 })

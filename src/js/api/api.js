@@ -56,6 +56,28 @@ export function put(url, token, payload, callback, callbackError = console.error
         analyseResponse(oReq, callback, callbackError);
     }
     oReq.open("put", url, true);
+    oReq.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
     oReq.setRequestHeader('Authorization', token);
+    oReq.send(JSON.stringify(payload))
+}
+
+
+/**
+ * Send a post request and parse result
+ *
+ * @param url the url where to send the request (to the API)
+ * @param token to authenticate the request
+ * @param payload the content
+ * @param callback the callback if request succeed
+ * @param callbackError the callback if request (or parsing) fail
+ */
+export function post(url, token, payload, callback, callbackError = console.error) {
+    const oReq = new XMLHttpRequest();
+    oReq.onload = () => {
+        analyseResponse(oReq, callback, callbackError);
+    }
+    oReq.open("post", url, true);
+    oReq.setRequestHeader('Authorization', token);
+    oReq.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
     oReq.send(JSON.stringify(payload))
 }

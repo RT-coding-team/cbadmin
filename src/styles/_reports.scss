@@ -1,0 +1,30 @@
+
+.report-list{
+  margin-top: 10px;
+  div{
+    position: relative;
+    :last-child{
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}
+
+.report-controls{
+  * {
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+  div{
+    display: inline-block;
+  }
+  >:last-child{
+    float: right;
+  }
+  svg{
+    width: 16px;
+    height: 16px;
+    margin-left: 12px;
+  }
+}
