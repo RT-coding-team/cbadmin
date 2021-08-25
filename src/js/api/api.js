@@ -37,7 +37,7 @@ export function get(url, token, callback, callbackError = console.error) {
     }
     oReq.open("get", url, true);
     if (token)
-        oReq.setRequestHeader('Authorization', `Basic ${token}`);
+        oReq.setRequestHeader('Authorization', token);
     oReq.send();
 }
 
@@ -56,6 +56,6 @@ export function put(url, token, payload, callback, callbackError = console.error
         analyseResponse(oReq, callback, callbackError);
     }
     oReq.open("put", url, true);
-    oReq.setRequestHeader('Authorization', `Basic ${token}`);
+    oReq.setRequestHeader('Authorization', token);
     oReq.send(JSON.stringify(payload))
 }
