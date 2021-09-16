@@ -16,7 +16,7 @@ function login(e) {
         else errorMessage.innerText = 'Unknown error occurred. Please try later'
     }
 
-    get(`${API_URL}ui-config`, token, successCallback, errorCallback);
+    get(`${API_URL}ui-config`, `Basic ${token}`, successCallback, errorCallback);
 }
 
 document.getElementById('loginForm').addEventListener('submit', login);
