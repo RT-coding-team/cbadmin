@@ -24,7 +24,8 @@ function successCallback(id) {
  * Open a snackbar and display an error message
  * @param name the updated field
  */
-function errorCallback(id) {
+function errorCallback(id, code) {
+    if(code === 401) window.location.href = "/login.html";
     openSnackBar(`${messages[id]} not initiated`, 'error');
 }
 
@@ -37,7 +38,7 @@ function attachSystemScript(id, token) {
     const button = document.getElementById(`${id}-button`)
 
     button.addEventListener('click', () => {
-        post(`${API_URL}system`,token,{value:id},()=>successCallback(id), ()=>errorCallback(id))
+        post(`${API_URL}system`,token,{value:id},()=>successCallback(id), (code)=>errorCallback(id, code))
     })
 }
 

@@ -13,7 +13,8 @@ function successCallback(name) {
  * Open a snackbar and display an error message
  * @param name the updated field
  */
-function errorCallback() {
+function errorCallback(code) {
+    if(code === 401) window.location.href = "/login.html";
     openSnackBar('Unknown error occurred. Please try later', 'error');
 }
 

@@ -4,7 +4,8 @@ import openSnackBar from "../components/snackbar";
 /**
  * When there is an error, show a message in the top
  */
-function errorCallback() {
+function errorCallback(code) {
+    if(code === 401) window.location.href = "/login.html";
     openSnackBar('Unknown error occurred. Please try later', 'error');
 }
 
