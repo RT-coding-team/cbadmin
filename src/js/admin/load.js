@@ -110,7 +110,6 @@ export default function (token) {
     getProperty('wpa-passphrase-input', 'wpa-passphrase', token);
 
     getProperty('server_url-input', 'brand/server_url', token, stringParserRenderer);
-    getProperty('server_authorization-input', 'brand/server_authorization', token, stringParserRenderer);
     getProperty('server_sitename-input', 'brand/server_sitename', token, stringParserRenderer);
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
