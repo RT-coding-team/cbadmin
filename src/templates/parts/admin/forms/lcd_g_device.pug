@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'lcd_g_device'
+
+block icon
+    include ../../../icons/wifi
+
+block title
+    | Serial Device
+
+block form
+    div.position-relative
+        input.w-100.input-text#lcd_g_device-input(placeholder='Serial Device', name='lcd_g_device')
+        +button-save('lcd_g_device')

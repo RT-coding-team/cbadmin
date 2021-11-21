@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'client-ssid'
+
+block icon
+    include ../../../icons/wifi
+
+block title
+    | Client SSID
+
+block form
+    div.position-relative
+        input.w-100.input-text#client-ssid-input(placeholder='Client SSID', name='client-ssid')
+        +button-save('client-ssid')

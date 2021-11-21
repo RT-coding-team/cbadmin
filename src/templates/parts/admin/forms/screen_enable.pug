@@ -1,0 +1,25 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'Screen_Enable'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Screen Enable
+
+block form
+    div.position-relative
+        +switch('screen_enable_main_page', 'Show LCD Main Page')
+    div.position-relative
+        +switch('screen_enable_info_page', 'Show LCD Info Page')
+    div.position-relative
+        +switch('screen_enable_battery_page', 'Show LCD Battery Page')
+    div.position-relative
+        +switch('screen_enable_memory_page', 'Show LCD Memory Page')
+    div.position-relative
+        +switch('screen_enable_stats_pages', 'Show LCD Stats Pages')
+    div.position-relative
+        +switch('screen_enable_admin_pages', 'Show LCD Admin Pages')

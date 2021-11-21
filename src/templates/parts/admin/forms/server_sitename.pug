@@ -2,15 +2,15 @@ extends ../../../layout/form
 include ../../../mixins/button-save
 
 block variables
-    - var id = 'banner-message'
+    - var id = 'server_sitename'
 
 block icon
     include ../../../icons/blockquote
 
 block title
-    | Banner message
+    | Site Name
 
 block form
     div.position-relative
-        textarea.w-100.input-text#banner-message-input(placeholder='Banner message', name='banner-message')
+        input.w-100.input-text#server_sitename-input(placeholder='Site Name', name='server_sitename')
         +button-save(id)

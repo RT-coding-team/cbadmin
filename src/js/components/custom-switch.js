@@ -17,5 +17,5 @@ for (let i = 0; i < switches.length | 0; i++) {
             input.checked = true
         }
         switches[i].className = classNames.join(' ');
-    })
+    });
 }

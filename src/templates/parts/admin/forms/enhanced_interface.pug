@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'enhanced'
+
+block icon
+    include ../../../icons/wifi
+
+block title
+    | Use Enhanced Interface
+
+block form
+    div.position-relative
+        +switch('enhanced', 'Use Enhanced Interface')

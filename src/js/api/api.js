@@ -1,5 +1,5 @@
-export const API_URL = `/admin/api/`;
-export const ASSETS_URL = `/__connectbox_assets__/`;
+export const API_URL = `http://10.42.0.62/admin/api/`;
+export const ASSETS_URL = `http://10.42.0.62/__connectbox_assets__/`;
 
 /**
  * Analyse a completed request to detect errors (and call error callback), or continue (and call success callback)
@@ -18,7 +18,7 @@ function analyseResponse(req, callbackSuccess, callbackError) {
 
         callbackSuccess(res?.result?.[0] !== undefined ? res.result[0] : res);
     } catch (e) {
-        console.error(e)
+        console.log(e)
         callbackError(req.status, req.responseText);
     }
 }

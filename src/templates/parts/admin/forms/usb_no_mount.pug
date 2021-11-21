@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'usb0NoMount'
+
+block icon
+    include ../../../icons/usb
+
+block title
+    | Don’t Mount USB
+
+block form
+    div.position-relative
+        +switch('usb0NoMount', 'Don’t Mount USB')

@@ -1,18 +1,16 @@
 extends ../../../layout/form
-include ../../../mixins/switch
 include ../../../mixins/button-save
 
 block variables
-    - var id = 'static-site-config'
+    - var id = 'server_authorization'
 
 block icon
     include ../../../icons/key
 
 block title
-    | Static site configuration
+    | Server Authorization Key
 
 block form
     div.position-relative
-        +switch(id, 'Enable')
+        input.w-100.input-text#server_authorization-input(placeholder='Server Authorization Key', name='server_authorization')
         +button-save(id)
-
