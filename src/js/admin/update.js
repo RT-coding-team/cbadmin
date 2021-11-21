@@ -14,7 +14,7 @@ function successCallback(name) {
  * @param name the updated field
  */
 function errorCallback(code) {
-    if (code === 401) window.location.href = "/login.html";
+    if (code === 401) window.location.href = "/admin/login.html";
     openSnackBar('Unknown error occurred. Please try later', 'error');
 }
 

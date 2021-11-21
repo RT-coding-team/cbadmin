@@ -25,7 +25,7 @@ function successCallback(id) {
  * @param name the updated field
  */
 function errorCallback(id, code) {
-    if(code === 401) window.location.href = "/login.html";
+    if(code === 401) window.location.href = "/admin/login.html";
     openSnackBar(`${messages[id]} not initiated`, 'error');
 }
 
