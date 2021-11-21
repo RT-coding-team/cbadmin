@@ -82,10 +82,20 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
     })
 }
 
+/**
+ * Get the state of a switch (checked / not checked) and convert to int 1 or 0
+ * @param id the id of the switch
+ * @returns {number}
+ */
 function getSwitchStatus(id) {
     return document.getElementById(`${id}-input`).checked ? 1 : 0
 }
 
+/**
+ * As soon as one of the switch of screen enable is clicked, send PUT request to set Screen_Enable, with all other switches
+ * @param id the id of the switch to listen to
+ * @param token the token to authenticate the requests
+ */
 function attacheUpdateCallbackToScreenEnable(id, token) {
     const element = document.getElementById(`${id}-switch`)
     element.addEventListener('click', (e) => {
@@ -120,6 +130,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
     attachUpdateBrandCallbackToSwitch('enhanced', 'enhanced', token);
 
+    // Screen_Enable group of switches
     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_info_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_battery_page', token);
@@ -127,6 +138,7 @@ export default function attachUpdateCallbacks(token) {
     attacheUpdateCallbackToScreenEnable('screen_enable_stats_pages', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
 
+    // Brand text inputs
     attachUpdateBrandCallbackToTextField('server_url', 'server_url', token);
     attachUpdateBrandCallbackToTextField('server_authorization', 'server_authorization', token);
     attachUpdateBrandCallbackToTextField('server_sitename', 'server_sitename', token);

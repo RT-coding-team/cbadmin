@@ -2,6 +2,19 @@ import {API_URL, get} from "../api/api";
 import openSnackBar from "../components/snackbar";
 
 /**
+ * Helper to activate a switch at the beginning
+ *
+ * @param id the base id of the switch to activate
+ */
+function activateSwitch(id) {
+    const classNames = document.getElementById(`${id}-switch`).className
+        .split(' ')
+        .filter(className => className !== "form-checkbox-div--unchecked");
+    document.getElementById(`${id}-switch`).className = [...classNames, 'form-checkbox-div--checked'].join(' ');
+    document.getElementById(`${id}-input`).checked = true;
+}
+
+/**
  * When there is an error, show a message in the top
  */
 function errorCallback(code) {
@@ -19,10 +32,22 @@ function defaultRenderer(element, value) {
     element.value = value
 }
 
+/**
+ * Renderer to activate a switch if value is the string "1"
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
 function switchRenderer(element, value) {
     if(value === '"1"') activateSwitch(element.id);
 }
 
+/**
+ * Renderer to parse a JSON to a string and set it as a value to a text input
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
 function stringParserRenderer(element, prop) {
     try {
         const parsedProp = JSON.parse(prop)
@@ -47,14 +72,11 @@ function getProperty(id, name, token, renderer = defaultRenderer) {
     get(`${API_URL}${name}`, token, successCallback, errorCallback);
 }
 
-function activateSwitch(id) {
-    const classNames = document.getElementById(`${id}-switch`).className
-        .split(' ')
-        .filter(className => className !== "form-checkbox-div--unchecked");
-    document.getElementById(`${id}-switch`).className = [...classNames, 'form-checkbox-div--checked'].join(' ');
-    document.getElementById(`${id}-input`).checked = true;
-}
-
+/**
+ * Get Screen_Enable from server, and activate (or not) corresponding screens switches
+ *
+ * @param token the authorization token
+ */
 function getScreenEnable(token) {
     const successCallback = (prop) => {
         try {
