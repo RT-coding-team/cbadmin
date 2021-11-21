@@ -34,7 +34,6 @@ function setProperty(name, payload, token) {
  * @param updateCallback the callback to attach
  */
 function attachUpdate(id, updateCallback) {
-    console.log(id)
     const form = document.getElementById(`${id}-send`);
     form.addEventListener('click', updateCallback)
 }
@@ -124,6 +123,8 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('wpa-passphrase', 'wpa-passphrase', token);
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
+    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token);
+    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token);
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('enable_mass_storage', 'enable_mass_storage', token);
@@ -146,6 +147,4 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_email', 'server_siteadmin_email', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
     attachUpdateBrandCallbackToTextField('g_device', 'lcd_g_device', token);
-    attachUpdateBrandCallbackToTextField('openwell-download', 'openwell-download', token);
-    attachUpdateBrandCallbackToTextField('moodle_download', 'moodle_download', token);
 }
