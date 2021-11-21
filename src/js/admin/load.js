@@ -2,10 +2,23 @@ import {API_URL, get} from "../api/api";
 import openSnackBar from "../components/snackbar";
 
 /**
+ * Helper to activate a switch at the beginning
+ *
+ * @param id the base id of the switch to activate
+ */
+function activateSwitch(id) {
+    const classNames = document.getElementById(`${id}-switch`).className
+        .split(' ')
+        .filter(className => className !== "form-checkbox-div--unchecked");
+    document.getElementById(`${id}-switch`).className = [...classNames, 'form-checkbox-div--checked'].join(' ');
+    document.getElementById(`${id}-input`).checked = true;
+}
+
+/**
  * When there is an error, show a message in the top
  */
 function errorCallback(code) {
-    if(code === 401) window.location.href = "/login.html";
+    if (code === 401) window.location.href = "/login.html";
     openSnackBar('Unknown error occurred. Please try later', 'error');
 }
 
@@ -17,6 +30,31 @@ function errorCallback(code) {
  */
 function defaultRenderer(element, value) {
     element.value = value
+}
+
+/**
+ * Renderer to activate a switch if value is the string "1"
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function switchRenderer(element, value) {
+    if(value === '"1"') activateSwitch(element.id);
+}
+
+/**
+ * Renderer to parse a JSON to a string and set it as a value to a text input
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function stringParserRenderer(element, prop) {
+    try {
+        const parsedProp = JSON.parse(prop)
+        element.value = parsedProp || "";
+    } catch (e) {
+        element.value = "";
+    }
 }
 
 /**
@@ -35,21 +73,59 @@ function getProperty(id, name, token, renderer = defaultRenderer) {
 }
 
 /**
+ * Get Screen_Enable from server, and activate (or not) corresponding screens switches
+ *
+ * @param token the authorization token
+ */
+function getScreenEnable(token) {
+    const successCallback = (prop) => {
+        try {
+            const pages = JSON.parse(prop);
+            if (pages[0])
+                activateSwitch("screen_enable_main_page");
+            if (pages[1])
+                activateSwitch("screen_enable_info_page");
+            if (pages[2])
+                activateSwitch("screen_enable_battery_page");
+            if (pages[3])
+                activateSwitch("screen_enable_memory_page");
+            if (pages.slice(4, 12).every(x=>x))
+                activateSwitch("screen_enable_stats_pages");
+            if (pages[12])
+                activateSwitch("screen_enable_admin_pages");
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    get(`${API_URL}brand/Screen_Enable`, token, successCallback, errorCallback);
+}
+
+/**
  * Get all readable params and set values of inputs
  *
  * @param token the authorization token
  */
 export default function (token) {
     getProperty('ssid-input', 'ssid', token);
+    getProperty('wpa-passphrase-input', 'wpa-passphrase', token);
+
+    getProperty('server_url-input', 'brand/server_url', token, stringParserRenderer);
+    getProperty('server_sitename-input', 'brand/server_sitename', token, stringParserRenderer);
+    getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
+    getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
+    getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
+    getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
+    getProperty('openwell-download-input', 'brand/openwell-download', token, stringParserRenderer);
+    getProperty('moodle_download-input', 'brand/moodle_download', token, stringParserRenderer);
+
+    getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
+    getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
+    getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
+
+    getProperty('client-ssid-input', 'client-ssid', token);
     getProperty('channel-input', 'channel', token);
-    getProperty('static-site-config-input', 'staticsite', token, (element, value) => {
-        element.checked = value === 'true'
-    });
     getProperty('hostname-input', 'hostname', token);
-    getProperty('banner-message-input', 'ui-config', token, (element, value) => {
-        const uiConfig = JSON.parse(value);
-        element.value = uiConfig?.Client?.banner || "";
-        element.setAttribute('data-ui-config', value);
-    });
+
+    getScreenEnable(token);
 }
 

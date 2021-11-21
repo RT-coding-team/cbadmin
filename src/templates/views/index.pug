@@ -15,11 +15,13 @@ block content
         .container-fluid.p-0.m-0
             .row.row-cols-1.row-cols-xl-3
                 .col
+                    include  ../parts/admin/sections/password
                     include ../parts/admin/sections/wireless_access_point
+                    include ../parts/admin/sections/client_wi_fi
                     include ../parts/admin/sections/web_server
                 .col
-                    include ../parts/admin/sections/user_interface
-                    include  ../parts/admin/sections/password
+                    include ../parts/admin/sections/server_connection
+                    include ../parts/admin/sections/lcd_configuration
                     include  ../parts/admin/sections/system
                 .col
                     include  ../parts/admin/sections/reports

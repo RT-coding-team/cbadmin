@@ -5,6 +5,7 @@
   height: 16px;
   border-radius: 8px;
   position: relative;
+  margin-right: 8px;
   div{
     width: 10px;
     height: 10px;
@@ -16,10 +17,10 @@
 
 .form-checkbox-div--checked
 {
-  background-color: #87a7d7;
-  border: solid 1px #87a7d7;
+  background-color: $secondary;
+  border: solid 1px $primary;
   div{
-    background-color: #fff;
+    background-color: $primary;
     left: auto;
     right: 2px;
   }

@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'server_url'
+
+block icon
+    include ../../../icons/edit
+
+block title
+    | Server URL
+
+block form
+    div.position-relative
+        input.w-100.input-text#server_url-input(placeholder='Server URL', name='server_url')
+        +button-save(id)

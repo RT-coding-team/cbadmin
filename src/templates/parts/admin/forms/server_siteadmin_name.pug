@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'server_siteadmin_name'
+
+block icon
+    include ../../../icons/admin
+
+block title
+    | Administrator Name
+
+block form
+    div.position-relative
+        input.w-100.input-text#server_siteadmin_name-input(placeholder='Administrator Name', name='server_siteadmin_name')
+        +button-save(id)
