@@ -1,16 +1,8 @@
-extends ../../../layout/form
-include ../../../mixins/button-save
+div.mb-3
+    include ../../../icons/channel
+    label(for="client-ssid-input")
+        | Client SSID
 
-block variables
-    - var id = 'client-ssid'
-
-block icon
-    include ../../../icons/wifi
-
-block title
-    | Client SSID
-
-block form
+div.form-accordion-content.hidden.mb-4.ms-15-icon.me-5
     div.position-relative
         input.w-100.input-text#client-ssid-input(placeholder='Client SSID', name='client-ssid')
-        +button-save('client-ssid')

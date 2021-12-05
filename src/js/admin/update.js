@@ -76,8 +76,18 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
     const element = document.getElementById(`${id}-switch`)
     element.addEventListener('click', (e) => {
         e.preventDefault();
-        const value = document.getElementById(`${id}-input`).checked ? 1 : 0 ;
-        setProperty("brand", {value:`${name}=${value}`}, token);
+        const value = document.getElementById(`${id}-input`).checked ? 1 : 0;
+        setProperty("brand", {value: `${name}=${value}`}, token);
+    })
+}
+
+function attachUpdateToMultipleTextFields(fields, id, token) {
+    attachUpdate(id, (e) => {
+        e.preventDefault();
+        for (let i = 0; i < fields.length; i++) {
+            const value = document.getElementById(`${fields[i].id}-input`).value;
+            setProperty(fields[i].name, {value}, token);
+        }
     })
 }
 
@@ -115,12 +125,19 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
  * @param token the token to authenticate the requests
  */
 export default function attachUpdateCallbacks(token) {
+    // Multiple text fields
+    attachUpdateToMultipleTextFields([
+        {id: 'ssid', name: 'ssid'},
+        {id: 'channel', name: 'channel'},
+        {id: 'wpa-passphrase', name: 'wpa-passphrase'},
+    ], 'wap', token);
+    attachUpdateToMultipleTextFields([
+        {id: 'client-ssid', name: 'client-ssid'},
+        {id: 'client-wifipassword', name: 'client-wifipassword'},
+        {id: 'client-wificountry', name: 'client-wificountry'},
+    ], 'client_wifi', token);
+
     // Text fields
-    attachUpdateCallbackToTextField('ssid', 'ssid', token);
-    attachUpdateCallbackToTextField('client-ssid', 'client-ssid', token);
-    attachUpdateCallbackToTextField('client-wifipassword', 'client-wifipassword', token);
-    attachUpdateCallbackToTextField('channel', 'channel', token);
-    attachUpdateCallbackToTextField('wpa-passphrase', 'wpa-passphrase', token);
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
     attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token);

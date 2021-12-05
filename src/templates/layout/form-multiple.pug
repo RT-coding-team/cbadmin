@@ -1,0 +1,16 @@
+block variables
+    - var id=null
+
+form.d-flex.flex-row
+    div.flex-grow-1
+        block items
+    div.d-flex.flex-column.justify-content-center
+        div.position-relative
+            a.btn-open-form(id="btn-open-form-"+id, data-input-name=id)
+                include ../icons/chevron-down
+            a.hidden.btn-close-form(id="btn-close-form-"+id, data-input-name=id)
+                include ../icons/chevron-up
+            .button-save.mt-3.hidden
+                button.bg-transparent.border-0.p-0.text-primary(id=id + '-send', type="submit")
+                    include ../icons/save
+
