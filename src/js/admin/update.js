@@ -24,8 +24,8 @@ function errorCallback(code) {
  * @param payload the payload (often  {value:...})
  * @param token the token to authenticate the request
  */
-function setProperty(name, payload, token) {
-    put(`${API_URL}${name}`, token, payload, () => successCallback(name), errorCallback)
+function setProperty(name, payload, token, callback) {
+    put(`${API_URL}${name}`, token, payload, callback || (() => successCallback(name)), errorCallback)
 }
 
 /**
@@ -39,6 +39,28 @@ function attachUpdate(id, updateCallback) {
 }
 
 /**
+ * Show spinner instead of done icon
+ * @param id
+ */
+function showLoader(id) {
+    document.getElementById(`${id}-send`).style.display = 'none';
+    const loader = document.getElementById(`${id}-loader`)
+    if(loader)
+        loader.style.display = 'block';
+}
+
+/**
+ * Hide spinner and show save icon again
+ * @param id
+ */
+function hideLoader(id) {
+    document.getElementById(`${id}-send`).style.display = 'block';
+    const loader = document.getElementById(`${id}-loader`)
+    if(loader)
+        loader.style.display = 'none';
+}
+
+/**
  * Send new value of a textual field when clicked on the send button
  * @param name the name of the field for the api
  * @param id the id of the form
@@ -47,8 +69,12 @@ function attachUpdate(id, updateCallback) {
 function attachUpdateCallbackToTextField(name, id, token) {
     attachUpdate(id, (e) => {
         e.preventDefault();
+        showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty(name, {value}, token);
+        setProperty(name, {value}, token, () => {
+            successCallback(name);
+            hideLoader(id);
+        });
     })
 }
 
@@ -61,8 +87,12 @@ function attachUpdateCallbackToTextField(name, id, token) {
 function attachUpdateBrandCallbackToTextField(name, id, token) {
     attachUpdate(id, (e) => {
         e.preventDefault();
+        showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty("brand", {value: `${name}=${value}`}, token);
+        setProperty("brand", {value: `${name}=${value}`}, token, () => {
+            successCallback(name);
+            hideLoader(id);
+        });
     })
 }
 
@@ -81,13 +111,48 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
     })
 }
 
+/**
+ * Make several API call to set a property sequentials recursively
+ *
+ * Proof of termination:
+ *  - base case: i = values.length < infty
+ *  - invariant: (values.length - i) is a positive integer decreasing strictly
+ *  So this function ends as soon as i starts under names.length (in practice, start at 0 is safe)
+ *
+ * @param i the index
+ * @param names an array of names of fields
+ * @param values an array of values to send
+ * @param token the token
+ */
+function setPropertyRecursive(i, names, values, token, finalCallback) {
+    if (i >= values.length)
+        finalCallback();
+
+    const value = values[i];
+    setProperty(names[i], {value}, token, () => {
+        successCallback(names[i]);
+        setPropertyRecursive(i + 1, names, values, token, finalCallback);
+    });
+}
+
+/**
+ * Attach to a single button (by id) sending of several fields (in fields)
+ * @param fields an array of fields [{name:String, id:String}]
+ * @param id the id of the button
+ * @param token the token
+ */
 function attachUpdateToMultipleTextFields(fields, id, token) {
     attachUpdate(id, (e) => {
         e.preventDefault();
-        for (let i = 0; i < fields.length; i++) {
-            const value = document.getElementById(`${fields[i].id}-input`).value;
-            setProperty(fields[i].name, {value}, token);
-        }
+
+        showLoader(id);
+
+        const names = fields.map(field => field.name);
+        const values = fields.map(field => document.getElementById(`${field.id}-input`).value)
+
+        setPropertyRecursive(0, names, values, token, () => {
+            hideLoader(id);
+        });
     })
 }
 
@@ -112,6 +177,7 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
             getSwitchStatus('screen_enable_main_page'),
             getSwitchStatus('screen_enable_info_page'),
             getSwitchStatus('screen_enable_battery_page'),
+            getSwitchStatus('screen_enable_battery_details_page'),
             getSwitchStatus('screen_enable_memory_page'),
             ...(getSwitchStatus('screen_enable_stats_pages') ? [1, 1, 1, 1, 1, 1, 1, 1] : [0, 0, 0, 0, 0, 0, 0, 0]),
             getSwitchStatus('screen_enable_admin_pages'),
@@ -152,6 +218,7 @@ export default function attachUpdateCallbacks(token) {
     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_info_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_battery_page', token);
+    attacheUpdateCallbackToScreenEnable('screen_enable_battery_details_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_memory_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_stats_pages', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
