@@ -23,9 +23,18 @@ function errorCallback(code) {
  * @param name the name of the field for the API
  * @param payload the payload (often  {value:...})
  * @param token the token to authenticate the request
+ * @param callback if provided, override the default callback (that open a modal)
+ * @param loaderId if provided, hide the loader associated and show the button with this id
  */
-function setProperty(name, payload, token, callback) {
-    put(`${API_URL}${name}`, token, payload, callback || (() => successCallback(name)), errorCallback)
+function setProperty(name, payload, token, callback, loaderId=null) {
+    put(`${API_URL}${name}`, token, payload, () => {
+        if(callback) callback(name);
+        else successCallback(name);
+        if(loaderId) hideLoader(loaderId)
+    }, (code) => {
+        errorCallback(code);
+        if(loaderId) hideLoader(loaderId);
+    })
 }
 
 /**
@@ -71,10 +80,7 @@ function attachUpdateCallbackToTextField(name, id, token) {
         e.preventDefault();
         showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty(name, {value}, token, () => {
-            successCallback(name);
-            hideLoader(id);
-        });
+        setProperty(name, {value}, token, null, id);
     })
 }
 
@@ -89,10 +95,7 @@ function attachUpdateBrandCallbackToTextField(name, id, token) {
         e.preventDefault();
         showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty("brand", {value: `${name}=${value}`}, token, () => {
-            successCallback(name);
-            hideLoader(id);
-        });
+        setProperty("brand", {value: `${name}=${value}`}, token, null, id);
     })
 }
 
@@ -123,16 +126,16 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
  * @param names an array of names of fields
  * @param values an array of values to send
  * @param token the token
+ * @param loaderId the id of the button to show when all requests are completed
  */
-function setPropertyRecursive(i, names, values, token, finalCallback) {
-    if (i >= values.length)
-        finalCallback();
+function setPropertyRecursive(i, names, values, token, loaderId) {
+    if (i >= values.length) return;
 
     const value = values[i];
     setProperty(names[i], {value}, token, () => {
         successCallback(names[i]);
-        setPropertyRecursive(i + 1, names, values, token, finalCallback);
-    });
+        setPropertyRecursive(i + 1, names, values, token, loaderId);
+    }, i === values.length - 1 ? loaderId : null);
 }
 
 /**
@@ -150,9 +153,7 @@ function attachUpdateToMultipleTextFields(fields, id, token) {
         const names = fields.map(field => field.name);
         const values = fields.map(field => document.getElementById(`${field.id}-input`).value)
 
-        setPropertyRecursive(0, names, values, token, () => {
-            hideLoader(id);
-        });
+        setPropertyRecursive(0, names, values, token, id);
     })
 }
 
@@ -204,6 +205,7 @@ export default function attachUpdateCallbacks(token) {
     ], 'client_wifi', token);
 
     // Text fields
+    attachUpdateCallbackToTextField('wipe', 'wipe', token);
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
     attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token);

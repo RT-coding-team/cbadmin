@@ -4,8 +4,6 @@ for (let i = 0; i < openButtons.length | 0; i++) {
     const contentBlocks = openButtons[i].parentElement.parentElement.parentElement.getElementsByClassName('form-accordion-content');
     const saveButtons = openButtons[i].parentElement.parentElement.parentElement.getElementsByClassName('button-save');
 
-    console.log(saveButtons);
-
     openButtons[i].addEventListener('click', () => {
         for (let j = 0; j < contentBlocks.length; j++)
             contentBlocks[j].style.display = "block";
