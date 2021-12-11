@@ -1,12 +1,14 @@
 import {API_URL, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
+import openPopup from "../components/popup";
+import {successMessage, successMessages} from "../messages/messages";
 
 /**
  * Open a snackbar and display a success message
  * @param name the updated field
  */
 function successCallback(name) {
-    openSnackBar(`${name} updated!`, 'success');
+    openSnackBar(successMessage(name), 'success');
 }
 
 /**
@@ -26,14 +28,14 @@ function errorCallback(code) {
  * @param callback if provided, override the default callback (that open a modal)
  * @param loaderId if provided, hide the loader associated and show the button with this id
  */
-function setProperty(name, payload, token, callback, loaderId=null) {
+function setProperty(name, payload, token, callback, loaderId = null) {
     put(`${API_URL}${name}`, token, payload, () => {
-        if(callback) callback(name);
+        if (callback) callback(name);
         else successCallback(name);
-        if(loaderId) hideLoader(loaderId)
+        if (loaderId) hideLoader(loaderId)
     }, (code) => {
         errorCallback(code);
-        if(loaderId) hideLoader(loaderId);
+        if (loaderId) hideLoader(loaderId);
     })
 }
 
@@ -54,7 +56,7 @@ function attachUpdate(id, updateCallback) {
 function showLoader(id) {
     document.getElementById(`${id}-send`).style.display = 'none';
     const loader = document.getElementById(`${id}-loader`)
-    if(loader)
+    if (loader)
         loader.style.display = 'block';
 }
 
@@ -65,7 +67,7 @@ function showLoader(id) {
 function hideLoader(id) {
     document.getElementById(`${id}-send`).style.display = 'block';
     const loader = document.getElementById(`${id}-loader`)
-    if(loader)
+    if (loader)
         loader.style.display = 'none';
 }
 
@@ -75,12 +77,12 @@ function hideLoader(id) {
  * @param id the id of the form
  * @param token the token to authenticate the request
  */
-function attachUpdateCallbackToTextField(name, id, token) {
+function attachUpdateCallbackToTextField(name, id, token, callback = null) {
     attachUpdate(id, (e) => {
         e.preventDefault();
         showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty(name, {value}, token, null, id);
+        setProperty(name, {value}, token, callback, id);
     })
 }
 
@@ -128,13 +130,13 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
  * @param token the token
  * @param loaderId the id of the button to show when all requests are completed
  */
-function setPropertyRecursive(i, names, values, token, loaderId) {
+function setPropertyRecursive(i, names, values, token, loaderId, finalSuccessCallback) {
     if (i >= values.length) return;
 
     const value = values[i];
     setProperty(names[i], {value}, token, () => {
-        successCallback(names[i]);
-        setPropertyRecursive(i + 1, names, values, token, loaderId);
+        if (i === values.length - 1) finalSuccessCallback();
+        setPropertyRecursive(i + 1, names, values, token, loaderId, finalSuccessCallback);
     }, i === values.length - 1 ? loaderId : null);
 }
 
@@ -144,7 +146,7 @@ function setPropertyRecursive(i, names, values, token, loaderId) {
  * @param id the id of the button
  * @param token the token
  */
-function attachUpdateToMultipleTextFields(fields, id, token) {
+function attachUpdateToMultipleTextFields(fields, id, token, callback) {
     attachUpdate(id, (e) => {
         e.preventDefault();
 
@@ -153,7 +155,7 @@ function attachUpdateToMultipleTextFields(fields, id, token) {
         const names = fields.map(field => field.name);
         const values = fields.map(field => document.getElementById(`${field.id}-input`).value)
 
-        setPropertyRecursive(0, names, values, token, id);
+        setPropertyRecursive(0, names, values, token, id, callback);
     })
 }
 
@@ -197,19 +199,19 @@ export default function attachUpdateCallbacks(token) {
         {id: 'ssid', name: 'ssid'},
         {id: 'channel', name: 'channel'},
         {id: 'wpa-passphrase', name: 'wpa-passphrase'},
-    ], 'wap', token);
+    ], 'wap', token, () => successCallback('wap'));
     attachUpdateToMultipleTextFields([
         {id: 'client-ssid', name: 'client-ssid'},
         {id: 'client-wifipassword', name: 'client-wifipassword'},
         {id: 'client-wificountry', name: 'client-wificountry'},
-    ], 'client_wifi', token);
+    ], 'client_wifi', token, () => successCallback('client_wifi'));
 
     // Text fields
-    attachUpdateCallbackToTextField('wipe', 'wipe', token);
+    attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token);
-    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token);
+    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('enable_mass_storage', 'enable_mass_storage', token);

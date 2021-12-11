@@ -44,3 +44,10 @@ window.addEventListener('load', () => {
     initReports(token)
     attachSystemScripts(token);
 })
+
+/**
+ * Attach callback to popup backdrop to close it
+ */
+const popup = document.getElementById("popup");
+popup.addEventListener('click', () => popup.style.display = 'none');
+

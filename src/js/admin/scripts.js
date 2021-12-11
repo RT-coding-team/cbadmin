@@ -1,5 +1,6 @@
 import {API_URL, post} from "../api/api";
 import openSnackBar from "../components/snackbar";
+import openPopup from "../components/popup";
 
 /**
  * Messages to prefix success/error messages
@@ -17,7 +18,7 @@ const messages = {
  * @param name the updated field
  */
 function successCallback(id) {
-    openSnackBar(`${messages[id]} successfully initiated`, 'success');
+    openPopup('Success', `${messages[id]} successfully initiated`, );
 }
 
 /**
