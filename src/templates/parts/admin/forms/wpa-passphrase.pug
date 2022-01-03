@@ -1,17 +1,8 @@
-extends ../../../layout/form
-include ../../../mixins/button-save
-
-block variables
-    - var id = 'wpa-passphrase'
-
-block icon
+div.mb-3
     include ../../../icons/key
+    label(for="wpa-passphrase-input")
+        | WPA Passphrase
 
-block title
-    | WPA Passphrase
-
-block form
+div.form-accordion-content.hidden.mb-4.ms-15-icon.me-5
     div.position-relative
         input.w-100.input-text#wpa-passphrase-input(placeholder='WPA Passphrase', name='wpa-passphrase')
-        +button-save(id)
-

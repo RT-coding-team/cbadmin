@@ -1,12 +1,14 @@
 import {API_URL, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
+import openPopup from "../components/popup";
+import {successMessage, successMessages} from "../messages/messages";
 
 /**
  * Open a snackbar and display a success message
  * @param name the updated field
  */
 function successCallback(name) {
-    openSnackBar(`${name} updated!`, 'success');
+    openSnackBar(successMessage(name), 'success');
 }
 
 /**
@@ -23,9 +25,18 @@ function errorCallback(code) {
  * @param name the name of the field for the API
  * @param payload the payload (often  {value:...})
  * @param token the token to authenticate the request
+ * @param callback if provided, override the default callback (that open a modal)
+ * @param loaderId if provided, hide the loader associated and show the button with this id
  */
-function setProperty(name, payload, token) {
-    put(`${API_URL}${name}`, token, payload, () => successCallback(name), errorCallback)
+function setProperty(name, payload, token, callback, loaderId = null) {
+    put(`${API_URL}${name}`, token, payload, () => {
+        if (callback) callback(name);
+        else successCallback(name);
+        if (loaderId) hideLoader(loaderId)
+    }, (code) => {
+        errorCallback(code);
+        if (loaderId) hideLoader(loaderId);
+    })
 }
 
 /**
@@ -39,16 +50,39 @@ function attachUpdate(id, updateCallback) {
 }
 
 /**
+ * Show spinner instead of done icon
+ * @param id
+ */
+function showLoader(id) {
+    document.getElementById(`${id}-send`).style.display = 'none';
+    const loader = document.getElementById(`${id}-loader`)
+    if (loader)
+        loader.style.display = 'block';
+}
+
+/**
+ * Hide spinner and show save icon again
+ * @param id
+ */
+function hideLoader(id) {
+    document.getElementById(`${id}-send`).style.display = 'block';
+    const loader = document.getElementById(`${id}-loader`)
+    if (loader)
+        loader.style.display = 'none';
+}
+
+/**
  * Send new value of a textual field when clicked on the send button
  * @param name the name of the field for the api
  * @param id the id of the form
  * @param token the token to authenticate the request
  */
-function attachUpdateCallbackToTextField(name, id, token) {
+function attachUpdateCallbackToTextField(name, id, token, callback = null) {
     attachUpdate(id, (e) => {
         e.preventDefault();
+        showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty(name, {value}, token);
+        setProperty(name, {value}, token, callback, id);
     })
 }
 
@@ -61,8 +95,9 @@ function attachUpdateCallbackToTextField(name, id, token) {
 function attachUpdateBrandCallbackToTextField(name, id, token) {
     attachUpdate(id, (e) => {
         e.preventDefault();
+        showLoader(id);
         const value = document.getElementById(`${id}-input`).value;
-        setProperty("brand", {value: `${name}=${value}`}, token);
+        setProperty("brand", {value: `${name}=${value}`}, token, null, id);
     })
 }
 
@@ -76,8 +111,51 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
     const element = document.getElementById(`${id}-switch`)
     element.addEventListener('click', (e) => {
         e.preventDefault();
-        const value = document.getElementById(`${id}-input`).checked ? 1 : 0 ;
-        setProperty("brand", {value:`${name}=${value}`}, token);
+        const value = document.getElementById(`${id}-input`).checked ? 1 : 0;
+        setProperty("brand", {value: `${name}=${value}`}, token);
+    })
+}
+
+/**
+ * Make several API call to set a property sequentials recursively
+ *
+ * Proof of termination:
+ *  - base case: i = values.length < infty
+ *  - invariant: (values.length - i) is a positive integer decreasing strictly
+ *  So this function ends as soon as i starts under names.length (in practice, start at 0 is safe)
+ *
+ * @param i the index
+ * @param names an array of names of fields
+ * @param values an array of values to send
+ * @param token the token
+ * @param loaderId the id of the button to show when all requests are completed
+ */
+function setPropertyRecursive(i, names, values, token, loaderId, finalSuccessCallback) {
+    if (i >= values.length) return;
+
+    const value = values[i];
+    setProperty(names[i], {value}, token, () => {
+        if (i === values.length - 1) finalSuccessCallback();
+        setPropertyRecursive(i + 1, names, values, token, loaderId, finalSuccessCallback);
+    }, i === values.length - 1 ? loaderId : null);
+}
+
+/**
+ * Attach to a single button (by id) sending of several fields (in fields)
+ * @param fields an array of fields [{name:String, id:String}]
+ * @param id the id of the button
+ * @param token the token
+ */
+function attachUpdateToMultipleTextFields(fields, id, token, callback) {
+    attachUpdate(id, (e) => {
+        e.preventDefault();
+
+        showLoader(id);
+
+        const names = fields.map(field => field.name);
+        const values = fields.map(field => document.getElementById(`${field.id}-input`).value)
+
+        setPropertyRecursive(0, names, values, token, id, callback);
     })
 }
 
@@ -102,6 +180,7 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
             getSwitchStatus('screen_enable_main_page'),
             getSwitchStatus('screen_enable_info_page'),
             getSwitchStatus('screen_enable_battery_page'),
+            getSwitchStatus('screen_enable_battery_details_page'),
             getSwitchStatus('screen_enable_memory_page'),
             ...(getSwitchStatus('screen_enable_stats_pages') ? [1, 1, 1, 1, 1, 1, 1, 1] : [0, 0, 0, 0, 0, 0, 0, 0]),
             getSwitchStatus('screen_enable_admin_pages'),
@@ -115,16 +194,24 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
  * @param token the token to authenticate the requests
  */
 export default function attachUpdateCallbacks(token) {
+    // Multiple text fields
+    attachUpdateToMultipleTextFields([
+        {id: 'ssid', name: 'ssid'},
+        {id: 'channel', name: 'channel'},
+        {id: 'wpa-passphrase', name: 'wpa-passphrase'},
+    ], 'wap', token, () => successCallback('wap'));
+    attachUpdateToMultipleTextFields([
+        {id: 'client-ssid', name: 'client-ssid'},
+        {id: 'client-wifipassword', name: 'client-wifipassword'},
+        {id: 'client-wificountry', name: 'client-wificountry'},
+    ], 'client_wifi', token, () => successCallback('client_wifi'));
+
     // Text fields
-    attachUpdateCallbackToTextField('ssid', 'ssid', token);
-    attachUpdateCallbackToTextField('client-ssid', 'client-ssid', token);
-    attachUpdateCallbackToTextField('client-wifipassword', 'client-wifipassword', token);
-    attachUpdateCallbackToTextField('channel', 'channel', token);
-    attachUpdateCallbackToTextField('wpa-passphrase', 'wpa-passphrase', token);
+    attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token);
-    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token);
+    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('enable_mass_storage', 'enable_mass_storage', token);
@@ -135,6 +222,7 @@ export default function attachUpdateCallbacks(token) {
     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_info_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_battery_page', token);
+    attacheUpdateCallbackToScreenEnable('screen_enable_battery_details_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_memory_page', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_stats_pages', token);
     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);

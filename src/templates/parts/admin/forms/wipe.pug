@@ -1,0 +1,19 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'wipe'
+
+block icon
+    include ../../../icons/wipe
+
+block title
+    | Delete all Content
+
+block form
+    p.text-caption Caution: This will delete all data from this device. Are you sure ? Confirm by entering your password again
+    div.position-relative
+        input.w-100.input-text#wipe-input(placeholder='Password', name='wipe')
+        .button-save.position-absolute.end--5.top-0.hidden
+            button.bg-transparent.border-0.p-0.text-primary(id='wipe-send', type="submit")
+                include ../../../icons/play

@@ -39,7 +39,7 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
-    if(value === '"1"') activateSwitch(element.id);
+    if (value === '"1"') activateSwitch(element.id);
 }
 
 /**
@@ -88,10 +88,12 @@ function getScreenEnable(token) {
             if (pages[2])
                 activateSwitch("screen_enable_battery_page");
             if (pages[3])
+                activateSwitch("screen_enable_battery_details_page");
+            if (pages[4])
                 activateSwitch("screen_enable_memory_page");
-            if (pages.slice(4, 12).every(x=>x))
+            if (pages.slice(5, 13).every(x => x))
                 activateSwitch("screen_enable_stats_pages");
-            if (pages[12])
+            if (pages[13])
                 activateSwitch("screen_enable_admin_pages");
         } catch (e) {
             console.log(e);

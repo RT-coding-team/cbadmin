@@ -11,6 +11,8 @@ block content
         .snackbar-inner
             | Hello
 
+    include ../layout/popup
+
     .my-5.mx-2.mx-md-5
         .container-fluid.p-0.m-0
             .row.row-cols-1.row-cols-xl-3
@@ -24,6 +26,7 @@ block content
                     include ../parts/admin/sections/lcd_configuration
                     include  ../parts/admin/sections/system
                 .col
+                    include  ../parts/admin/sections/wipe
                     include  ../parts/admin/sections/reports
                     include  ../parts/admin/sections/about
 

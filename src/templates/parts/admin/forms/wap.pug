@@ -1,0 +1,10 @@
+extends ../../../layout/form-multiple
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'wap'
+
+block items
+    include ./ssid
+    include ./channel
+    include ./wpa-passphrase
