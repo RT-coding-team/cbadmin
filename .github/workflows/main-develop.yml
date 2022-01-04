@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build Application
+    name: Build Dev Application 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
