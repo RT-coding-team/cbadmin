@@ -1,0 +1,28 @@
+name: Build the Application
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@main
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build
+        run: yarn build
+      - name: Package Release
+        run: zip -r dev-latest.zip dist
+      - name: Complete Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "dev-latest"
+          prerelease: true
+          title: "Latest Dev Release"
+          files: |
+            dev-latest.zip
