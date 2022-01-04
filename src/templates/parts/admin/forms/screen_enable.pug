@@ -2,7 +2,13 @@ extends ../../../layout/form
 include ../../../mixins/switch
 
 block variables
-    - var id = 'Screen_Enable'
+    - var id = 'lcd_pages_main'
+    - var id = 'lcd_pages_info'
+    - var id = 'lcd_pages_battery'
+    - var id = 'lcd_pages_multi_bat'
+    - var id = 'lcd_pages_memory'
+    - var id = 'lcd_pages_stats'
+    - var id = 'lcd_pages_admin'
 
 block icon
     include ../../../icons/screens
@@ -12,16 +18,16 @@ block title
 
 block form
     div.position-relative
-        +switch('screen_enable_main_page', 'Show LCD Main Page')
+        +switch('lcd_pages_main', 'Show LCD Main Page')
     div.position-relative
-        +switch('screen_enable_info_page', 'Show LCD Info Page')
+        +switch('lcd_pages_info', 'Show LCD Info Page')
     div.position-relative
-        +switch('screen_enable_battery_page', 'Show LCD Battery Page')
+        +switch('lcd_pages_battery', 'Show LCD Battery Page')
     div.position-relative
-        +switch('screen_enable_battery_details_page', 'Show LCD Battery Details Page')
+        +switch('lcd_pages_multi_bat', 'Show LCD Battery Details Page')
     div.position-relative
-        +switch('screen_enable_memory_page', 'Show LCD Memory Page')
+        +switch('lcd_pages_memory', 'Show LCD Memory Page')
     div.position-relative
-        +switch('screen_enable_stats_pages', 'Show LCD Stats Pages')
+        +switch('lcd_pages_stats', 'Show LCD Stats Pages')
     div.position-relative
-        +switch('screen_enable_admin_pages', 'Show LCD Admin Pages')
+        +switch('lcd_pages_admin', 'Show LCD Admin Pages')

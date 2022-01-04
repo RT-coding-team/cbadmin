@@ -218,14 +218,25 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
     attachUpdateBrandCallbackToSwitch('enhanced', 'enhanced', token);
 
+	// Added 20220104 to use keys for LCD pages rather than array
+	attachUpdateBrandCallbackToSwitch('lcd_pages_main','lcd_pages_main', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_info','lcd_pages_info', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_battery','lcd_pages_battery', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_multi_bat','lcd_pages_multi_bat', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_memory','lcd_pages_memory', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
+	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
+
+
     // Screen_Enable group of switches
-    attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_info_page', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_battery_page', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_battery_details_page', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_memory_page', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_stats_pages', token);
-    attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
+    //todo removed for using getProperty for screen enable
+//     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_info_page', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_battery_page', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_battery_details_page', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_memory_page', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_stats_pages', token);
+//     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
 
     // Brand text inputs
     attachUpdateBrandCallbackToTextField('server_url', 'server_url', token);

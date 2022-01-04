@@ -128,6 +128,15 @@ export default function (token) {
     getProperty('channel-input', 'channel', token);
     getProperty('hostname-input', 'hostname', token);
 
-    getScreenEnable(token);
+	// Added 20220104 to use keys for LCD pages rather than array
+	getProperty('lcd_pages_main','brand/lcd_pages_main', token);
+	getProperty('lcd_pages_info','brand/lcd_pages_info', token);
+	getProperty('lcd_pages_battery','brand/lcd_pages_battery', token);
+	getProperty('lcd_pages_multi_bat','brand/lcd_pages_multi_bat', token);
+	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token);
+	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token);
+	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token);
+
+    //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
 
