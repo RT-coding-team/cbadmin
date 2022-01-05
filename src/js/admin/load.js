@@ -39,6 +39,7 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
+	console.log(`switchRenderer: ${element} = ${value}`);
     if (value === '"1"') activateSwitch(element.id);
     if (value === '1') activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
 }
