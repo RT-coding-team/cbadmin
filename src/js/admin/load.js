@@ -68,7 +68,7 @@ function stringParserRenderer(element, prop) {
 function getProperty(id, name, token, renderer = defaultRenderer) {
     const successCallback = (prop) => {
         const element = document.getElementById(id);
-	    console.log(`Getting: ${id} -- ${name}: ${prop});
+	    console.log(`Getting: ${id} -- ${name}: ${prop}`);
         renderer(element, prop);
     }
     get(`${API_URL}${name}`, token, successCallback, errorCallback);
