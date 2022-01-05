@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'lcd_pages_multi_bat'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Show LCD Battery Details Page
+
+block form
+    div.position-relative
+        +switch('lcd_pages_multi_bat', 'Show LCD Battery Details Page')

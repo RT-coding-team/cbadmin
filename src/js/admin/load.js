@@ -129,13 +129,13 @@ export default function (token) {
     getProperty('hostname-input', 'hostname', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
-	getProperty('lcd_pages_main-switch','brand/lcd_pages_main', token, switchRenderer);
-	getProperty('lcd_pages_info-switch','brand/lcd_pages_info', token, switchRenderer);
-	getProperty('lcd_pages_battery-switch','brand/lcd_pages_battery', token, switchRenderer);
-	getProperty('lcd_pages_multi_bat-switch','brand/lcd_pages_multi_bat', token, switchRenderer);
-	getProperty('lcd_pages_memory-switch','brand/lcd_pages_memory', token, switchRenderer);
-	getProperty('lcd_pages_stats-switch','brand/lcd_pages_stats', token, switchRenderer);
-	getProperty('lcd_pages_admin-switch','brand/lcd_pages_admin', token, switchRenderer);
+	getProperty('lcd_pages_main','brand/lcd_pages_main', token, switchRenderer);
+	getProperty('lcd_pages_info','brand/lcd_pages_info', token, switchRenderer);
+	getProperty('lcd_pages_battery','brand/lcd_pages_battery', token, switchRenderer);
+	getProperty('lcd_pages_multi_bat','brand/lcd_pages_multi_bat', token, switchRenderer);
+	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
+	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
+	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

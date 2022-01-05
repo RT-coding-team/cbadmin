@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'lcd_pages_stats'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Show LCD Stats Pages
+
+block form
+    div.position-relative
+        +switch('lcd_pages_stats', 'Show LCD Stats Pages')
