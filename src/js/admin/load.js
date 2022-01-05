@@ -39,9 +39,8 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
-	console.log(`switchRenderer: ${element} = ${value}`);
     if (value === '"1"') activateSwitch(element.id);
-    if (value === '1') activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
 }
 
 /**
@@ -130,13 +129,13 @@ export default function (token) {
     getProperty('hostname-input', 'hostname', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
-	getProperty('lcd_pages_main-input','brand/lcd_pages_main', token, switchRenderer);
-	getProperty('lcd_pages_info-input','brand/lcd_pages_info', token, switchRenderer);
-	getProperty('lcd_pages_battery-input','brand/lcd_pages_battery', token, switchRenderer);
-	getProperty('lcd_pages_multi_bat-input','brand/lcd_pages_multi_bat', token, switchRenderer);
-	getProperty('lcd_pages_memory-input','brand/lcd_pages_memory', token, switchRenderer);
-	getProperty('lcd_pages_stats-input','brand/lcd_pages_stats', token, switchRenderer);
-	getProperty('lcd_pages_admin-input','brand/lcd_pages_admin', token, switchRenderer);
+	getProperty('lcd_pages_main-switch','brand/lcd_pages_main', token, switchRenderer);
+	getProperty('lcd_pages_info-switch','brand/lcd_pages_info', token, switchRenderer);
+	getProperty('lcd_pages_battery-switch','brand/lcd_pages_battery', token, switchRenderer);
+	getProperty('lcd_pages_multi_bat-switch','brand/lcd_pages_multi_bat', token, switchRenderer);
+	getProperty('lcd_pages_memory-switch','brand/lcd_pages_memory', token, switchRenderer);
+	getProperty('lcd_pages_stats-switch','brand/lcd_pages_stats', token, switchRenderer);
+	getProperty('lcd_pages_admin-switch','brand/lcd_pages_admin', token, switchRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
