@@ -71,6 +71,7 @@ function getProperty(id, name, token, renderer = defaultRenderer) {
         renderer(element, prop);
     }
     get(`${API_URL}${name}`, token, successCallback, errorCallback);
+    console.log(name,successCallback,errorCallback)
 }
 
 /**
