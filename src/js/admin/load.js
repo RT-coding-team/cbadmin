@@ -68,10 +68,10 @@ function stringParserRenderer(element, prop) {
 function getProperty(id, name, token, renderer = defaultRenderer) {
     const successCallback = (prop) => {
         const element = document.getElementById(id);
+	    console.log(`Getting: ${id} -- ${name}: ${prop});
         renderer(element, prop);
     }
     get(`${API_URL}${name}`, token, successCallback, errorCallback);
-    console.log(name,successCallback,errorCallback)
 }
 
 /**
@@ -118,8 +118,8 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
-    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-    getProperty('moodle_download-input', 'moodle_download', token, stringParserRenderer);
+//    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
+//    getProperty('moodle_download-input', 'moodle_download', token, stringParserRenderer);
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
