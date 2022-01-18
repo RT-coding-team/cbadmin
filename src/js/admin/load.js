@@ -125,6 +125,8 @@ export default function (token) {
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
 
     getProperty('client-ssid-input', 'client-ssid', token);
+    getProperty('client-wifipassword-input', 'client-wifipassword', token);
+    getProperty('client-wificountry-input', 'client-wificountry', token);
     getProperty('channel-input', 'channel', token);
     getProperty('hostname-input', 'hostname', token);
 
