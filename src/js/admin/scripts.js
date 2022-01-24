@@ -4,9 +4,11 @@ import openPopup from "../components/popup";
 
 /**
  * Messages to prefix success/error messages
- * @type {{reboot: string, unmountusb: string, reset: string, shutdown: string}}
+ * @type {{reboot: string, unmountusb: string, reset: string, shutdown: string,course-usb: string, openwell-usb: string}}
  */
 const messages = {
+	"course-usb":'Loading Course From USB',
+	"openwell-usb":'Loading Content From USB',
     unmountusb:'Unmounting USB',
     shutdown:'System shutdown',
     reboot:'System reboot',
@@ -48,6 +50,8 @@ function attachSystemScript(id, token) {
  * @param token the token to authenticate the requests
  */
 export default function attachSystemScripts(token){
+    attachSystemScript('openwell-usb', token);
+    attachSystemScript('course-usb', token);
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
