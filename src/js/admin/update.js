@@ -211,7 +211,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
     attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
-    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('course-download', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);

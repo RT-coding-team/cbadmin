@@ -118,8 +118,6 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
-//    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-//    getProperty('moodle_download-input', 'moodle_download', token, stringParserRenderer);
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
