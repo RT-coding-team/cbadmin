@@ -59,6 +59,25 @@ function stringParserRenderer(element, prop) {
 }
 
 /**
+ * Renderer to parse if Moodle and hide/show elements as needed
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function isMoodleRenderer(element, value) {
+	var isMoodle = false;
+	if (value == "1") {
+		isMoodle = true;
+	}
+	console.log('Moodle Value is ' + isMoodle);
+	if (isMoodle) {
+		console.log('Hiding Elements Not Used With Moodle');
+		var element = document.getElementById('server')
+		element.classList.add('hidden'); 
+	}
+}
+
+/**
  * Get the value of a parameter from the server, and set initial value of inputs to this value
  * @param id the id of the input
  * @param name the name of the parameter (server)
@@ -118,6 +137,13 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
+
+    getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
+    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
+    getProperty('moodle-download-input', 'moodle-download', token, stringParserRenderer);
+
+    getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
+    getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
