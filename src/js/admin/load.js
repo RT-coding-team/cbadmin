@@ -69,6 +69,11 @@ function isMoodleRenderer(element, value) {
 		isMoodle = true;
 	}
 	console.log('Moodle Value is ' + isMoodle);
+	if (isMoodle) {
+		console.log('Hiding Elements Not Used With Moodle');
+		var element = document.getElementById('server')
+		element.classList.add('hidden'); 
+	}
 }
 
 /**
