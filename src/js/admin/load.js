@@ -64,17 +64,13 @@ function stringParserRenderer(element, prop) {
  * @param value the value from the server
  */
 function isMoodleRenderer(element, prop) {
-    try {
-		if prop == "1" {
-			isMoodle = true;
-		}
-		else {
-			isMoodle = false;		
-		}
-		console.log('Moodle Value is ' + isMoodle);
-    } catch (e) {
-		isMoodle = false;
-    }
+	if (prop == "1") {
+		isMoodle = true;
+	}
+	else {
+		isMoodle = false;		
+	}
+	console.log('Moodle Value is ' + isMoodle);
 }
 
 /**
