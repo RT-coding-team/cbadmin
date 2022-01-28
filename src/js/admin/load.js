@@ -141,11 +141,12 @@ export default function (token) {
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
 
-    getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
+    getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
+    getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
+
     getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
     getProperty('course-download-input', 'course-download', token, stringParserRenderer);
 
-    getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
