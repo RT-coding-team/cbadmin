@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'lcd_pages_memory'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Show LCD Memory Page
+
+block form
+    div.position-relative
+        +switch('lcd_pages_memory', 'Show LCD Memory Page')

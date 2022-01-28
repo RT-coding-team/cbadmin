@@ -211,10 +211,9 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
     attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
-    attachUpdateCallbackToTextField('moodle_download', 'moodle_download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('course-download', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
-    attachUpdateBrandCallbackToSwitch('enable_mass_storage', 'enable_mass_storage', token);
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
     attachUpdateBrandCallbackToSwitch('enhanced', 'enhanced', token);
 
@@ -245,5 +244,4 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_name', 'server_siteadmin_name', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_email', 'server_siteadmin_email', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
-    attachUpdateBrandCallbackToTextField('g_device', 'lcd_g_device', token);
 }

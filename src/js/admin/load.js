@@ -40,6 +40,7 @@ function defaultRenderer(element, value) {
  */
 function switchRenderer(element, value) {
     if (value === '"1"') activateSwitch(element.id);
+    if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
 }
 
 /**
@@ -86,6 +87,7 @@ function isMoodleRenderer(element, value) {
 function getProperty(id, name, token, renderer = defaultRenderer) {
     const successCallback = (prop) => {
         const element = document.getElementById(id);
+	    console.log(`Getting: ${id} -- ${name}: ${prop}`);
         renderer(element, prop);
     }
     get(`${API_URL}${name}`, token, successCallback, errorCallback);
@@ -135,27 +137,31 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
+
     getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
     getProperty('moodle-download-input', 'moodle-download', token, stringParserRenderer);
 
     getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
-	getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
+    getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
+
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
 
     getProperty('client-ssid-input', 'client-ssid', token);
+    getProperty('client-wifipassword-input', 'client-wifipassword', token);
+    getProperty('client-wificountry-input', 'client-wificountry', token);
     getProperty('channel-input', 'channel', token);
     getProperty('hostname-input', 'hostname', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
-	getProperty('lcd_pages_main','brand/lcd_pages_main', token);
-	getProperty('lcd_pages_info','brand/lcd_pages_info', token);
-	getProperty('lcd_pages_battery','brand/lcd_pages_battery', token);
-	getProperty('lcd_pages_multi_bat','brand/lcd_pages_multi_bat', token);
-	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token);
-	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token);
-	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token);
+	getProperty('lcd_pages_main','brand/lcd_pages_main', token, switchRenderer);
+	getProperty('lcd_pages_info','brand/lcd_pages_info', token, switchRenderer);
+	getProperty('lcd_pages_battery','brand/lcd_pages_battery', token, switchRenderer);
+	getProperty('lcd_pages_multi_bat','brand/lcd_pages_multi_bat', token, switchRenderer);
+	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
+	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
+	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

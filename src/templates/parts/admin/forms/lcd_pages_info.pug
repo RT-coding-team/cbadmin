@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'lcd_pages_info'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Show LCD Info Page
+
+block form
+    div.position-relative
+        +switch('lcd_pages_info', 'Show LCD Info Page')

@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'lcd_pages_admin'
+
+block icon
+    include ../../../icons/screens
+
+block title
+    | Show LCD Admin Pages
+
+block form
+    div.position-relative
+        +switch('lcd_pages_admin', 'Show LCD Admin Pages')
