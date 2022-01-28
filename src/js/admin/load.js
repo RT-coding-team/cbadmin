@@ -75,6 +75,9 @@ function isMoodleRenderer(element, value) {
 		var element = document.getElementById('server')
 		element.classList.add('hidden'); 
 	}
+	else {
+	
+	}
 }
 
 /**
@@ -140,7 +143,7 @@ export default function (token) {
 
     getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-    getProperty('moodle-download-input', 'moodle-download', token, stringParserRenderer);
+    getProperty('course-download-input', 'course-download', token, stringParserRenderer);
 
     getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
