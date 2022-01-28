@@ -39,7 +39,7 @@ function errorCallback(id, code) {
  */
 function attachSystemScript(id, token) {
     const button = document.getElementById(`${id}-button`)
-
+	console.log(`attachSystemScript: ${id}-button`);
     button.addEventListener('click', () => {
         post(`${API_URL}system`,token,{value:id},()=>successCallback(id), (code)=>errorCallback(id, code))
     })
@@ -50,8 +50,6 @@ function attachSystemScript(id, token) {
  * @param token the token to authenticate the requests
  */
 export default function attachSystemScripts(token){
-    attachSystemScript('openwell-usb', token);
-    attachSystemScript('course-usb', token);
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
