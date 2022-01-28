@@ -63,12 +63,10 @@ function stringParserRenderer(element, prop) {
  * @param element the input element to set
  * @param value the value from the server
  */
-function isMoodleRenderer(element, prop) {
-	if (prop == "1") {
+function isMoodleRenderer(element, value) {
+	var isMoodle = false;
+	if (value == "1") {
 		isMoodle = true;
-	}
-	else {
-		isMoodle = false;		
 	}
 	console.log('Moodle Value is ' + isMoodle);
 }
@@ -134,7 +132,7 @@ export default function (token) {
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
     getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-    getProperty('moodle_download-input', 'moodle_download', token, stringParserRenderer);
+    getProperty('moodle-download-input', 'moodle-download', token, stringParserRenderer);
 
     getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
 	getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
