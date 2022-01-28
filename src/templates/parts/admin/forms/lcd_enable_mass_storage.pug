@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'Enable_MassStorage'
+
+block icon
+    include ../../../icons/usb
+
+block title
+    | Mass Storage
+
+block form
+    div.position-relative
+        input.w-100.input-text#lcd_g_device-input(placeholder='Enable Mass Storage', name='Enable_MassStorage')
+        +button-save('Enable_MassStorage')

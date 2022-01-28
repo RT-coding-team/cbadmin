@@ -145,11 +145,10 @@ export default function (token) {
     getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
     getProperty('course-download-input', 'course-download', token, stringParserRenderer);
 
-    getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
+    getProperty('enable_mass_storage-input', 'brand/enable_massstorage', token, switchRenderer);
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
-    getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
 
     getProperty('client-ssid-input', 'client-ssid', token);
     getProperty('client-wifipassword-input', 'client-wifipassword', token);
