@@ -1,0 +1,18 @@
+extends ../../../layout/form
+include ../../../mixins/button-save-download
+
+block variables
+    - var id = 'openwell-usb'
+
+block icon
+    include ../../../icons/usb
+
+block title
+    | Load OpenWell Content From USB Flash
+
+block form
+    div.position-relative
+        label TEST
+        .float-end
+            button.bg-transparent.border-0.text-primary.p-0(id=`openwell-usb-button`)
+                include  ../../../icons/play
