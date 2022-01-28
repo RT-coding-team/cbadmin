@@ -1,5 +1,6 @@
 export const API_URL = `/admin/api/`;
 export const ASSETS_URL = `/__connectbox_assets__/`;
+export var isMoodle = false;
 
 /**
  * Analyse a completed request to detect errors (and call error callback), or continue (and call success callback)

@@ -58,6 +58,26 @@ function stringParserRenderer(element, prop) {
 }
 
 /**
+ * Renderer to parse if Moodle and hide/show elements as needed
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function isMoodleRenderer(element, prop) {
+    try {
+		if prop == "1" {
+			isMoodle = true;
+		}
+		else {
+			isMoodle = false;		
+		}
+		console.log('Moodle Value is ' + isMoodle);
+    } catch (e) {
+		isMoodle = false;
+    }
+}
+
+/**
  * Get the value of a parameter from the server, and set initial value of inputs to this value
  * @param id the id of the input
  * @param name the name of the parameter (server)
@@ -121,6 +141,7 @@ export default function (token) {
     getProperty('moodle_download-input', 'moodle_download', token, stringParserRenderer);
 
     getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
+	getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
     getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
 
