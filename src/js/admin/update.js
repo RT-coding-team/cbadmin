@@ -215,7 +215,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('course-download', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
-    attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
+    attachUpdateBrandCallbackToSwitch('usb0nomount', 'usb0nomount', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
 	attachUpdateBrandCallbackToSwitch('lcd_pages_main','lcd_pages_main', token);
