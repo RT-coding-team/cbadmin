@@ -108,6 +108,7 @@ function attachUpdateBrandCallbackToTextField(name, id, token) {
  * @param token the token to authenticate the request
  */
 function attachUpdateBrandCallbackToSwitch(name, id, token) {
+	console.log(`attachUpdateBrandCallbackToSwitch: ${name}: ${id}`);
     const element = document.getElementById(`${id}-switch`)
     element.addEventListener('click', (e) => {
         e.preventDefault();
@@ -215,7 +216,6 @@ export default function attachUpdateCallbacks(token) {
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
-    attachUpdateBrandCallbackToSwitch('enhanced', 'enhanced', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
 	attachUpdateBrandCallbackToSwitch('lcd_pages_main','lcd_pages_main', token);
