@@ -159,7 +159,7 @@ export default function (token) {
 
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
-    getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
+    getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
     getProperty('client-ssid-input', 'client-ssid', token);
     getProperty('client-wifipassword-input', 'client-wifipassword', token);
