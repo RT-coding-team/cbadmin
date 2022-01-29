@@ -5,12 +5,12 @@ block variables
     - var id = 'g_device'
 
 block icon
-    include ../../../icons/wifi
+    include ../../../icons/usb
 
 block title
-    | Serial Device
+    | OTG Driver
 
 block form
     div.position-relative
-        input.w-100.input-text#g_device-input(placeholder='Serial Device', name='g_device')
+        input.w-100.input-text#g_device-input(placeholder='Set OTG Driver', name='g_device')
         +button-save(id)
