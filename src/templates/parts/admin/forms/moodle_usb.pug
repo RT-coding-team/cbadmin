@@ -1,6 +1,3 @@
-extends ../../../layout/form
-include ../../../mixins/button-save-download
-
 block variables
     - var id = 'courseusb'
 
@@ -11,8 +8,6 @@ block title
     | Load Moodle Course From USB Flash
 
 block form
-    div.position-relative
-        label Add Course(s) on USB to Moodle
-        .float-end
-            button.bg-transparent.border-0.text-primary.p-0(id=`courseusb-button`)
-                include  ../../../icons/play
+    .float-end
+        button.bg-transparent.border-0.text-primary.p-0(id=`${id}-button`)
+            include  ../../../icons/play

@@ -1,6 +1,3 @@
-extends ../../../layout/form
-include ../../../mixins/button-save-download
-
 block variables
     - var id = 'openwellusb'
 
@@ -11,8 +8,6 @@ block title
     | Load OpenWell Content From USB Flash
 
 block form
-    div.position-relative
-        label Overwrite OpenWell Content With Data From USB
-        .float-end
-            button.bg-transparent.border-0.text-primary.p-0(id=`openwellusb-button`)
-                include  ../../../icons/play
+    .float-end
+        button.bg-transparent.border-0.text-primary.p-0(id=`${id}-button`)
+            include  ../../../icons/play
