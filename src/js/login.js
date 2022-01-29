@@ -13,7 +13,7 @@ function login(e) {
     const errorCallback = (status) => {
         const errorMessage = document.getElementById('message-error')
         if (status === 401) errorMessage.innerText = 'Invalid password'
-        else errorMessage.innerText = 'Unknown error occurred. Please try later'
+        else errorMessage.innerText = 'Unable to Connect To Database'
     }
 
     get(`${API_URL}ui-config`, `Basic ${token}`, successCallback, errorCallback);

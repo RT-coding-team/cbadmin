@@ -17,7 +17,7 @@ function successCallback(name) {
  */
 function errorCallback(code) {
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar('Unknown error occurred. Please try later', 'error');
+    openSnackBar(`Unable to Save To Database: ${error}`);
 }
 
 /**

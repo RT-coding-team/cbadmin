@@ -17,9 +17,10 @@ function activateSwitch(id) {
 /**
  * When there is an error, show a message in the top
  */
-function errorCallback(code) {
+function errorCallback(code,error) {
+console.log(code,error);
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar('Unknown error occurred. Please try later', 'error');
+    openSnackBar(`Unable to Retrieve From Database: ${error}`);
 }
 
 /**
@@ -143,9 +144,6 @@ export default function (token) {
 
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
-
-    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-    getProperty('course-download-input', 'course-download', token, stringParserRenderer);
 
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
