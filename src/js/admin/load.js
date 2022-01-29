@@ -85,7 +85,7 @@ function isMoodleRenderer(element, value) {
 		var elements = document.getElementsByClassName('noMoodle')
 		for (var element of elements) {
 			var item = elements[element]
-			console.log(item);
+			console.log(item); 
 			item.classList.add('hidden'); 	
 		}
 	}
