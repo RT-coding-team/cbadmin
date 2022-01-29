@@ -1,14 +1,14 @@
-import {API_URL, post} from "../api/api";
+import {API_URL, get, post} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 
 /**
  * Messages to prefix success/error messages
- * @type {{reboot: string, unmountusb: string, reset: string, shutdown: string,course-usb: string, openwell-usb: string}}
+ * @type {{reboot: string, unmountusb: string, reset: string, shutdown: string,courseusb: string, openwellusb: string}}
  */
 const messages = {
-	"course-usb":'Loading Course From USB',
-	"openwell-usb":'Loading Content From USB',
+	courseusb:'Loading Course From USB',
+	openwellusb:'Loading Content From USB',
     unmountusb:'Unmounting USB',
     shutdown:'System shutdown',
     reboot:'System reboot',
@@ -39,9 +39,9 @@ function errorCallback(id, code) {
  */
 function attachSystemScript(id, token) {
     const button = document.getElementById(`${id}-button`)
-
+	console.log(`attachSystemScript: ${id}-button`);
     button.addEventListener('click', () => {
-        post(`${API_URL}system`,token,{value:id},()=>successCallback(id), (code)=>errorCallback(id, code))
+        get(`${API_URL}do/${id}`,token,()=>successCallback(id), (code)=>errorCallback(id, code))
     })
 }
 
@@ -50,8 +50,8 @@ function attachSystemScript(id, token) {
  * @param token the token to authenticate the requests
  */
 export default function attachSystemScripts(token){
-    attachSystemScript('openwell-usb', token);
-    attachSystemScript('course-usb', token);
+    attachSystemScript('openwellusb', token);
+    attachSystemScript('courseusb', token);
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);

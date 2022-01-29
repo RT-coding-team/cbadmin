@@ -5,9 +5,16 @@ block title
     | Web Server
 
 block content
-    include ../forms/enhanced_interface
-    include ../forms/hostname
-    include ../forms/usb_no_mount
-    include ../forms/openwell_download
-    include ../forms/moodle_download
-    
+
+    .allUsers
+        include ../forms/hostname
+    .allUsers
+        include ../forms/usb_no_mount
+    .allUsers
+        include ../forms/openwell_download
+    .allUsers
+        include ../forms/openwell_usb
+    .withMoodle.hidden#moodle_download
+        include ../forms/moodle_download
+    .withMoodle.hidden#moodle_usb
+        include ../forms/moodle_usb

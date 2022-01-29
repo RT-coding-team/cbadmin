@@ -17,9 +17,10 @@ function activateSwitch(id) {
 /**
  * When there is an error, show a message in the top
  */
-function errorCallback(code) {
+function errorCallback(code,error) {
+console.log(code,error);
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar('Unknown error occurred. Please try later', 'error');
+    openSnackBar(`Unable to Retrieve From Database: ${error}`);
 }
 
 /**
@@ -39,8 +40,12 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
-    if (value === '"1"') activateSwitch(element.id);
-    if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    if (value == '"1"' || value == '1' || value == 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    else if (value === 'none' || (value != '"0"' && value != '0' && value != 0)) {  // Added by DM 20220128 to handle OTG 
+		console.log('Hiding Element:' + element.id);
+		var element = document.getElementById(element.id)
+		element.classList.add('hidden');     	
+    }
 }
 
 /**
@@ -71,9 +76,20 @@ function isMoodleRenderer(element, value) {
 	}
 	console.log('Moodle Value is ' + isMoodle);
 	if (isMoodle) {
-		console.log('Hiding Elements Not Used With Moodle');
-		var element = document.getElementById('server')
-		element.classList.add('hidden'); 
+		var elements = document.getElementsByClassName('withMoodle')
+		for (var element of elements) {
+			console.log('Showing Element Used With Moodle: ' + element.id)
+			var item = document.getElementById(element.id)
+			item.classList.remove('hidden'); 
+		}
+	}
+	else {
+		var elements = document.getElementsByClassName('noMoodle')
+		for (var element of elements) {
+			console.log('Showing Element Not Used With Moodle: ' + element.id)
+			var item = document.getElementById(element.id)
+			item.classList.remove('hidden'); 
+		}
 	}
 }
 
@@ -138,15 +154,12 @@ export default function (token) {
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
 
-    getProperty('lcd_g_device-input', 'brand/g_device', token, stringParserRenderer);
-    getProperty('openwell-download-input', 'openwell-download', token, stringParserRenderer);
-    getProperty('moodle-download-input', 'moodle-download', token, stringParserRenderer);
+    getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
+    getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
-    getProperty('enable_mass_storage', 'brand/enable_mass_storage', token, switchRenderer);
     getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
 
     getProperty('usb0NoMount', 'brand/usb0NoMount', token, switchRenderer);
-    getProperty('enhanced', 'brand/enhanced', token, switchRenderer);
 
     getProperty('client-ssid-input', 'client-ssid', token);
     getProperty('client-wifipassword-input', 'client-wifipassword', token);
@@ -162,6 +175,7 @@ export default function (token) {
 	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
+	getProperty('otg','brand/otg', token, switchRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

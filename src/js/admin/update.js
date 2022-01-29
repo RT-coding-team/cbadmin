@@ -17,7 +17,7 @@ function successCallback(name) {
  */
 function errorCallback(code) {
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar('Unknown error occurred. Please try later', 'error');
+    openSnackBar(`Unable to Save To Database: ${error}`);
 }
 
 /**
@@ -108,6 +108,7 @@ function attachUpdateBrandCallbackToTextField(name, id, token) {
  * @param token the token to authenticate the request
  */
 function attachUpdateBrandCallbackToSwitch(name, id, token) {
+	console.log(`attachUpdateBrandCallbackToSwitch: ${name}: ${id}`);
     const element = document.getElementById(`${id}-switch`)
     element.addEventListener('click', (e) => {
         e.preventDefault();
@@ -215,7 +216,6 @@ export default function attachUpdateCallbacks(token) {
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0NoMount', 'usb0NoMount', token);
-    attachUpdateBrandCallbackToSwitch('enhanced', 'enhanced', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
 	attachUpdateBrandCallbackToSwitch('lcd_pages_main','lcd_pages_main', token);
@@ -226,6 +226,7 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
 
+	attachUpdateBrandCallbackToSwitch('otg','otg', token);
 
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
@@ -244,4 +245,8 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_name', 'server_siteadmin_name', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_email', 'server_siteadmin_email', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
+
+    attachUpdateBrandCallbackToTextField('g_device', 'g_device', token);
+    attachUpdateBrandCallbackToTextField('enable_mass_storage', 'enable_mass_storage', token);
+
 }
