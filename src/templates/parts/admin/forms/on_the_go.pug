@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'otg'
+
+block icon
+    include ../../../icons/usb
+
+block title
+    | Use On The Go Link To Mobile Phone
+
+block form
+    div.position-relative
+        +switch('otg', 'On The Go')

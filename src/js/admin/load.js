@@ -41,7 +41,12 @@ function defaultRenderer(element, value) {
  */
 function switchRenderer(element, value) {
     if (value === '"1"') activateSwitch(element.id);
-    if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    else if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    else if (value === 'none' || value === '"0"' || value === '0' || value === 0) {  // Added by DM 20220128 to handle OTG 
+		console.log('Hiding Element:' + element.id);
+		var element = document.getElementById(element.id)
+		element.classList.add('hidden');     	
+    }
 }
 
 /**
@@ -163,6 +168,7 @@ export default function (token) {
 	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
+	getProperty('otg','brand/otg', token, switchRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

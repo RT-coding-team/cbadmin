@@ -226,6 +226,7 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
 
+	attachUpdateBrandCallbackToSwitch('otg','otg', token);
 
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
