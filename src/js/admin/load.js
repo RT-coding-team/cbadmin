@@ -84,9 +84,8 @@ function isMoodleRenderer(element, value) {
 		console.log('Hiding Elements Requiring Moodle');
 		var elements = document.getElementsByClassName('noMoodle')
 		for (var element of elements) {
-			var item = elements[element]
-			console.log(item,element,element.id); 
-			item.classList.add('hidden'); 	
+			var item = document.getElementById(element.id)
+			item.classList.add('hidden'); 
 		}
 	}
 }
