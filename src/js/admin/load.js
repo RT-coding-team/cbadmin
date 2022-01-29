@@ -76,17 +76,17 @@ function isMoodleRenderer(element, value) {
 	}
 	console.log('Moodle Value is ' + isMoodle);
 	if (isMoodle) {
-		var elements = document.getElementsByClassName('noMoodle')
+		var elements = document.getElementsByClassName('withMoodle')
 		for (var element of elements) {
-			console.log('Showing Element Not Used With Moodle: ' + element.id)
+			console.log('Showing Element Used With Moodle: ' + element.id)
 			var item = document.getElementById(element.id)
 			item.classList.remove('hidden'); 
 		}
 	}
 	else {
-		var elements = document.getElementsByClassName('withMoodle')
+		var elements = document.getElementsByClassName('noMoodle')
 		for (var element of elements) {
-			console.log('Showing Element Used With Moodle: ' + element.id)
+			console.log('Showing Element Not Used With Moodle: ' + element.id)
 			var item = document.getElementById(element.id)
 			item.classList.remove('hidden'); 
 		}
