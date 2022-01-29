@@ -71,5 +71,8 @@ module.exports = {
             arrowFunction: false,
         },
     },
-    mode: "production"
+    mode: "production",
+    optimization: {
+        minimize: false
+    },
 };
