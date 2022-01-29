@@ -40,9 +40,8 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
-    if (value === '"1"') activateSwitch(element.id);
-    else if (value === '1' || value === 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
-    else if (value === 'none' || value === '"0"' || value === '0' || value === 0) {  // Added by DM 20220128 to handle OTG 
+    if (value == '"1"' || value == '1' || value == 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    else if (value === 'none' || value != '"0"' || value != '0' || value != 0) {  // Added by DM 20220128 to handle OTG 
 		console.log('Hiding Element:' + element.id);
 		var element = document.getElementById(element.id)
 		element.classList.add('hidden');     	
