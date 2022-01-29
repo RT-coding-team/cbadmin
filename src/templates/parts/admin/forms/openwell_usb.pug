@@ -1,13 +1,8 @@
-block variables
-    - var id = 'openwellusb'
-
-block icon
+div.mb-3
     include ../../../icons/usb
+    label(for="openwellusb-input")
+        | Load OpenWell Content From USB Flash
 
-block title
-    | Load OpenWell Content From USB Flash
-
-block form
     .float-end
-        button.bg-transparent.border-0.text-primary.p-0(id=`${id}-button`)
+        button.bg-transparent.border-0.text-primary.p-0(id=openwellusb-button)
             include  ../../../icons/play

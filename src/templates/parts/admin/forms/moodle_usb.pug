@@ -1,13 +1,8 @@
-block variables
-    - var id = 'courseusb'
-
-block icon
+div.mb-3
     include ../../../icons/usb
+    label(for="courseusb-input")
+        | Load Moodle Course(s) From USB Flash
 
-block title
-    | Load Moodle Course From USB Flash
-
-block form
     .float-end
-        button.bg-transparent.border-0.text-primary.p-0(id=`${id}-button`)
+        button.bg-transparent.border-0.text-primary.p-0(id=courseusb-button)
             include  ../../../icons/play
