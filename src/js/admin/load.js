@@ -49,6 +49,24 @@ function switchRenderer(element, value) {
 }
 
 /**
+ * Renderer to populate <select> with the default
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function selectRenderer(element, value) {
+	if (value === 'none') {
+		console.log('Hiding Element:' + element.id);
+		var element = document.getElementById(element.id)
+		element.classList.add('hidden');     		
+	}
+	else {
+alert('select value = ' + value);
+		element.value = value;
+	}
+}
+
+/**
  * Renderer to parse a JSON to a string and set it as a value to a text input
  *
  * @param element the input element to set
@@ -175,7 +193,7 @@ export default function (token) {
 	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
-	getProperty('otg','brand/otg', token, switchRenderer);
+	getProperty('otg_enable','brand/otg_enable', token, selectRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
