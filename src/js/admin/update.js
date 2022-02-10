@@ -200,11 +200,13 @@ export default function attachUpdateCallbacks(token) {
         {id: 'ssid', name: 'ssid'},
         {id: 'channel', name: 'channel'},
         {id: 'wpa-passphrase', name: 'wpa-passphrase'},
+        {id: 'wap-wifi-restart', name: 'wifi-restart'}
     ], 'wap', token, () => successCallback('wap'));
     attachUpdateToMultipleTextFields([
         {id: 'client-ssid', name: 'client-ssid'},
         {id: 'client-wifipassword', name: 'client-wifipassword'},
         {id: 'client-wificountry', name: 'client-wificountry'},
+        {id: 'client-wifi-restart', name: 'wifi-restart'}
     ], 'client_wifi', token, () => successCallback('client_wifi'));
 
     // Text fields
@@ -226,7 +228,7 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
 
-	attachUpdateBrandCallbackToSwitch('otg','otg', token);
+	attachUpdateBrandCallbackToSwitch('otg_enable','otg_enable', token);
 
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
