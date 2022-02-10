@@ -13,6 +13,8 @@ block title
 block form
     div.position-relative
         select.input-text(name="otg_enable" id="otg_enable")
+            option(value="") --- Please Select
             option(value="both") All USB Cable Types (Default)
             option(value="1") Use On The Go Cables Only
             option(value="0") Disable On The Go
+        +button-save(id)

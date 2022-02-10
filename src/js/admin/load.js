@@ -61,7 +61,6 @@ function selectRenderer(element, value) {
 		element.classList.add('hidden');     		
 	}
 	else {
-alert('select value = ' + value);
 		element.value = value;
 	}
 }
