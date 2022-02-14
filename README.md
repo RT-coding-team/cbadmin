@@ -1,6 +1,9 @@
 # cbadmin
 Redesigned Connectbox Admin Interface
 
+# Introduction
+Watch [this video](https://www.loom.com/share/c8f7deb037b4445c8ad3be3e0f44318e?sharedAppSource=personal_library)
+
 ## Build
 
 To build this frontend admin interface, install dependencies and run the `build` with `yarn`:
