@@ -197,24 +197,24 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 export default function attachUpdateCallbacks(token) {
     // Multiple text fields
     attachUpdateToMultipleTextFields([
-        {id: 'ssid', name: 'ssid'},
-        {id: 'channel', name: 'channel'},
-        {id: 'wpa-passphrase', name: 'wpa-passphrase'},
-        {id: 'wap-wifi-restart', name: 'wifi-restart'}
+        {id: 'ssid', name: 'apssid'},
+        {id: 'channel', name: 'apchannel'},
+        {id: 'wpa-passphrase', name: 'appassphrase'},
+        {id: 'wap-wifi-restart', name: 'wifirestart'}
     ], 'wap', token, () => successCallback('wap'));
     attachUpdateToMultipleTextFields([
-        {id: 'client-ssid', name: 'client-ssid'},
-        {id: 'client-wifipassword', name: 'client-wifipassword'},
-        {id: 'client-wificountry', name: 'client-wificountry'},
-        {id: 'client-wifi-restart', name: 'wifi-restart'}
+        {id: 'client-ssid', name: 'clientssid'},
+        {id: 'client-wifipassword', name: 'clientpassphrase'},
+        {id: 'client-wificountry', name: 'clientcountry'},
+        {id: 'client-wifi-restart', name: 'wifirestart'}
     ], 'client_wifi', token, () => successCallback('client_wifi'));
 
     // Text fields
     attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
-    attachUpdateCallbackToTextField('course-download', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('openwell-download', 'openwelldownload', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('course-download', 'coursedownload', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0nomount', 'usb0nomount', token);
