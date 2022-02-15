@@ -17,9 +17,7 @@ function login(e) {
     }
 
     //get(`${API_URL}ui-config`, `Basic ${token}`, successCallback, errorCallback);
-    var payload = {password:password};
-	console.log(payload);
-    put(`${API_URL}auth`,'',`{"password":"${password}"}`,successCallback,errorCallback)
+    put(`${API_URL}auth`,'',{password:password},successCallback,errorCallback)
 }
 
 document.getElementById('loginForm').addEventListener('submit', login);
