@@ -172,6 +172,7 @@ export default function (token) {
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
 
+	getProperty('otg_enable-ingput','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
@@ -192,7 +193,6 @@ export default function (token) {
 	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
-	getProperty('otg_enable','brand/otg_enable', token, selectRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
