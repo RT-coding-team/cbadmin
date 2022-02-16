@@ -228,8 +228,6 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
 
-	attachUpdateBrandCallbackToSwitch('otg_enable','otg_enable', token);
-
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
 //     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
@@ -241,6 +239,7 @@ export default function attachUpdateCallbacks(token) {
 //     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
 
     // Brand text inputs
+	attachUpdateBrandCallbackToTextField('otg_enable','otg_enable', token); // otg_enable is actually a select but updating works just like text
     attachUpdateBrandCallbackToTextField('server_url', 'server_url', token);
     attachUpdateBrandCallbackToTextField('server_authorization', 'server_authorization', token);
     attachUpdateBrandCallbackToTextField('server_sitename', 'server_sitename', token);
