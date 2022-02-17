@@ -20,6 +20,10 @@ function errorCallback(code) {
     openSnackBar(`Unable to Save To Database: ${error}`);
 }
 
+function passwordMismatch() {
+	openSnackBar('Sorry, your passwords do not match');
+}
+
 /**
  * Send the new value of a field with a put request
  * @param name the name of the field for the API
@@ -29,14 +33,21 @@ function errorCallback(code) {
  * @param loaderId if provided, hide the loader associated and show the button with this id
  */
 function setProperty(name, payload, token, callback, loaderId = null) {
-    put(`${API_URL}${name}`, token, payload, () => {
-        if (callback) callback(name);
-        else successCallback(name);
-        if (loaderId) hideLoader(loaderId)
-    }, (code) => {
-        errorCallback(code);
-        if (loaderId) hideLoader(loaderId);
-    })
+	// First check if this is password update for matching confirmation password prior to PUT
+	if (name === "password" && document.getElementById(`password-input`).value !== document.getElementById(`passwordConfirm-input`).value) {
+		if (loaderId) hideLoader(loaderId);
+		passwordMismatch();
+	}
+	else {
+		put(`${API_URL}${name}`, token, payload, () => {
+			if (callback) callback(name);
+			else successCallback(name);
+			if (loaderId) hideLoader(loaderId)
+		}, (code) => {
+			errorCallback(code);
+			if (loaderId) hideLoader(loaderId);
+		})
+	}
 }
 
 /**
