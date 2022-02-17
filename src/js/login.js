@@ -7,7 +7,7 @@ function login(e) {
     const token = str2B64(`admin:${password}`);
 
     const successCallback = () => {
-        localStorage.setItem('admin-authorization', `Basic ${token}`);
+        //localStorage.setItem('admin-authorization', `Basic ${token}`);
         window.location = '/admin';
     }
     const errorCallback = (status) => {
