@@ -55,5 +55,5 @@ export default function attachSystemScripts(token){
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
-    attachSystemScript('reset', token);
+    //attachSystemScript('reset', token);
 }
