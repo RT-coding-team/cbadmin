@@ -34,7 +34,7 @@ function passwordMismatch() {
  */
 function setProperty(name, payload, token, callback, loaderId = null) {
 	// First check if this is password update for matching confirmation password prior to PUT
-	if (name === "password" && document.getElementById(`password-input`).value !== document.getElementById(`passwordConfirm-input`).value) {
+	if (name === "password" && document.getElementById(`password-input`).value.length > 5 && document.getElementById(`password-input`).value !== document.getElementById(`passwordConfirm-input`).value) {
 		if (loaderId) hideLoader(loaderId);
 		passwordMismatch();
 	}
