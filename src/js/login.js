@@ -1,4 +1,4 @@
-import {API_URL, get} from "./api/api";
+import {API_URL, put} from "./api/api";
 import str2B64 from "./utils/utf8";
 
 function login(e) {
@@ -7,7 +7,7 @@ function login(e) {
     const token = str2B64(`admin:${password}`);
 
     const successCallback = () => {
-        localStorage.setItem('admin-authorization', `Basic ${token}`);
+        //localStorage.setItem('admin-authorization', `Basic ${token}`);
         window.location = '/admin';
     }
     const errorCallback = (status) => {
@@ -16,7 +16,8 @@ function login(e) {
         else errorMessage.innerText = 'Unable to Connect To Database'
     }
 
-    get(`${API_URL}ui-config`, `Basic ${token}`, successCallback, errorCallback);
+    //get(`${API_URL}ui-config`, `Basic ${token}`, successCallback, errorCallback);
+    put(`${API_URL}auth`,'',{password:password},successCallback,errorCallback)
 }
 
 document.getElementById('loginForm').addEventListener('submit', login);

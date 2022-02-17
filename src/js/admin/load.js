@@ -162,8 +162,9 @@ function getScreenEnable(token) {
  * @param token the authorization token
  */
 export default function (token) {
-    getProperty('ssid-input', 'ssid', token);
-    getProperty('wpa-passphrase-input', 'wpa-passphrase', token);
+    getProperty('ssid-input', 'apssid', token);
+    getProperty('wpa-passphrase-input', 'appassphrase', token);
+    getProperty('channel-input', 'apchannel', token);
 
     getProperty('server_url-input', 'brand/server_url', token, stringParserRenderer);
     getProperty('server_sitename-input', 'brand/server_sitename', token, stringParserRenderer);
@@ -171,17 +172,17 @@ export default function (token) {
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
 
+	getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
-    getProperty("is-moodle", 'is-moodle', token, isMoodleRenderer)
+    getProperty("is-moodle", 'ismoodle', token, isMoodleRenderer)
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
-    getProperty('client-ssid-input', 'client-ssid', token);
-    getProperty('client-wifipassword-input', 'client-wifipassword', token);
-    getProperty('client-wificountry-input', 'client-wificountry', token);
-    getProperty('channel-input', 'channel', token);
+    getProperty('client-ssid-input', 'clientssid', token);
+    getProperty('client-wifipassword-input', 'clientpassphrase', token);
+    getProperty('client-wificountry-input', 'clientcountry', token);
     getProperty('hostname-input', 'hostname', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
@@ -192,7 +193,6 @@ export default function (token) {
 	getProperty('lcd_pages_memory','brand/lcd_pages_memory', token, switchRenderer);
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
-	getProperty('otg_enable','brand/otg_enable', token, selectRenderer);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

@@ -20,6 +20,10 @@ function errorCallback(code) {
     openSnackBar(`Unable to Save To Database: ${error}`);
 }
 
+function passwordMismatch() {
+	openSnackBar('Sorry, your passwords do not match');
+}
+
 /**
  * Send the new value of a field with a put request
  * @param name the name of the field for the API
@@ -29,14 +33,21 @@ function errorCallback(code) {
  * @param loaderId if provided, hide the loader associated and show the button with this id
  */
 function setProperty(name, payload, token, callback, loaderId = null) {
-    put(`${API_URL}${name}`, token, payload, () => {
-        if (callback) callback(name);
-        else successCallback(name);
-        if (loaderId) hideLoader(loaderId)
-    }, (code) => {
-        errorCallback(code);
-        if (loaderId) hideLoader(loaderId);
-    })
+	// First check if this is password update for matching confirmation password prior to PUT
+	if (name === "password" && document.getElementById(`password-input`).value !== document.getElementById(`passwordConfirm-input`).value) {
+		if (loaderId) hideLoader(loaderId);
+		passwordMismatch();
+	}
+	else {
+		put(`${API_URL}${name}`, token, payload, () => {
+			if (callback) callback(name);
+			else successCallback(name);
+			if (loaderId) hideLoader(loaderId)
+		}, (code) => {
+			errorCallback(code);
+			if (loaderId) hideLoader(loaderId);
+		})
+	}
 }
 
 /**
@@ -197,24 +208,24 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 export default function attachUpdateCallbacks(token) {
     // Multiple text fields
     attachUpdateToMultipleTextFields([
-        {id: 'ssid', name: 'ssid'},
-        {id: 'channel', name: 'channel'},
-        {id: 'wpa-passphrase', name: 'wpa-passphrase'},
-        {id: 'wap-wifi-restart', name: 'wifi-restart'}
+        {id: 'ssid', name: 'apssid'},
+        {id: 'channel', name: 'apchannel'},
+        {id: 'wpa-passphrase', name: 'appassphrase'},
+        {id: 'wap-wifi-restart', name: 'wifirestart'}
     ], 'wap', token, () => successCallback('wap'));
     attachUpdateToMultipleTextFields([
-        {id: 'client-ssid', name: 'client-ssid'},
-        {id: 'client-wifipassword', name: 'client-wifipassword'},
-        {id: 'client-wificountry', name: 'client-wificountry'},
-        {id: 'client-wifi-restart', name: 'wifi-restart'}
+        {id: 'client-ssid', name: 'clientssid'},
+        {id: 'client-wifipassword', name: 'clientpassphrase'},
+        {id: 'client-wificountry', name: 'clientcountry'},
+        {id: 'client-wifi-restart', name: 'wifirestart'}
     ], 'client_wifi', token, () => successCallback('client_wifi'));
 
     // Text fields
     attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwell-download', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
-    attachUpdateCallbackToTextField('course-download', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('openwelldownload', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('coursedownload', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0nomount', 'usb0nomount', token);
@@ -228,8 +239,6 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
 
-	attachUpdateBrandCallbackToSwitch('otg_enable','otg_enable', token);
-
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
 //     attacheUpdateCallbackToScreenEnable('screen_enable_main_page', token);
@@ -241,6 +250,7 @@ export default function attachUpdateCallbacks(token) {
 //     attacheUpdateCallbackToScreenEnable('screen_enable_admin_pages', token);
 
     // Brand text inputs
+	attachUpdateBrandCallbackToTextField('otg_enable','otg_enable', token); // otg_enable is actually a select but updating works just like text
     attachUpdateBrandCallbackToTextField('server_url', 'server_url', token);
     attachUpdateBrandCallbackToTextField('server_authorization', 'server_authorization', token);
     attachUpdateBrandCallbackToTextField('server_sitename', 'server_sitename', token);

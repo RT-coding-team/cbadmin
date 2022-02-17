@@ -2,7 +2,7 @@ extends ../../../layout/form
 include ../../../mixins/switch
 
 block variables
-    - var id = 'otg'
+    - var id = 'otg_enable'
 
 block icon
     include ../../../icons/usb
@@ -12,7 +12,7 @@ block title
 
 block form
     div.position-relative
-        select.input-text(name="otg_enable" id="otg_enable")
+        select.input-text(name="otg_enable" id="otg_enable-input")
             option(value="") --- Please Select
             option(value="both") All USB Cable Types (Default)
             option(value="1") Use On The Go Cables Only
