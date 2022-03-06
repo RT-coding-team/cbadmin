@@ -34,6 +34,7 @@ function passwordMismatch() {
  */
 function setProperty(name, payload, token, callback, loaderId = null) {
 	// First check if this is password update for matching confirmation password prior to PUT
+	openSnackBar('Processing...','success');
 	if (name === "password" && document.getElementById(`password-input`).value.length > 5 && document.getElementById(`password-input`).value !== document.getElementById(`passwordConfirm-input`).value) {
 		if (loaderId) hideLoader(loaderId);
 		passwordMismatch();
@@ -144,7 +145,7 @@ function attachUpdateBrandCallbackToSwitch(name, id, token) {
  */
 function setPropertyRecursive(i, names, values, token, loaderId, finalSuccessCallback) {
     if (i >= values.length) return;
-
+	openSnackBar('Processing...','success');
     const value = values[i];
     setProperty(names[i], {value}, token, () => {
         if (i === values.length - 1) finalSuccessCallback();

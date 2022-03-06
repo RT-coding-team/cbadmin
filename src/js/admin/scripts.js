@@ -41,6 +41,7 @@ function attachSystemScript(id, token) {
     const button = document.getElementById(`${id}-button`)
 	console.log(`attachSystemScript: ${id}-button`);
     button.addEventListener('click', () => {
+   		openSnackBar('Processing...','success');
         get(`${API_URL}do/${id}`,token,()=>successCallback(id), (code)=>errorCallback(id, code))
     })
 }
