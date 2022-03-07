@@ -5,7 +5,8 @@ module.exports = {
     entry: {
         main:'./src/js/index.js',
         admin:'./src/js/admin.js',
-        login:'./src/js/login.js'
+        login:'./src/js/login.js',
+        logs:'./src/js/logs.js'
     },
     resolve: {
         extensions: ['.js', '.jsx', '.scss']
