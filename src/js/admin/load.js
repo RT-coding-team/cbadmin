@@ -80,6 +80,31 @@ function stringParserRenderer(element, prop) {
     }
 }
 
+
+/**
+ * Renderer to parse a JSON to a text block
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function textRenderer(element, prop) {
+	element.innerHTML = element.innerHTML + prop;
+}
+
+/**
+ * Renderer to parse a JSON to a text block
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function logSourcesRenderer(element, prop) {
+	var html = ''
+	for (var key of prop) {
+		html += `<a href="/admin/logs.html#${key}" target=logs>${key}</a><BR>`;
+	}
+	element.innerHTML = html;
+}
+
 /**
  * Renderer to parse if Moodle and hide/show elements as needed
  *
@@ -165,6 +190,9 @@ export default function (token) {
     getProperty('ssid-input', 'apssid', token);
     getProperty('wpa-passphrase-input', 'appassphrase', token);
     getProperty('channel-input', 'apchannel', token);
+    getProperty('clientwificonnection', 'clientwificonnection', token, textRenderer);
+    getProperty('connectedclients', 'connectedclients', token, textRenderer);
+    getProperty('logsources', 'logsources', token, logSourcesRenderer);
 
     getProperty('server_url-input', 'brand/server_url', token, stringParserRenderer);
     getProperty('server_sitename-input', 'brand/server_sitename', token, stringParserRenderer);
