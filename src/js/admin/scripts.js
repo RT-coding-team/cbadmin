@@ -9,6 +9,7 @@ import openPopup from "../components/popup";
 const messages = {
 	courseusb:'Loading Course From USB',
 	openwellusb:'Loading Content From USB',
+	openwellrefresh:'Refreshing Missing Content For OpenWell',
     unmountusb:'Unmounting USB',
     shutdown:'System shutdown',
     reboot:'System reboot',
@@ -53,6 +54,7 @@ function attachSystemScript(id, token) {
  */
 export default function attachSystemScripts(token){
     attachSystemScript('openwellusb', token);
+    attachSystemScript('openwellrefresh', token);
     attachSystemScript('courseusb', token);
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
