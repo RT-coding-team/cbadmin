@@ -13,6 +13,7 @@ const messages = {
     shutdown:'System shutdown',
     reboot:'System reboot',
     reset:'System reset',
+    sync:'Sync With Server'
 }
 
 /**
@@ -56,5 +57,6 @@ export default function attachSystemScripts(token){
     attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
+    attachSystemScript('sync', token);
     //attachSystemScript('reset', token);
 }
