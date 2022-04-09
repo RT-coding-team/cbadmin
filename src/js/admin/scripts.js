@@ -56,7 +56,6 @@ export default function attachSystemScripts(token){
     attachSystemScript('openwellusb', token);
     attachSystemScript('openwellrefresh', token);
     attachSystemScript('courseusb', token);
-    attachSystemScript('unmountusb', token);
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
     attachSystemScript('sync', token);
