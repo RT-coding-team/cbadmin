@@ -62,6 +62,21 @@ function attachUpdate(id, updateCallback) {
 }
 
 /**
+ * Attach a callback to the send button of a form
+ * @param id the id of the form
+ * @param updateCallback the callback to attach
+ */
+function attachUpdateCallbackToSelect(id) {
+	console.log(`attachUpdateCallbackToSelect: ${id}`);
+    var select = document.getElementById(`${id}-input`);
+    select.addEventListener('change', (event) => {
+		console.log('Changing SSID to available network: ' + event.target.value);
+		document.getElementById('client-ssid-input').value = event.target.value;
+		document.getElementById('client-wifipassword-input').value = "";
+	});
+}
+
+/**
  * Show spinner instead of done icon
  * @param id
  */
@@ -227,6 +242,9 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('password', 'password', token);
     attachUpdateCallbackToTextField('openwelldownload', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
     attachUpdateCallbackToTextField('coursedownload', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+
+	// Select
+	attachUpdateCallbackToSelect('client-wifiscan',null,token);
 
     // Switch (parse true/false)
     attachUpdateBrandCallbackToSwitch('usb0nomount', 'usb0nomount', token);
