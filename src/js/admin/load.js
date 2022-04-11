@@ -66,6 +66,22 @@ function selectRenderer(element, value) {
 }
 
 /**
+ * Renderer to populate <select> with the default
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function wifiScanRenderer(element, value) {
+	var encText = {true:"Password Required",false:"No Password"}
+	for (var record of value) {
+		var option = document.createElement("option");
+		option.value = record.ssid;
+		option.text = `${record.ssid}:     (${encText[record.encryption]})`;
+		element.appendChild(option);
+	}
+}
+
+/**
  * Renderer to parse a JSON to a string and set it as a value to a text input
  *
  * @param element the input element to set
@@ -209,6 +225,7 @@ export default function (token) {
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
+	getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);
     getProperty('client-ssid-input', 'clientssid', token);
     getProperty('client-wifipassword-input', 'clientpassphrase', token);
     getProperty('client-wificountry-input', 'clientcountry', token);
