@@ -216,6 +216,7 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
+    getProperty('server_siteadmin_country-input', 'brand/server_siteadmin_country', token, stringParserRenderer);
 
 	getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);

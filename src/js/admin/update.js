@@ -276,6 +276,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_name', 'server_siteadmin_name', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_email', 'server_siteadmin_email', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
+    attachUpdateBrandCallbackToTextField('server_siteadmin_country', 'server_siteadmin_country', token);
 
     attachUpdateBrandCallbackToTextField('g_device', 'g_device', token);
     attachUpdateBrandCallbackToTextField('enable_mass_storage', 'enable_mass_storage', token);
