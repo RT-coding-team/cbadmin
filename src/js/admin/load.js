@@ -54,6 +54,21 @@ function switchRenderer(element, value) {
  * @param element the input element to set
  * @param value the value from the server
  */
+function listRenderer(element, array) {
+	for (var value of array) {
+		var option = document.createElement("option");
+		option.value = value;
+		option.text = value;
+		element.appendChild(option);
+	}
+}
+
+/**
+ * Renderer to populate <select> with the default
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
 function selectRenderer(element, value) {
 	if (value === 'none') {
 		console.log('Hiding Element:' + element.id);
@@ -216,12 +231,14 @@ export default function (token) {
     getProperty('server_siteadmin_name-input', 'brand/server_siteadmin_name', token, stringParserRenderer);
     getProperty('server_siteadmin_email-input', 'brand/server_siteadmin_email', token, stringParserRenderer);
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
+    getProperty('server_siteadmin_country-input', 'brand/server_siteadmin_country', token, stringParserRenderer);
 
 	getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
     getProperty("is-moodle", 'ismoodle', token, isMoodleRenderer)
+	getProperty('courseusb-input','coursesonusb', token, listRenderer);
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
