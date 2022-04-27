@@ -1,8 +1,17 @@
-div.mb-3
-    include ../../../icons/usb
-    label(for="courseusb-input")
-        | Load Moodle Course(s) From USB Flash
+extends ../../../layout/form
+include ../../../mixins/button-save-download
 
-    .float-end
-        button.bg-transparent.border-0.text-primary.p-0(id="courseusb-button")
-            include  ../../../icons/play
+block variables
+    - var id = 'courseusb'
+
+block icon
+    include ../../../icons/usb
+
+block title
+    | Load Moodle Course From USB (/USB/courses)
+
+block form
+    div.position-relative
+        select.input-text(name="coursesusb" id="courseusb-input")
+            option(value="") --- Choose Course
+        +button-save-download(id)

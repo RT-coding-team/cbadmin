@@ -54,6 +54,21 @@ function switchRenderer(element, value) {
  * @param element the input element to set
  * @param value the value from the server
  */
+function listRenderer(element, array) {
+	for (var value of array) {
+		var option = document.createElement("option");
+		option.value = value;
+		option.text = value;
+		element.appendChild(option);
+	}
+}
+
+/**
+ * Renderer to populate <select> with the default
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
 function selectRenderer(element, value) {
 	if (value === 'none') {
 		console.log('Hiding Element:' + element.id);
@@ -223,6 +238,7 @@ export default function (token) {
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
     getProperty("is-moodle", 'ismoodle', token, isMoodleRenderer)
+	getProperty('courseusb-input','coursesonusb', token, listRenderer);
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
