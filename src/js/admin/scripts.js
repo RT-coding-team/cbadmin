@@ -30,7 +30,7 @@ function successCallback(id) {
  */
 function errorCallback(id, code) {
     if(code === 401) window.location.href = "/admin/login.html";
-    openSnackBar(`${messages[id]} not initiated`, 'error');
+    openSnackBar(`${messages[id]} failed`, 'error');
 }
 
 /**
