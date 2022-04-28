@@ -97,6 +97,21 @@ function wifiScanRenderer(element, value) {
 }
 
 /**
+ * Renderer to populate <select> with the default
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function subscriptionsRenderer(element, array) {
+	for (var value of array) {
+		var option = document.createElement("option");
+		option.value = value.value;
+		option.text = value.name;
+		element.appendChild(option);
+	}
+}
+
+/**
  * Renderer to parse a JSON to a string and set it as a value to a text input
  *
  * @param element the input element to set
@@ -239,7 +254,7 @@ export default function (token) {
 
     getProperty("is-moodle", 'ismoodle', token, isMoodleRenderer)
 	getProperty('courseusb-input','coursesonusb', token, listRenderer);
-	getProperty('subscribe-input','subscriptions', token, listRenderer);
+	getProperty('subscribe-input','subscriptions', token, subscriptionsRenderer);
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
