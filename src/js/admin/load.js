@@ -107,6 +107,9 @@ function subscriptionsRenderer(element, array) {
 		var option = document.createElement("option");
 		option.value = value.value;
 		option.text = value.name;
+		if (value.isSelected) {
+			option.selected = true;
+		}
 		element.appendChild(option);
 	}
 }
