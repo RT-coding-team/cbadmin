@@ -240,7 +240,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwelldownload', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('subscribe', 'subscribe', token);
     attachUpdateCallbackToTextField('coursedownload', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
     attachUpdateCallbackToTextField('courseusb', 'courseusb', token, () => openPopup('Success', 'Installing Course'));
 

@@ -2,15 +2,16 @@ extends ../../../layout/form
 include ../../../mixins/button-save-download
 
 block variables
-    - var id = 'openwell-download'
+    - var id = 'subscribe'
 
 block icon
     include ../../../icons/download
 
 block title
-    | Load OpenWell Content From URL
+    | Subscribe to OpenWell Content Package
 
 block form
     div.position-relative
-        input.w-100.input-text#openwell-download-input(placeholder='Load OpenWell Content From URL', name='openwell-download')
+        select.input-text(name="subscribe" id="subscribe-input")
+            option(value="") --- Choose Package
         +button-save-download(id)

@@ -239,6 +239,7 @@ export default function (token) {
 
     getProperty("is-moodle", 'ismoodle', token, isMoodleRenderer)
 	getProperty('courseusb-input','coursesonusb', token, listRenderer);
+	getProperty('subscribe-input','subscriptions', token, listRenderer);
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
