@@ -251,7 +251,7 @@ export default function (token) {
     getProperty('server_siteadmin_phone-input', 'brand/server_siteadmin_phone', token, stringParserRenderer);
     getProperty('server_siteadmin_country-input', 'brand/server_siteadmin_country', token, stringParserRenderer);
 
-	getProperty('disable_openwell_chat','brand/disable_openwell_chat', token, switchRenderer);
+	getProperty('disable_openwell_chat','disable_openwell_chat', token, switchRenderer);
 
 	getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
