@@ -258,6 +258,7 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateBrandCallbackToSwitch('lcd_pages_memory','lcd_pages_memory', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_stats','lcd_pages_stats', token);
 	attachUpdateBrandCallbackToSwitch('lcd_pages_admin','lcd_pages_admin', token);
+	attachUpdateBrandCallbackToSwitch('disable_openwell_chat','disable_openwell_chat', token);
 
     // Screen_Enable group of switches
     //todo removed for using getProperty for screen enable
