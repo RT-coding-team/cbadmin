@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'disable_openwell_chat'
+
+block icon
+    include ../../../icons/settings
+
+block title
+    | Disable OpenWell Chat
+
+block form
+    div.position-relative
+        +switch('disable_openwell_chat', 'Disable OpenWell Chat')

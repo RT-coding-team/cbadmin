@@ -114,6 +114,22 @@ function attachUpdateCallbackToTextField(name, id, token, callback = null) {
 }
 
 /**
+ * Send new value of a switch when clicked on the send button
+ * @param name the name of the field for the api
+ * @param id the id of the form
+ * @param token the token to authenticate the request
+ */
+function attachUpdateCallbackToSwitch(name, id, token, callback = null) {
+	console.log(`attachUpdateCallbackToSwitch: ${name}: ${id}`);
+    const element = document.getElementById(`${id}-switch`)
+    element.addEventListener('click', (e) => {
+        e.preventDefault();
+        const value = document.getElementById(`${id}-input`).checked ? 1 : 0;
+        setProperty(name, {value}, token, callback, id);
+    })
+}
+
+/**
  * Send new value of a textual field when clicked on the send button
  * @param name the name of the field for the api
  * @param id the id of the form
@@ -240,7 +256,7 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateCallbackToTextField('wipe', 'wipe', token, () => openPopup('Success', 'The SD card is being wiped'));
     attachUpdateCallbackToTextField('hostname', 'hostname', token);
     attachUpdateCallbackToTextField('password', 'password', token);
-    attachUpdateCallbackToTextField('openwelldownload', 'openwell-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
+    attachUpdateCallbackToTextField('subscribe', 'subscribe', token);
     attachUpdateCallbackToTextField('coursedownload', 'course-download', token, () => openPopup('Success', 'Downloading & Installing Now'));
     attachUpdateCallbackToTextField('courseusb', 'courseusb', token, () => openPopup('Success', 'Installing Course'));
 
@@ -248,6 +264,7 @@ export default function attachUpdateCallbacks(token) {
 	attachUpdateCallbackToSelect('client-wifiscan',null,token);
 
     // Switch (parse true/false)
+	attachUpdateCallbackToSwitch('disable_openwell_chat','disable_openwell_chat', token);
     attachUpdateBrandCallbackToSwitch('usb0nomount', 'usb0nomount', token);
 
 	// Added 20220104 to use keys for LCD pages rather than array
