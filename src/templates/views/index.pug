@@ -19,19 +19,19 @@ block content
                 .col
                     #password
                         include  ../parts/admin/sections/password
-                    #wap.hidden.isAdvanced
+                    #wap
                         include ../parts/admin/sections/wireless_access_point
                     #wifi
                         include ../parts/admin/sections/client_wi_fi
                     #web
                         include ../parts/admin/sections/web_server
                 .col
+                    #moodle.hiden.isMoodle
+                        include ../parts/admin/sections/moodle
                     #server
                         include ../parts/admin/sections/server_connection
                     #otg
                         include ../parts/admin/sections/on_the_go
-                    #lcd.hidden.isAdvanced
-                        include ../parts/admin/sections/lcd_configuration
                     #system
                         include  ../parts/admin/sections/system
                 .col
@@ -39,6 +39,8 @@ block content
                         include  ../parts/admin/sections/logs
                     #reports
                         include  ../parts/admin/sections/reports
+                    #lcd.hidden.isAdvanced
+                        include ../parts/admin/sections/lcd_configuration
                     #about
                         include  ../parts/admin/sections/about
                     #wipe.hidden.isAdvanced

@@ -1,0 +1,23 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'moodle_courses_functions'
+
+block icon
+    include ../../../icons/admin
+
+block title
+    | Moodle Course Functions
+
+block form
+    div.position-relative
+        select.input-text(name="moodle_courses" id="moodle_courses-input")
+            option(value="") --- Choose Course
+        br
+        span
+            | Rename
+            br
+            | Delete
+            br
+            | More??
