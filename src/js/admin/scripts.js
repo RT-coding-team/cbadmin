@@ -47,6 +47,23 @@ function attachSystemScript(id, token) {
     })
 }
 
+function attachAdvanced(id,token) {
+    const button = document.getElementById(`${id}-button`)
+	console.log(`attachSystemScript: ${id}-button`);
+    button.addEventListener('click', () => {
+   		openSnackBar('Enabling Advanced Options','success');
+		console.log("Enabling Advanced Options -- show hidden regions");
+		var elements = document.getElementsByClassName('isAdvanced')
+		for (var element of elements) {
+			console.log('Showing Advanced Option: ' + element.id)
+			var item = document.getElementById(element.id)
+			item.classList.remove('hidden'); 
+		}
+
+    })
+
+}
+
 /**
  * Attach all API to buttons of system section
  * @param token the token to authenticate the requests
@@ -57,5 +74,6 @@ export default function attachSystemScripts(token){
     attachSystemScript('shutdown', token);
     attachSystemScript('reboot', token);
     attachSystemScript('sync', token);
+    attachAdvanced('advanced', token);
     //attachSystemScript('reset', token);
 }

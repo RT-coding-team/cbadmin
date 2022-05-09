@@ -19,18 +19,18 @@ block content
                 .col
                     #password
                         include  ../parts/admin/sections/password
-                    #wap
+                    #wap.hidden.isAdvanced
                         include ../parts/admin/sections/wireless_access_point
                     #wifi
                         include ../parts/admin/sections/client_wi_fi
                     #web
                         include ../parts/admin/sections/web_server
                 .col
-                    #server.noMoodle.hidden
+                    #server
                         include ../parts/admin/sections/server_connection
                     #otg
                         include ../parts/admin/sections/on_the_go
-                    #lcd
+                    #lcd.hidden.isAdvanced
                         include ../parts/admin/sections/lcd_configuration
                     #system
                         include  ../parts/admin/sections/system
@@ -41,7 +41,7 @@ block content
                         include  ../parts/admin/sections/reports
                     #about
                         include  ../parts/admin/sections/about
-                    #wipe
+                    #wipe.hidden.isAdvanced
                         include  ../parts/admin/sections/wipe
 
 block scripts

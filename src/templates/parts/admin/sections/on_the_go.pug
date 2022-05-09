@@ -5,6 +5,9 @@ block title
     | Uplink Via Mobile Phone
 
 block content
-    include ../forms/on_the_go.pug
-    include ../forms/lcd_g_device
-    include ../forms/lcd_enable_mass_storage
+    #onthegoregion
+        include ../forms/on_the_go.pug
+    #lcdgdeviceregion.hidden.isAdvanced
+        include ../forms/lcd_g_device
+    #lcdenablemassstorageregion.hidden.isAdvanced    
+        include ../forms/lcd_enable_mass_storage
