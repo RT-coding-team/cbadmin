@@ -2,14 +2,14 @@ extends ../../../layout/form
 include ../../../mixins/switch
 
 block variables
-    - var id = 'disable_openwell_chat'
+    - var id = 'disable_chat'
 
 block icon
     include ../../../icons/settings
 
 block title
-    | Disable OpenWell Chat
+    | Disable Chat
 
 block form
     div.position-relative
-        +switch('disable_openwell_chat', 'Disable OpenWell Chat')
+        +switch('disable_chat', 'Disable Chat')
