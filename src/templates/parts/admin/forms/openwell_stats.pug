@@ -1,0 +1,15 @@
+extends ../../../layout/form
+include ../../../mixins/switch
+
+block variables
+    - var id = 'disable_stats'
+
+block icon
+    include ../../../icons/settings
+
+block title
+    | Disable Stats
+
+block form
+    div.position-relative
+        +switch('disable_stats', 'Disable Stats')
