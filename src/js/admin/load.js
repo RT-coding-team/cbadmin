@@ -248,9 +248,30 @@ function lmsUserSelectRender(element, value) {
  * @return {void}
  */
 function lmsSetUpEvents(token) {
+    // LMS Update User
+    const userSelect = document.getElementById('moodle_users-input');
+    const wrapper = document.getElementById('moodle_users-update-form');
+    const userSuccessCallback = (data) => {
+        const user = data[0];
+        document.getElementById('moodle_update_username-input').value = user.username;
+        document.getElementById('moodle_update_firstname-input').value = user.firstname;
+        document.getElementById('moodle_update_lastname-input').value = user.lastname;
+        document.getElementById('moodle_update_email-input').value = user.email;
+        document.getElementById('moodle_update_user_id-input').value = user.id;
+        wrapper.classList.remove('d-none');
+    };
+    userSelect.addEventListener('change', ()  =>  {
+        const userId = userSelect.value;
+        if (userId) {
+            get(`${API_URL}/lms/users/${userId}`, token, userSuccessCallback, errorCallback);
+        } else {
+            wrapper.classList.add('d-none');
+        }
+    });
+    // Course Functions
     const courseSelect = document.getElementById('moodle_courses-input');
     const list = document.getElementById('course-users-list');
-    const successCallback = (data) => {
+    const courseSuccessCallback = (data) => {
         list.innerHTML = '';
         if (data.length == 0) {
             const li = document.createElement('li');
@@ -281,7 +302,7 @@ function lmsSetUpEvents(token) {
     courseSelect.addEventListener('change', ()  =>  {
         const courseId = courseSelect.value;
         if (courseId) {
-            get(`${API_URL}/lms/courses/${courseId}/users`, token, successCallback, errorCallback);
+            get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
         } else {
             list.innerHTML = '';
         }

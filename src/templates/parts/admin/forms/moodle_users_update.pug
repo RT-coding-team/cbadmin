@@ -14,10 +14,12 @@ block form
     div.position-relative
         select.input-text(name="moodle_users" id="moodle_users-input")
             option(value="") --- Choose User To Update
-        input.w-100.hiden.input-text#moodle_username-input(placeholder='Username', name='moodle_username')
-        input.w-100.hiden.input-text#moodle_password-input(placeholder='Password', name='moodle_password')
-        input.w-100.hiden.input-text#moodle_firstname-input(placeholder='First Name', name='moodle_firstname')
-        input.w-100.hiden.input-text#moodle_lastname-input(placeholder='Last Name', name='moodle_lastname')
-        input.w-100.hiden.input-text#moodle_email-input(placeholder='Email (optional / required for teachers)', name='moodle_email')
-        | Delete This User
-        +button-save(id)
+        div.d-none#moodle_users-update-form
+            input.w-100.hiden.input-text#moodle_update_username-input(placeholder='Username', name='moodle_username')
+            input.w-100.hiden.input-text#moodle_update_password-input(placeholder='Password', name='moodle_password')
+            input.w-100.hiden.input-text#moodle_update_firstname-input(placeholder='First Name', name='moodle_firstname')
+            input.w-100.hiden.input-text#moodle_update_lastname-input(placeholder='Last Name', name='moodle_lastname')
+            input.w-100.hiden.input-text#moodle_update_email-input(placeholder='Email (optional / required for teachers)', name='moodle_email')
+            input#moodle_update_user_id-input(type='hidden')
+            | Delete This User
+            +button-save(id)
