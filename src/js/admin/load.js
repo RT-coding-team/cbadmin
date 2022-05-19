@@ -40,8 +40,9 @@ function defaultRenderer(element, value) {
  * @param value the value from the server
  */
 function switchRenderer(element, value) {
-    if (value == '"1"' || value == '1' || value == 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
-    else if (value === 'none' || (value != '"0"' && value != '0' && value != 0)) {  // Added by DM 20220128 to handle OTG
+    const state = value[0];
+    if (state == '"1"' || state == '1' || state == 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
+    else if (state === 'none' || (state != '"0"' && state != '0' && state != 0)) {  // Added by DM 20220128 to handle OTG
 		console.log('Hiding Element:' + element.id);
 		var element = document.getElementById(element.id)
 		element.classList.add('hidden');
@@ -184,16 +185,43 @@ function isMoodleRenderer(element, value) {
 }
 
 /**
+ * Renderer for the LMS course select box
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function lmsCourseSelectRender(element, value) {
+    value
+        .sort((a, b)   =>  {
+            const la = a.fullname.toLowerCase();
+            const lb = b.fullname.toLowerCase();
+            if (la < lb) {
+                return -1;
+            }
+            if (la > lb) {
+                return 1;
+            }
+            return 0;
+        })
+        .forEach((course) =>  {
+            const option = document.createElement('option');
+            option.text = course.fullname;
+            option.value = course.id;
+            element.appendChild(option);
+        });
+}
+
+/**
  * Renderer for the LMS user select box
  *
  * @param element the input element to set
  * @param value the value from the server
  */
 function lmsUserSelectRender(element, value) {
-    if (!('users' in value.result)) {
+    if (!('users' in value)) {
         console.error('No users were found!', value);
     }
-    const users = value.result.users;
+    const users = value.users;
     users
         .sort((a, b)   =>  {
             const la = a.fullname.toLowerCase();
@@ -310,6 +338,8 @@ export default function (token) {
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
     getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
+    getProperty('moodle_courses-input', 'lms/courses', token, lmsCourseSelectRender);
+    getProperty('moodle_courses_functions-input', 'lms/courses', token, lmsCourseSelectRender);
 
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
