@@ -9,10 +9,11 @@ titleElement.textContent += logRequested;
 // Populate the data
 var element = document.getElementById('logsArea');
 const successCallback = (data) => {
+	const logs = data[0];
 	var html = '';
-	for (var key of Object.keys(data)) {
+	for (var key of Object.keys(logs)) {
 		console.log(key);
-		html += `<h1>${key}</h1>${data[key].replace(/\n/g,'<BR>\n')}\n<HR>\n`;
+		html += `<h1>${key}</h1>${logs[key].replace(/\n/g,'<BR>\n')}\n<HR>\n`;
 	}
 	element.innerHTML = html;
 }
