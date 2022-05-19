@@ -243,6 +243,52 @@ function lmsUserSelectRender(element, value) {
 }
 
 /**
+ * Set up events for all the LMS functionality
+ *
+ * @return {void}
+ */
+function lmsSetUpEvents(token) {
+    const courseSelect = document.getElementById('moodle_courses-input');
+    const list = document.getElementById('course-users-list');
+    const successCallback = (data) => {
+        list.innerHTML = '';
+        if (data.length == 0) {
+            const li = document.createElement('li');
+            li.innerHTML = 'Sorry, no users found.';
+            list.appendChild(li);
+            return;
+        }
+        data
+            .sort((a, b)   =>  {
+                const la = a.fullname.toLowerCase();
+                const lb = b.fullname.toLowerCase();
+                if (la < lb) {
+                    return -1;
+                }
+                if (la > lb) {
+                    return 1;
+                }
+                return 0;
+            })
+            .forEach((user) =>  {
+                const li = document.createElement('li');
+                const roles = user.roles.map((role) =>  role.shortname);
+                const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
+                li.innerHTML = `${user.fullname}${roleText}`;
+                list.appendChild(li);
+            });
+    }
+    courseSelect.addEventListener('change', ()  =>  {
+        const courseId = courseSelect.value;
+        if (courseId) {
+            get(`${API_URL}/lms/courses/${courseId}/users`, token, successCallback, errorCallback);
+        } else {
+            list.innerHTML = '';
+        }
+    });
+}
+
+/**
  * Get the value of a parameter from the server, and set initial value of inputs to this value
  * @param id the id of the input
  * @param name the name of the parameter (server)
@@ -340,6 +386,6 @@ export default function (token) {
     getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
     getProperty('moodle_courses-input', 'lms/courses', token, lmsCourseSelectRender);
     getProperty('moodle_courses_functions-input', 'lms/courses', token, lmsCourseSelectRender);
-
+    lmsSetUpEvents(token);
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }

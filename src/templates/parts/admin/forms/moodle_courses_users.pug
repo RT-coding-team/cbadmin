@@ -14,8 +14,5 @@ block form
     div.position-relative
         select.input-text(name="moodle_courses" id="moodle_courses-input")
             option(value="") --- Choose Course
-        br
-        span
-            | Derek Maxson (teacher)
-            br
-            | Brian Ward (student)
+        div
+            ul.mt-2(id="course-users-list")
