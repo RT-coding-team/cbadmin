@@ -41,10 +41,10 @@ function defaultRenderer(element, value) {
  */
 function switchRenderer(element, value) {
     if (value == '"1"' || value == '1' || value == 1) activateSwitch(element.id); // Added by DM 20220104 to handle integer values in the brand.txt
-    else if (value === 'none' || (value != '"0"' && value != '0' && value != 0)) {  // Added by DM 20220128 to handle OTG 
+    else if (value === 'none' || (value != '"0"' && value != '0' && value != 0)) {  // Added by DM 20220128 to handle OTG
 		console.log('Hiding Element:' + element.id);
 		var element = document.getElementById(element.id)
-		element.classList.add('hidden');     	
+		element.classList.add('hidden');
     }
 }
 
@@ -73,7 +73,7 @@ function selectRenderer(element, value) {
 	if (value === 'none') {
 		console.log('Hiding Element:' + element.id);
 		var element = document.getElementById(element.id)
-		element.classList.add('hidden');     		
+		element.classList.add('hidden');
 	}
 	else {
 		element.value = value;
@@ -129,7 +129,6 @@ function stringParserRenderer(element, prop) {
     }
 }
 
-
 /**
  * Renderer to parse a JSON to a text block
  *
@@ -171,7 +170,7 @@ function isMoodleRenderer(element, value) {
 		for (var element of elements) {
 			console.log('Showing Element Used With Moodle: ' + element.id)
 			var item = document.getElementById(element.id)
-			item.classList.remove('hidden'); 
+			item.classList.remove('hidden');
 		}
 	}
 	else {
@@ -179,9 +178,40 @@ function isMoodleRenderer(element, value) {
 		for (var element of elements) {
 			console.log('Showing Element Not Used With Moodle: ' + element.id)
 			var item = document.getElementById(element.id)
-			item.classList.remove('hidden'); 
+			item.classList.remove('hidden');
 		}
 	}
+}
+
+/**
+ * Renderer for the LMS user select box
+ *
+ * @param element the input element to set
+ * @param value the value from the server
+ */
+function lmsUserSelectRender(element, value) {
+    if (!('users' in value.result)) {
+        console.error('No users were found!', value);
+    }
+    const users = value.result.users;
+    users
+        .sort((a, b)   =>  {
+            const la = a.fullname.toLowerCase();
+            const lb = b.fullname.toLowerCase();
+            if (la < lb) {
+                return -1;
+            }
+            if (la > lb) {
+                return 1;
+            }
+            return 0;
+        })
+        .forEach((user) =>  {
+            const option = document.createElement('option');
+            option.text = user.fullname;
+            option.value = user.id;
+            element.appendChild(option);
+        });
 }
 
 /**
@@ -254,7 +284,7 @@ export default function (token) {
 	getProperty('disable_chat','disable_chat', token, switchRenderer);
 	getProperty('disable_stats','disable_stats', token, switchRenderer);
 
-	getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
+    getProperty('otg_enable-input','brand/otg_enable', token, selectRenderer);
     getProperty('g_device-input', 'brand/g_device', token, stringParserRenderer);
     getProperty('enable_mass_storage-input', 'brand/enable_mass_storage', token, stringParserRenderer);
 
@@ -279,6 +309,7 @@ export default function (token) {
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
+    getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
+
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
-
