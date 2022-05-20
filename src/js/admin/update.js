@@ -1,8 +1,8 @@
-import {API_URL, del, get, put} from "../api/api";
+import {API_URL, del, get, post, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
-import {alphaSortWithKey, appendOptionsToSelect, validateLMSPassword} from '../utils/utils';
+import {alphaSortWithKey, appendOptionsToSelect, validateLMSPassword, validateObjectValues} from '../utils/utils';
 
 /**
  * Open a snackbar and display a success message
@@ -241,6 +241,41 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
  * @return {void}
  */
 function attachLMSCallbacksForAddingUsers(token) {
+    const saveButton = document.getElementById('moodle_users_add-btn');
+    const saveSuccessCallback = (data) => {
+        hideLoader('moodle_users_add');
+        saveButton.classList.remove('d-none');
+        document.getElementById('moodle_username-input').value = '';
+        document.getElementById('moodle_password-input').value = '';
+        document.getElementById('moodle_firstname-input').value = '';
+        document.getElementById('moodle_lastname-input').value = '';
+        document.getElementById('moodle_email-input').value = '';
+        lmsUpdateUserSelector(token);
+        if ((Array.isArray(data)) && ('id' in data[0])) {
+            openSnackBar('The user has been added', 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to add the user.', 'error');
+    };
+    saveButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const username = document.getElementById('moodle_username-input').value;
+        const password = document.getElementById('moodle_password-input').value;
+        const firstname = document.getElementById('moodle_firstname-input').value;
+        const lastname = document.getElementById('moodle_lastname-input').value;
+        const email = document.getElementById('moodle_email-input').value;
+        let payload = { username, firstname, lastname, email, password };
+        const errors = [...validateObjectValues(payload), ...validateLMSPassword(password)];
+        if (errors.length > 0) {
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
+        }
+        saveButton.classList.add('d-none');
+        showLoader('moodle_users_add');
+        post(`${API_URL}/lms/users`, token, payload, saveSuccessCallback, errorCallback);
+        return false;
+    });
 
 }
 
@@ -276,7 +311,7 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
         lmsUpdateUserSelector(token);
         hideLoader('moodle_users_account_remove');
         deleteButton.classList.remove('d-none');
-        const status = (data.includes('deleted')) ? 'success' : 'error';
+        const status =(data.includes('deleted')) ? 'success' : 'error';
         openSnackBar(data, status);
     };
     deleteButton.addEventListener('click', (event) => {
@@ -328,7 +363,7 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
             payload['password'] = password;
             const errors = validateLMSPassword(password);
             if (errors.length > 0) {
-                openSnackBar(errors.join("\r\n"), false);
+                openSnackBar(errors.join("\r\n"), 'error');
                 return false;
             }
         }
