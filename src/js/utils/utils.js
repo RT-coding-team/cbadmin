@@ -56,34 +56,51 @@ export const clearSelector = (selector) => {
         }
     });
 }
+
 /**
  * Validates the password based on the LMS requirements
  *
  * @param  {string} password    The password to validate
- * @return {array}              An array of errors. It is empty if the password validates.
+ * @return {array}              An array of errors. It is empty then it validates.
  */
 export const validateLMSPassword = (password) => {
     const errors = [];
     const specials = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
     // At least 8 characters
     if (password.length < 8) {
-        errors.push('You need to supply at least 8 characters.');
+        errors.push('You\'re password must be at least 8 characters.');
     }
     // At least 1 digit
     if (!/[0-9]/.test(password)) {
-        errors.push('You need to supply at least 1 number.');
+        errors.push('You\'re password must have at least 1 number.');
     }
     // At least 1 lowercase
     if (!/[a-z]/.test(password)) {
-        errors.push('You need to supply at least 1 lowercase letter.');
+        errors.push('You\'re password must have at least 1 lowercase letter.');
     }
     // At least 1 uppercase
     if (!/[A-Z]/.test(password)) {
-        errors.push('You need to supply at least 1 uppercase letter.');
+        errors.push('You\'re password must have at least 1 uppercase letter.');
     }
     // At least 1 non-alphanumeric symbol (ex. *, -, or #)
     if (!specials.test(password)) {
-        errors.push('You need to supply at least 1 special character. (ex. *, -, or #)');
+        errors.push('You\'re password must have at least 1 special character. (ex. *, -, or #)');
+    }
+    return errors;
+}
+
+/**
+ * Validate an objects values are not empty.
+ *
+ * @param  {object} obj The object to iterate
+ * @return {array}      An array of errors. It is empty then it validates.
+ */
+export const validateObjectValues = (obj) => {
+    const errors = [];
+    for (const key in obj) {
+        if (obj[key] === '') {
+            errors.push(`You must supply a valid ${key}!`);
+        }
     }
     return errors;
 }
