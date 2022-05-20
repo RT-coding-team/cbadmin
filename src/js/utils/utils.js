@@ -56,3 +56,34 @@ export const clearSelector = (selector) => {
         }
     });
 }
+/**
+ * Validates the password based on the LMS requirements
+ *
+ * @param  {string} password    The password to validate
+ * @return {array}              An array of errors. It is empty if the password validates.
+ */
+export const validateLMSPassword = (password) => {
+    const errors = [];
+    const specials = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    // At least 8 characters
+    if (password.length < 8) {
+        errors.push('You need to supply at least 8 characters.');
+    }
+    // At least 1 digit
+    if (!/[0-9]/.test(password)) {
+        errors.push('You need to supply at least 1 number.');
+    }
+    // At least 1 lowercase
+    if (!/[a-z]/.test(password)) {
+        errors.push('You need to supply at least 1 lowercase letter.');
+    }
+    // At least 1 uppercase
+    if (!/[A-Z]/.test(password)) {
+        errors.push('You need to supply at least 1 uppercase letter.');
+    }
+    // At least 1 non-alphanumeric symbol (ex. *, -, or #)
+    if (!specials.test(password)) {
+        errors.push('You need to supply at least 1 special character. (ex. *, -, or #)');
+    }
+    return errors;
+}

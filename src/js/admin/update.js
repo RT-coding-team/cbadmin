@@ -2,7 +2,7 @@ import {API_URL, del, get, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
-import {alphaSortWithKey, appendOptionsToSelect} from '../utils/utils';
+import {alphaSortWithKey, appendOptionsToSelect, validateLMSPassword} from '../utils/utils';
 
 /**
  * Open a snackbar and display a success message
@@ -326,6 +326,11 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         let payload = { username, firstname, lastname, email };
         if (password !== '') {
             payload['password'] = password;
+            const errors = validateLMSPassword(password);
+            if (errors.length > 0) {
+                openSnackBar(errors.join("\r\n"), false);
+                return false;
+            }
         }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_update');
