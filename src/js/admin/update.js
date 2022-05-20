@@ -271,14 +271,16 @@ function lmsUpdateUserSelector(token) {
  */
 function attachLMSCallbacksForDeletingUser(token, wrapper) {
     const deleteButton = document.getElementById('moodle_users_account_remove-btn');
-    const deleteSuccessCallback = (data)    =>  {
+    const deleteSuccessCallback = (data) => {
         wrapper.classList.add('d-none');
         lmsUpdateUserSelector(token);
         hideLoader('moodle_users_account_remove');
         deleteButton.classList.remove('d-none');
+        const status = (data.includes('deleted')) ? 'success' : 'error';
+        openSnackBar(data, status);
     };
-    deleteButton.addEventListener('click', (event)   =>  {
-        event.stopPropagation();
+    deleteButton.addEventListener('click', (event) => {
+        event.preventDefault();
         const id = document.getElementById('moodle_update_user_id-input').value;
         const username = document.getElementById('moodle_update_username-input').value;
         if (!id) {
@@ -301,7 +303,35 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
  * @return {void}
  */
 function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
-
+    const saveButton = document.getElementById('moodle_users_update-btn');
+    const saveSuccessCallback = (data) => {
+        wrapper.classList.add('d-none');
+        lmsUpdateUserSelector(token);
+        hideLoader('moodle_users_update');
+        saveButton.classList.remove('d-none');
+        const status = (data.includes('updated')) ? 'success' : 'error';
+        openSnackBar(data, status);
+    };
+    saveButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const id = document.getElementById('moodle_update_user_id-input').value;
+        if (!id) {
+            return false;
+        }
+        const username = document.getElementById('moodle_update_username-input').value;
+        const password = document.getElementById('moodle_update_password-input').value;
+        const firstname = document.getElementById('moodle_update_firstname-input').value;
+        const lastname = document.getElementById('moodle_update_lastname-input').value;
+        const email = document.getElementById('moodle_update_email-input').value;
+        let payload = { username, firstname, lastname, email };
+        if (password !== '') {
+            payload['password'] = password;
+        }
+        saveButton.classList.add('d-none');
+        showLoader('moodle_users_update');
+        put(`${API_URL}/lms/users/${id}`, token, payload, saveSuccessCallback, errorCallback);
+        return false;
+    });
 }
 
 /**
@@ -347,6 +377,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
     const userSuccessCallback = (data) => {
         const user = data[0];
         document.getElementById('moodle_update_username-input').value = user.username;
+        document.getElementById('moodle_update_password-input').value = '';
         document.getElementById('moodle_update_firstname-input').value = user.firstname;
         document.getElementById('moodle_update_lastname-input').value = user.lastname;
         document.getElementById('moodle_update_email-input').value = user.email;
@@ -362,6 +393,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
             document.getElementById('moodle_update_username-input').value = '';
             document.getElementById('moodle_update_firstname-input').value = '';
             document.getElementById('moodle_update_lastname-input').value = '';
+            document.getElementById('moodle_update_password-input').value = '';
             document.getElementById('moodle_update_email-input').value = '';
             document.getElementById('moodle_update_user_id-input').value = '';
         }
