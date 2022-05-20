@@ -1,4 +1,4 @@
-import {API_URL, get} from "../api/api";
+import {API_URL, del, get} from "../api/api";
 import openSnackBar from "../components/snackbar";
 
 /**
@@ -12,6 +12,21 @@ function activateSwitch(id) {
         .filter(className => className !== "form-checkbox-div--unchecked");
     document.getElementById(`${id}-switch`).className = [...classNames, 'form-checkbox-div--checked'].join(' ');
     document.getElementById(`${id}-input`).checked = true;
+}
+
+/**
+ * Clear the selector of all options but the first.
+ *
+ * @param  {object} selector    The selector you want to clear
+ * @return {void}
+ */
+function clearSelector(selector) {
+    const options = selector.querySelectorAll('option');
+    options.forEach((option, i)    =>  {
+        if (i > 0) {
+            option.remove();
+        }
+    });
 }
 
 /**
@@ -191,6 +206,7 @@ function isMoodleRenderer(element, value) {
  * @param value the value from the server
  */
 function lmsCourseSelectRender(element, value) {
+    clearSelector(element);
     value
         .sort((a, b)   =>  {
             const la = a.fullname.toLowerCase();
@@ -221,6 +237,7 @@ function lmsUserSelectRender(element, value) {
     if (!('users' in value)) {
         console.error('No users were found!', value);
     }
+    clearSelector(element);
     const users = value.users;
     users
         .sort((a, b)   =>  {
@@ -266,7 +283,35 @@ function lmsSetUpEvents(token) {
             get(`${API_URL}/lms/users/${userId}`, token, userSuccessCallback, errorCallback);
         } else {
             wrapper.classList.add('d-none');
+            document.getElementById('moodle_update_username-input').value = '';
+            document.getElementById('moodle_update_firstname-input').value = '';
+            document.getElementById('moodle_update_lastname-input').value = '';
+            document.getElementById('moodle_update_email-input').value = '';
+            document.getElementById('moodle_update_user_id-input').value = '';
         }
+    });
+    // Delete user on update form
+    const deleteButton = document.getElementById('moodle_users_account_remove-remove');
+    const loader = document.getElementById('moodle_users_account_remove-loader');
+    const deleteSuccessCallback = (data)    =>  {
+        wrapper.classList.add('d-none');
+        getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
+        loader.display = 'none';;
+        deleteButton.classList.remove('d-none');
+    };
+    deleteButton.addEventListener('click', (event)   =>  {
+        event.stopPropagation();
+        const id = document.getElementById('moodle_update_user_id-input').value;
+        const username = document.getElementById('moodle_update_username-input').value;
+        if (!id) {
+            return false;
+        }
+        if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
+            loader.display = 'block';
+            deleteButton.classList.add('d-none');
+            del(`${API_URL}/lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
+        }
+        return false;
     });
     // Course Functions
     const courseSelect = document.getElementById('moodle_courses-input');

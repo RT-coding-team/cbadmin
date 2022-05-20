@@ -24,6 +24,24 @@ function analyseResponse(req, callbackSuccess, callbackError) {
 }
 
 /**
+ * Send a delete request and parse result
+ * @param url the url where to send the request (to the API)
+ * @param token to authenticate the request
+ * @param callback the callback if request succeed
+ * @param callbackError the callback if request (or parsing) fail
+ */
+export function del(url, token, callback, callbackError = console.error) {
+    const oReq = new XMLHttpRequest();
+    oReq.onload = () => {
+        analyseResponse(oReq, callback, callbackError)
+    }
+    oReq.open('delete', url, true);
+    if (token)
+        oReq.setRequestHeader('Authorization', token);
+    oReq.send();
+}
+
+/**
  * Send a get request and parse result
  * @param url the url where to send the request (to the API)
  * @param token to authenticate the request
