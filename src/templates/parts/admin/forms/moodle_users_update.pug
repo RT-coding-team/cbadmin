@@ -1,5 +1,6 @@
 extends ../../../layout/form
 include ../../../mixins/button-save
+include ../../../mixins/button-account-remove
 
 block variables
     - var id = 'moodle_users_update'
@@ -21,5 +22,5 @@ block form
             input.w-100.hiden.input-text#moodle_update_lastname-input(placeholder='Last Name', name='moodle_lastname')
             input.w-100.hiden.input-text#moodle_update_email-input(placeholder='Email (optional / required for teachers)', name='moodle_email')
             input#moodle_update_user_id-input(type='hidden')
-            | Delete This User
             +button-save(id)
+            +button-account-remove('moodle_users_account_remove')
