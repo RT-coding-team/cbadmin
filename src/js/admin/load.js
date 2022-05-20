@@ -1,4 +1,5 @@
 import {API_URL, del, get} from "../api/api";
+import {alphaSortWithKey} from '../utils/utils';
 import openSnackBar from "../components/snackbar";
 
 /**
@@ -208,17 +209,7 @@ function isMoodleRenderer(element, value) {
 function lmsCourseSelectRender(element, value) {
     clearSelector(element);
     value
-        .sort((a, b)   =>  {
-            const la = a.fullname.toLowerCase();
-            const lb = b.fullname.toLowerCase();
-            if (la < lb) {
-                return -1;
-            }
-            if (la > lb) {
-                return 1;
-            }
-            return 0;
-        })
+        .sort(alphaSortWithKey('fullname'))
         .forEach((course) =>  {
             const option = document.createElement('option');
             option.text = course.fullname;
@@ -240,17 +231,7 @@ function lmsUserSelectRender(element, value) {
     clearSelector(element);
     const users = value.users;
     users
-        .sort((a, b)   =>  {
-            const la = a.fullname.toLowerCase();
-            const lb = b.fullname.toLowerCase();
-            if (la < lb) {
-                return -1;
-            }
-            if (la > lb) {
-                return 1;
-            }
-            return 0;
-        })
+        .sort(alphaSortWithKey('fullname'))
         .forEach((user) =>  {
             const option = document.createElement('option');
             option.text = user.fullname;
@@ -325,17 +306,7 @@ function lmsSetUpEvents(token) {
             return;
         }
         data
-            .sort((a, b)   =>  {
-                const la = a.fullname.toLowerCase();
-                const lb = b.fullname.toLowerCase();
-                if (la < lb) {
-                    return -1;
-                }
-                if (la > lb) {
-                    return 1;
-                }
-                return 0;
-            })
+            .sort(alphaSortWithKey('fullname'))
             .forEach((user) =>  {
                 const li = document.createElement('li');
                 const roles = user.roles.map((role) =>  role.shortname);
