@@ -1,7 +1,8 @@
-import {API_URL, put} from "../api/api";
+import {API_URL, del, get, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
+import {alphaSortWithKey, appendOptionsToSelect} from '../utils/utils';
 
 /**
  * Open a snackbar and display a success message
@@ -57,7 +58,7 @@ function setProperty(name, payload, token, callback, loaderId = null) {
  * @param updateCallback the callback to attach
  */
 function attachUpdate(id, updateCallback) {
-    const form = document.getElementById(`${id}-send`);
+    const form = document.getElementById(`${id}-btn`);
     form.addEventListener('click', updateCallback)
 }
 
@@ -81,7 +82,7 @@ function attachUpdateCallbackToSelect(id) {
  * @param id
  */
 function showLoader(id) {
-    document.getElementById(`${id}-send`).style.display = 'none';
+    document.getElementById(`${id}-btn`).style.display = 'none';
     const loader = document.getElementById(`${id}-loader`)
     if (loader)
         loader.style.display = 'block';
@@ -92,7 +93,7 @@ function showLoader(id) {
  * @param id
  */
 function hideLoader(id) {
-    document.getElementById(`${id}-send`).style.display = 'block';
+    document.getElementById(`${id}-btn`).style.display = 'block';
     const loader = document.getElementById(`${id}-loader`)
     if (loader)
         loader.style.display = 'none';
@@ -234,6 +235,190 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 }
 
 /**
+ * Attach the callbacks for adding LMS users
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForAddingUsers(token) {
+
+}
+
+/**
+ * Update the LMS user selector
+ *
+ * @param   {string}    token   the token to authenticate the requests
+ * @return  {void}
+ */
+function lmsUpdateUserSelector(token) {
+    const selector = document.getElementById('moodle_users-input');
+    const lmsUserSelectRender = (data) => {
+        if (!('users' in data)) {
+            console.error('No users were found!', value);
+        }
+        const users = data.users;
+        appendOptionsToSelect(selector, users, 'fullname', 'id');
+    };
+    get(`${API_URL}/lms/users`, token, lmsUserSelectRender, errorCallback);
+}
+
+/**
+ * Attach the callbacks for deleting LMS users
+ *
+ * @param   {string}    token   the token to authenticate the requests
+ * @param   {object}    wrapper the form wrapper
+ * @return {void}
+ */
+function attachLMSCallbacksForDeletingUser(token, wrapper) {
+    const deleteButton = document.getElementById('moodle_users_account_remove-btn');
+    const deleteSuccessCallback = (data)    =>  {
+        wrapper.classList.add('d-none');
+        lmsUpdateUserSelector(token);
+        hideLoader('moodle_users_account_remove');
+        deleteButton.classList.remove('d-none');
+    };
+    deleteButton.addEventListener('click', (event)   =>  {
+        event.stopPropagation();
+        const id = document.getElementById('moodle_update_user_id-input').value;
+        const username = document.getElementById('moodle_update_username-input').value;
+        if (!id) {
+            return false;
+        }
+        if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
+            deleteButton.classList.add('d-none');
+            showLoader('moodle_users_account_remove');
+            del(`${API_URL}/lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
+        }
+        return false;
+    });
+}
+
+/**
+ * Attach the callbacks for updating LMS users
+ *
+ * @param  {string}     token   the token to authenticate the requests
+ * @param   {object}    wrapper the form wrapper
+ * @return {void}
+ */
+function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
+
+}
+
+/**
+ * Attach the callbacks for updating LMS courses
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForUpdatingCourses(token) {
+
+}
+
+/**
+ * Attach the callbacks for deleting LMS courses
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForDeletingCourses(token) {
+
+}
+
+/**
+ * Attach the callbacks for the add LMS user form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForAddUserForm(token) {
+    attachLMSCallbacksForAddingUsers(token);
+}
+
+/**
+ * Attach the callbacks for update LMS user form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForUpdateUserForm(token) {
+    // Handle the user selector on the update form
+    const userSelect = document.getElementById('moodle_users-input');
+    const wrapper = document.getElementById('moodle_users-update-form');
+    const userSuccessCallback = (data) => {
+        const user = data[0];
+        document.getElementById('moodle_update_username-input').value = user.username;
+        document.getElementById('moodle_update_firstname-input').value = user.firstname;
+        document.getElementById('moodle_update_lastname-input').value = user.lastname;
+        document.getElementById('moodle_update_email-input').value = user.email;
+        document.getElementById('moodle_update_user_id-input').value = user.id;
+        wrapper.classList.remove('d-none');
+    };
+    userSelect.addEventListener('change', ()  =>  {
+        const userId = userSelect.value;
+        if (userId) {
+            get(`${API_URL}/lms/users/${userId}`, token, userSuccessCallback, errorCallback);
+        } else {
+            wrapper.classList.add('d-none');
+            document.getElementById('moodle_update_username-input').value = '';
+            document.getElementById('moodle_update_firstname-input').value = '';
+            document.getElementById('moodle_update_lastname-input').value = '';
+            document.getElementById('moodle_update_email-input').value = '';
+            document.getElementById('moodle_update_user_id-input').value = '';
+        }
+    });
+    attachLMSCallbacksForUpdatingUsers(token, wrapper);
+    attachLMSCallbacksForDeletingUser(token, wrapper);
+}
+
+/**
+ * Attach the callbacks for course roster form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForCourseRosterForm(token) {
+    const courseSelect = document.getElementById('moodle_courses-input');
+    const list = document.getElementById('course-users-list');
+    const courseSuccessCallback = (data) => {
+        list.innerHTML = '';
+        if (data.length == 0) {
+            const li = document.createElement('li');
+            li.innerHTML = 'Sorry, no users found.';
+            list.appendChild(li);
+            return;
+        }
+        data
+            .sort(alphaSortWithKey('fullname'))
+            .forEach((user) =>  {
+                const li = document.createElement('li');
+                const roles = user.roles.map((role) =>  role.shortname);
+                const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
+                li.innerHTML = `${user.fullname}${roleText}`;
+                list.appendChild(li);
+            });
+    }
+    courseSelect.addEventListener('change', ()  =>  {
+        const courseId = courseSelect.value;
+        if (courseId) {
+            get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
+        } else {
+            list.innerHTML = '';
+        }
+    });
+}
+
+/**
+ * Attach the callbacks for updating LMS course form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForCourseUpdateForm(token) {
+    attachLMSCallbacksForUpdatingCourses(token);
+    attachLMSCallbacksForDeletingCourses(token);
+}
+
+/**
  * Attach all fields to their corresponding update callbacks
  * @param token the token to authenticate the requests
  */
@@ -297,7 +482,18 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_country', 'server_siteadmin_country', token);
 
+    // LMS forms and fields
+    attachLMSCallbacksForAddUserForm(token);
+    attachLMSCallbacksForUpdateUserForm(token);
+    attachLMSCallbacksForCourseRosterForm(token);
+    attachLMSCallbacksForCourseUpdateForm(token);
+
+    // attachLMSCallbacksForAddingUsers(token);
+
+    // attachLMSCallbacksForShowingCourseRoster(token);
+    // attachLMSCallbacksForUpdatingCourses(token);
+    // attachLMSCallbacksForDeletingCourses(token);
+
     attachUpdateBrandCallbackToTextField('g_device', 'g_device', token);
     attachUpdateBrandCallbackToTextField('enable_mass_storage', 'enable_mass_storage', token);
-
 }

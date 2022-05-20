@@ -1,5 +1,5 @@
 import {API_URL, del, get} from "../api/api";
-import {alphaSortWithKey} from '../utils/utils';
+import {alphaSortWithKey, appendOptionsToSelect} from '../utils/utils';
 import openSnackBar from "../components/snackbar";
 
 /**
@@ -13,21 +13,6 @@ function activateSwitch(id) {
         .filter(className => className !== "form-checkbox-div--unchecked");
     document.getElementById(`${id}-switch`).className = [...classNames, 'form-checkbox-div--checked'].join(' ');
     document.getElementById(`${id}-input`).checked = true;
-}
-
-/**
- * Clear the selector of all options but the first.
- *
- * @param  {object} selector    The selector you want to clear
- * @return {void}
- */
-function clearSelector(selector) {
-    const options = selector.querySelectorAll('option');
-    options.forEach((option, i)    =>  {
-        if (i > 0) {
-            option.remove();
-        }
-    });
 }
 
 /**
@@ -201,131 +186,6 @@ function isMoodleRenderer(element, value) {
 }
 
 /**
- * Renderer for the LMS course select box
- *
- * @param element the input element to set
- * @param value the value from the server
- */
-function lmsCourseSelectRender(element, value) {
-    clearSelector(element);
-    value
-        .sort(alphaSortWithKey('fullname'))
-        .forEach((course) =>  {
-            const option = document.createElement('option');
-            option.text = course.fullname;
-            option.value = course.id;
-            element.appendChild(option);
-        });
-}
-
-/**
- * Renderer for the LMS user select box
- *
- * @param element the input element to set
- * @param value the value from the server
- */
-function lmsUserSelectRender(element, value) {
-    if (!('users' in value)) {
-        console.error('No users were found!', value);
-    }
-    clearSelector(element);
-    const users = value.users;
-    users
-        .sort(alphaSortWithKey('fullname'))
-        .forEach((user) =>  {
-            const option = document.createElement('option');
-            option.text = user.fullname;
-            option.value = user.id;
-            element.appendChild(option);
-        });
-}
-
-/**
- * Set up events for all the LMS functionality
- *
- * @return {void}
- */
-function lmsSetUpEvents(token) {
-    // LMS Update User
-    const userSelect = document.getElementById('moodle_users-input');
-    const wrapper = document.getElementById('moodle_users-update-form');
-    const userSuccessCallback = (data) => {
-        const user = data[0];
-        document.getElementById('moodle_update_username-input').value = user.username;
-        document.getElementById('moodle_update_firstname-input').value = user.firstname;
-        document.getElementById('moodle_update_lastname-input').value = user.lastname;
-        document.getElementById('moodle_update_email-input').value = user.email;
-        document.getElementById('moodle_update_user_id-input').value = user.id;
-        wrapper.classList.remove('d-none');
-    };
-    userSelect.addEventListener('change', ()  =>  {
-        const userId = userSelect.value;
-        if (userId) {
-            get(`${API_URL}/lms/users/${userId}`, token, userSuccessCallback, errorCallback);
-        } else {
-            wrapper.classList.add('d-none');
-            document.getElementById('moodle_update_username-input').value = '';
-            document.getElementById('moodle_update_firstname-input').value = '';
-            document.getElementById('moodle_update_lastname-input').value = '';
-            document.getElementById('moodle_update_email-input').value = '';
-            document.getElementById('moodle_update_user_id-input').value = '';
-        }
-    });
-    // Delete user on update form
-    const deleteButton = document.getElementById('moodle_users_account_remove-remove');
-    const loader = document.getElementById('moodle_users_account_remove-loader');
-    const deleteSuccessCallback = (data)    =>  {
-        wrapper.classList.add('d-none');
-        getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
-        loader.display = 'none';;
-        deleteButton.classList.remove('d-none');
-    };
-    deleteButton.addEventListener('click', (event)   =>  {
-        event.stopPropagation();
-        const id = document.getElementById('moodle_update_user_id-input').value;
-        const username = document.getElementById('moodle_update_username-input').value;
-        if (!id) {
-            return false;
-        }
-        if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
-            loader.display = 'block';
-            deleteButton.classList.add('d-none');
-            del(`${API_URL}/lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
-        }
-        return false;
-    });
-    // Course Functions
-    const courseSelect = document.getElementById('moodle_courses-input');
-    const list = document.getElementById('course-users-list');
-    const courseSuccessCallback = (data) => {
-        list.innerHTML = '';
-        if (data.length == 0) {
-            const li = document.createElement('li');
-            li.innerHTML = 'Sorry, no users found.';
-            list.appendChild(li);
-            return;
-        }
-        data
-            .sort(alphaSortWithKey('fullname'))
-            .forEach((user) =>  {
-                const li = document.createElement('li');
-                const roles = user.roles.map((role) =>  role.shortname);
-                const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
-                li.innerHTML = `${user.fullname}${roleText}`;
-                list.appendChild(li);
-            });
-    }
-    courseSelect.addEventListener('change', ()  =>  {
-        const courseId = courseSelect.value;
-        if (courseId) {
-            get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
-        } else {
-            list.innerHTML = '';
-        }
-    });
-}
-
-/**
  * Get the value of a parameter from the server, and set initial value of inputs to this value
  * @param id the id of the input
  * @param name the name of the parameter (server)
@@ -420,9 +280,17 @@ export default function (token) {
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
-    getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
+    const lmsCourseSelectRender = (element, value) => appendOptionsToSelect(element, value, 'fullname', 'id');
     getProperty('moodle_courses-input', 'lms/courses', token, lmsCourseSelectRender);
     getProperty('moodle_courses_functions-input', 'lms/courses', token, lmsCourseSelectRender);
-    lmsSetUpEvents(token);
+    const lmsUserSelectRender = (element, value) => {
+        if (!('users' in value)) {
+            console.error('No users were found!', value);
+        }
+        const users = value.users;
+        appendOptionsToSelect(element, users, 'fullname', 'id');
+    };
+    getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
+
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
