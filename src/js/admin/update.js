@@ -253,7 +253,8 @@ function attachLMSCallbacksForAddingUsers(token) {
         document.getElementById('moodle_firstname-input').value = '';
         document.getElementById('moodle_lastname-input').value = '';
         document.getElementById('moodle_email-input').value = '';
-        lmsUpdateUserSelector(token);
+        const selector = document.getElementById('moodle_users-input');
+        lmsUpdateUserSelector(selector, token);
         if ((Array.isArray(data)) && ('id' in data[0])) {
             openSnackBar('The user has been added', 'success');
             return;
@@ -290,16 +291,17 @@ function attachLMSCallbacksForAddingUsers(token) {
 /**
  * Update the LMS user selector
  *
- * @param   {string}    token   the token to authenticate the requests
+ * @param   {object}    selector    the selector to update
+ * @param   {string}    token       the token to authenticate the requests
+ * @param   {array}     exclude     an array of user ids that you want to exclude
  * @return  {void}
  */
-function lmsUpdateUserSelector(token) {
-    const selector = document.getElementById('moodle_users-input');
+function lmsUpdateUserSelector(selector, token, exclude = []) {
     const lmsUserSelectRender = (data) => {
         if (!('users' in data)) {
             console.error('No users were found!', value);
         }
-        const users = data.users;
+        const users = data.users.filter((user) => (!exclude.includes(user.id)));
         appendOptionsToSelect(selector, users, 'fullname', 'id');
     };
     get(`${API_URL}/lms/users`, token, lmsUserSelectRender, errorCallback);
@@ -316,7 +318,8 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
     const deleteButton = document.getElementById('moodle_users_account_remove-btn');
     const deleteSuccessCallback = (data) => {
         wrapper.classList.add('d-none');
-        lmsUpdateUserSelector(token);
+        const selector = document.getElementById('moodle_users-input');
+        lmsUpdateUserSelector(selector, token);
         hideLoader('moodle_users_account_remove');
         deleteButton.classList.remove('d-none');
         if ((typeof data === 'string') && (data.includes('deleted'))) {
@@ -353,7 +356,8 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
     const saveButton = document.getElementById('moodle_users_update-btn');
     const saveSuccessCallback = (data) => {
         wrapper.classList.add('d-none');
-        lmsUpdateUserSelector(token);
+        const selector = document.getElementById('moodle_users-input');
+        lmsUpdateUserSelector(selector, token);
         hideLoader('moodle_users_update');
         saveButton.classList.remove('d-none');
         if ((typeof data === 'string') && (data.includes('updated'))) {
@@ -480,6 +484,9 @@ function attachLMSCallbacksForCourseRosterForm(token) {
     const list = document.getElementById('course-users-list');
     const courseSuccessCallback = (data) => {
         list.innerHTML = '';
+        const exclude = data.map((user) => user.id);
+        const selector = document.getElementById('moodle_enrollees-input');
+        lmsUpdateUserSelector(selector, token, exclude);
         if (data.length == 0) {
             const li = document.createElement('li');
             li.innerHTML = 'Sorry, no users found.';
