@@ -317,8 +317,12 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
         lmsUpdateUserSelector(token);
         hideLoader('moodle_users_account_remove');
         deleteButton.classList.remove('d-none');
-        const status =(data.includes('deleted')) ? 'success' : 'error';
-        openSnackBar(data, status);
+        if ((typeof data === 'string') && (data.includes('deleted'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to delete the user.', 'error');
     };
     deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
