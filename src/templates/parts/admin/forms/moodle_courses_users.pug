@@ -1,5 +1,5 @@
 extends ../../../layout/form
-include ../../../mixins/button-save
+include ../../../mixins/button-add-to-class
 
 block variables
     - var id = 'moodle_courses_users'
@@ -12,7 +12,11 @@ block title
 
 block form
     div.position-relative
-        select.input-text(name="moodle_courses" id="moodle_courses-input")
+        select.input-text.mb-1(name="moodle_courses" id="moodle_courses-input")
             option(value="") --- Choose Course
-        div
+        select.input-text.mb-2(name="moodle_enrollees" id="moodle_enrollees-input")
+            option(value="") --- Choose a User to Enroll
+        div.border-top.pt-1
+            p.fst-italic Current Members
             ul.mt-2(id="course-users-list")
+        +button-add-to-class(id)
