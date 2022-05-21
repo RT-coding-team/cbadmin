@@ -2,7 +2,9 @@ import {API_URL, del, get, post, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
-import {alphaSortWithKey, appendOptionsToSelect, validateLMSPassword, validateObjectValues} from '../utils/utils';
+import {
+    alphaSortWithKey, appendOptionsToSelect, validateLMSPassword, validateLMSUsername, validateObjectValues
+} from '../utils/utils';
 
 /**
  * Open a snackbar and display a success message
@@ -266,7 +268,11 @@ function attachLMSCallbacksForAddingUsers(token) {
         const lastname = document.getElementById('moodle_lastname-input').value;
         const email = document.getElementById('moodle_email-input').value;
         let payload = { username, firstname, lastname, email, password };
-        const errors = [...validateObjectValues(payload), ...validateLMSPassword(password)];
+        const errors = [
+            ...validateObjectValues(payload),
+            ...validateLMSPassword(password),
+            ...validateLMSUsername(username)
+        ];
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
@@ -344,8 +350,12 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         lmsUpdateUserSelector(token);
         hideLoader('moodle_users_update');
         saveButton.classList.remove('d-none');
-        const status = (data.includes('updated')) ? 'success' : 'error';
-        openSnackBar(data, status);
+        if ((typeof data === 'string') && (data.includes('updated'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to update the user.', 'error');
     };
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -359,13 +369,20 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         const lastname = document.getElementById('moodle_update_lastname-input').value;
         const email = document.getElementById('moodle_update_email-input').value;
         let payload = { username, firstname, lastname, email };
+        let errors = [];
         if (password !== '') {
             payload['password'] = password;
-            const errors = validateLMSPassword(password);
-            if (errors.length > 0) {
-                openSnackBar(errors.join("\r\n"), 'error');
-                return false;
-            }
+            errors = [
+                ...validateLMSPassword(password),
+                ...validateLMSUsername(username)
+            ];
+        } else {
+            errors = validateLMSUsername(username);
+        }
+        if (errors.length > 0) {
+            console.log('here', errors);
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
         }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_update');

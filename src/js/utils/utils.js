@@ -88,6 +88,24 @@ export const validateLMSPassword = (password) => {
     }
     return errors;
 }
+/**
+ * Validate the LMS username
+ *
+ * @param  {string} username    The username to validate
+ * @return {array}              An array of errors. It is empty then it validates.
+ */
+export const validateLMSUsername = (username) => {
+    const errors = [];
+    const specialBlacklist = /[!#$%^&*()+=\[\]{};':"\\|,<>\/?]+/;
+    //It cannot contain uppercase letters
+    if (/[A-Z]/.test(username)) {
+        errors.push('You\'re username cannot contain uppercase letters.');
+    }
+    if (specialBlacklist.test(username)) {
+        errors.push('You\'re username can only contain these special characters: hypen \'-\', underscore \'_\', period \'.\', or at-sign \'@\'');
+    }
+    return errors;
+}
 
 /**
  * Validate an objects values are not empty.
