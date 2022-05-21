@@ -3,8 +3,8 @@ import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
 import {
-    alphaSortWithKey, appendOptionsToSelect, validateLMSEmail, validateLMSPassword,
-    validateLMSUsername, validateObjectValues
+    alphaSortWithKey, appendItemsToList, appendOptionsToSelect, validateLMSEmail,
+    validateLMSPassword, validateLMSUsername, validateObjectValues
 } from '../utils/utils';
 
 /**
@@ -406,6 +406,46 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
 }
 
 /**
+ * Attach callbacks for enrolling students
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @param  {object} list    the list to update
+ * @return {void}
+ */
+function attachLMSCallbacksForEnrollingUser(token, list) {
+    const enrollButton = document.getElementById('moodle_courses_users-btn');
+    const enrollSuccessCallback = (data) => {
+        console.log(data);
+        // update the list of enrollees
+
+        if ((typeof data === 'string') && (data.includes('enrolled'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to enroll the user in the course.', 'error');
+    };
+    enrollButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const courseId = document.getElementById('moodle_courses-input').value;
+        const userId = document.getElementById('moodle_enrollees-input').value;
+        const errors = [];
+        if (!courseId) {
+            errors.push('Please select a course.');
+        }
+        if (!userId) {
+            errors.push('Please select an enrollee.');
+        }
+        if (errors.length > 0) {
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
+        }
+        put(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, {}, enrollSuccessCallback, errorCallback);
+        return false;
+    });
+}
+
+/**
  * Attach the callbacks for updating LMS courses
  *
  * @param  {string} token   the token to authenticate the requests
@@ -493,15 +533,13 @@ function attachLMSCallbacksForCourseRosterForm(token) {
             list.appendChild(li);
             return;
         }
-        data
-            .sort(alphaSortWithKey('fullname'))
-            .forEach((user) =>  {
-                const li = document.createElement('li');
-                const roles = user.roles.map((role) =>  role.shortname);
-                const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
-                li.innerHTML = `${user.fullname}${roleText}`;
-                list.appendChild(li);
-            });
+        const values = data.map((user) => {
+            const roles = user.roles.map((role) =>  role.shortname);
+            const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
+            return { title: `${user.fullname}${roleText}` };
+        });
+        console.log(values);
+        appendItemsToList(list, values, 'title');
     }
     courseSelect.addEventListener('change', ()  =>  {
         const courseId = courseSelect.value;
@@ -511,6 +549,7 @@ function attachLMSCallbacksForCourseRosterForm(token) {
             list.innerHTML = '';
         }
     });
+    attachLMSCallbacksForEnrollingUser(token, list);
 }
 
 /**

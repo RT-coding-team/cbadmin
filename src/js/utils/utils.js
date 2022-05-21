@@ -22,6 +22,25 @@ export const alphaSortWithKey = (key) => {
 }
 
 /**
+ * Append the list items to the list
+ *
+ * @param  {object} list        The list to append to
+ * @param  {array}  values      An array of objects with the text for each item
+ * @param  {string} textKey     The key for which value to use for the text of the item
+ * @return {void}
+ */
+export const appendItemsToList = (list, values, textKey) => {
+    list.innerHTML = '';
+    values
+        .sort(alphaSortWithKey(textKey))
+        .forEach((val) =>  {
+            const li = document.createElement('li');
+            li.innerHTML = `${val[textKey]}`;
+            list.appendChild(li);
+        });
+}
+
+/**
  * Append the options to a selector
  *
  * @param  {object} selector    The selector to append options to
