@@ -3,7 +3,8 @@ import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 import {successMessage, successMessages} from "../messages/messages";
 import {
-    alphaSortWithKey, appendOptionsToSelect, validateLMSPassword, validateLMSUsername, validateObjectValues
+    alphaSortWithKey, appendOptionsToSelect, validateLMSEmail, validateLMSPassword,
+    validateLMSUsername, validateObjectValues
 } from '../utils/utils';
 
 /**
@@ -271,7 +272,8 @@ function attachLMSCallbacksForAddingUsers(token) {
         const errors = [
             ...validateObjectValues(payload),
             ...validateLMSPassword(password),
-            ...validateLMSUsername(username)
+            ...validateLMSUsername(username),
+            ...validateLMSEmail(email)
         ];
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
@@ -378,10 +380,14 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
             payload['password'] = password;
             errors = [
                 ...validateLMSPassword(password),
-                ...validateLMSUsername(username)
+                ...validateLMSUsername(username),
+                ...validateLMSEmail(email),
             ];
         } else {
-            errors = validateLMSUsername(username);
+            errors = [
+                ...validateLMSUsername(username),
+                ...validateLMSEmail(email)
+            ];
         }
         if (errors.length > 0) {
             console.log('here', errors);

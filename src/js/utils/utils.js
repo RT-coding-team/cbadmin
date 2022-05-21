@@ -58,6 +58,22 @@ export const clearSelector = (selector) => {
 }
 
 /**
+ * Validates the email based on the LMS requirements
+ *
+ * @param  {string} email   The email to validate
+ * @return {array}          An array of errors. It is empty then it validates.
+ *
+ * @link https://stackoverflow.com/a/9204568/4638563
+ */
+export const validateLMSEmail = (email) => {
+    const errors = [];
+    if (!/\S+@\S+\.\S+/.test(email)) {
+        errors.push('You must provide a valid email address.');
+    }
+    return errors;
+}
+
+/**
  * Validates the password based on the LMS requirements
  *
  * @param  {string} password    The password to validate
@@ -88,6 +104,7 @@ export const validateLMSPassword = (password) => {
     }
     return errors;
 }
+
 /**
  * Validate the LMS username
  *
