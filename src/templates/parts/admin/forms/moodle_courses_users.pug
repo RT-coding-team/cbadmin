@@ -1,8 +1,10 @@
 extends ../../../layout/form
 include ../../../mixins/button-add-to-class
+include ../../../mixins/button-remove-from-class
 
 block variables
-    - var id = 'moodle_courses_users'
+    - var id = 'moodle_courses_users_add'
+    - var remove_id = 'moodle_courses_users_remove'
 
 block icon
     include ../../../icons/admin
@@ -20,3 +22,4 @@ block form
             p.fst-italic Current Members
             ul.mt-2(id="course-users-list")
         +button-add-to-class(id)
+        +button-remove-from-class(remove_id)

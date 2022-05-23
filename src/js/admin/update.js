@@ -289,6 +289,37 @@ function attachLMSCallbacksForAddingUsers(token) {
 }
 
 /**
+ * Update the course roster list.  Adds a data-enrolled on the provided list with all the ids
+ * of enrolled users.
+ *
+ * @param  {object}     list        The list to update
+ * @param  {token}      token       The API token
+ * @param  {integer}    courseId    The course to retrieve the id for
+ * @param  {String}     emptyText   The text to display if no users are found
+ * @return {void}
+ */
+function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no users found.') {
+    const courseSuccessCallback = (data) => {
+        const ids = data.map((user) => user.id);
+        list.innerHTML = '';
+        list.setAttribute('data-enrolled', ids.join('|'));
+        if (data.length == 0) {
+            const li = document.createElement('li');
+            li.innerHTML = emptyText;
+            list.appendChild(li);
+            return;
+        }
+        const values = data.map((user) => {
+            const roles = user.roles.map((role) =>  role.shortname);
+            const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
+            return { title: `${user.fullname}${roleText}` };
+        });
+        appendItemsToList(list, values, 'title');
+    }
+    get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
+}
+
+/**
  * Update the LMS user selector
  *
  * @param   {object}    selector    the selector to update
@@ -412,13 +443,20 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
  * @param  {object} list    the list to update
  * @return {void}
  */
-function attachLMSCallbacksForEnrollingUser(token, list) {
-    const enrollButton = document.getElementById('moodle_courses_users-btn');
+function attachLMSCallbacksForEnrollingUser(token) {
+    const courseSelect = document.getElementById('moodle_courses-input');
+    const enrollButton = document.getElementById('moodle_courses_users_add-btn');
+    const unenrollButton = document.getElementById('moodle_courses_users_remove-btn');
+    unenrollButton.classList.add('d-none');
+    const studentSelector = document.getElementById('moodle_enrollees-input');
+    const list = document.getElementById('course-users-list');
     const enrollSuccessCallback = (data) => {
-        console.log(data);
-        // update the list of enrollees
-
         if ((typeof data === 'string') && (data.includes('enrolled'))) {
+            // update the list of enrollees
+            const courseId = courseSelect.value;
+            lmsUpdateCourseRosterList(list, token, courseId);
+            enrollButton.classList.add('d-none');
+            unenrollButton.classList.remove('d-none');
             openSnackBar(data, 'success');
             return;
         }
@@ -427,14 +465,18 @@ function attachLMSCallbacksForEnrollingUser(token, list) {
     };
     enrollButton.addEventListener('click', (event) => {
         event.preventDefault();
-        const courseId = document.getElementById('moodle_courses-input').value;
+        const courseId = courseSelect.value;
         const userId = document.getElementById('moodle_enrollees-input').value;
         const errors = [];
+        const enrolled = list.getAttribute('data-enrolled');
         if (!courseId) {
             errors.push('Please select a course.');
         }
         if (!userId) {
             errors.push('Please select an enrollee.');
+        }
+        if (enrolled.split('|').includes(userId)) {
+            errors.push('The user is already enrolled.');
         }
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
@@ -442,6 +484,59 @@ function attachLMSCallbacksForEnrollingUser(token, list) {
         }
         put(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, {}, enrollSuccessCallback, errorCallback);
         return false;
+    });
+    const unenrollSuccessCallback = (data) => {
+        if ((typeof data === 'string') && (data.includes('unenrolled'))) {
+            // update the list of enrollees
+            const courseId = courseSelect.value;
+            lmsUpdateCourseRosterList(list, token, courseId);
+            enrollButton.classList.remove('d-none');
+            unenrollButton.classList.add('d-none');
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to remove the user in the course.', 'error');
+    };
+    unenrollButton.addEventListener('click', () => {
+        event.preventDefault();
+        const courseId = courseSelect.value;
+        const userId = document.getElementById('moodle_enrollees-input').value;
+        const errors = [];
+        const enrolled = list.getAttribute('data-enrolled');
+        if (!courseId) {
+            errors.push('Please select a course.');
+        }
+        if (!userId) {
+            errors.push('Please select an enrollee.');
+        }
+        if (!enrolled.split('|').includes(userId)) {
+            errors.push('The user is not enrolled in the class.');
+        }
+        if (errors.length > 0) {
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
+        }
+        del(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, unenrollSuccessCallback, errorCallback);
+        return false;
+    });
+    courseSelect.addEventListener('change', ()  =>  {
+        const courseId = courseSelect.value;
+        studentSelector.value = '';
+        lmsUpdateCourseRosterList(list, token, courseId);
+    });
+    studentSelector.addEventListener('change', () => {
+        const enrolled = list.getAttribute('data-enrolled');
+        const studentId = studentSelector.value;
+        if (enrolled.split('|').includes(studentId)) {
+            // if user is enrolled, display the unenroll button
+            enrollButton.classList.add('d-none');
+            unenrollButton.classList.remove('d-none');
+        } else {
+            // if the user is not enrolled, display the enroll button
+            enrollButton.classList.remove('d-none');
+            unenrollButton.classList.add('d-none');
+        }
     });
 }
 
@@ -520,36 +615,9 @@ function attachLMSCallbacksForUpdateUserForm(token) {
  * @return {void}
  */
 function attachLMSCallbacksForCourseRosterForm(token) {
-    const courseSelect = document.getElementById('moodle_courses-input');
-    const list = document.getElementById('course-users-list');
-    const courseSuccessCallback = (data) => {
-        list.innerHTML = '';
-        const exclude = data.map((user) => user.id);
-        const selector = document.getElementById('moodle_enrollees-input');
-        lmsUpdateUserSelector(selector, token, exclude);
-        if (data.length == 0) {
-            const li = document.createElement('li');
-            li.innerHTML = 'Sorry, no users found.';
-            list.appendChild(li);
-            return;
-        }
-        const values = data.map((user) => {
-            const roles = user.roles.map((role) =>  role.shortname);
-            const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
-            return { title: `${user.fullname}${roleText}` };
-        });
-        console.log(values);
-        appendItemsToList(list, values, 'title');
-    }
-    courseSelect.addEventListener('change', ()  =>  {
-        const courseId = courseSelect.value;
-        if (courseId) {
-            get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
-        } else {
-            list.innerHTML = '';
-        }
-    });
-    attachLMSCallbacksForEnrollingUser(token, list);
+    const selector = document.getElementById('moodle_enrollees-input');
+    lmsUpdateUserSelector(selector, token);
+    attachLMSCallbacksForEnrollingUser(token);
 }
 
 /**
