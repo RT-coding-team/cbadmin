@@ -319,6 +319,22 @@ function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no
 }
 
 /**
+ * Update the LMS course selectors
+ *
+ * @param   {string}    token       the token to authenticate the requests
+ * @param   {array}     exclude     an array of course ids that you want to exclude
+ * @return  {void}
+ */
+function lmsUpdateCourseSelectors(token, exclude = []) {
+    const lmsCourseSelectRender = (data) => {
+        const courses = data.filter((course) => (!exclude.includes(course.id)));
+        const selectors = document.querySelectorAll('.lms-course-selector');
+        selectors.forEach((selector) => appendOptionsToSelect(selector, courses, 'fullname', 'id'));
+    };
+    get(`${API_URL}/lms/courses`, token, lmsCourseSelectRender, errorCallback);
+}
+
+/**
  * Update the LMS user selectors
  *
  * @param   {string}    token       the token to authenticate the requests
@@ -612,7 +628,6 @@ function attachLMSCallbacksForUpdateUserForm(token) {
  * @return {void}
  */
 function attachLMSCallbacksForCourseRosterForm(token) {
-    lmsUpdateUserSelectors(token);
     attachLMSCallbacksForEnrollingUser(token);
 }
 
@@ -692,6 +707,8 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_country', 'server_siteadmin_country', token);
 
     // LMS forms and fields
+    lmsUpdateCourseSelectors(token);
+    lmsUpdateUserSelectors(token);
     attachLMSCallbacksForAddUserForm(token);
     attachLMSCallbacksForUpdateUserForm(token);
     attachLMSCallbacksForCourseRosterForm(token);

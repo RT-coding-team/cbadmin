@@ -280,17 +280,5 @@ export default function (token) {
 	getProperty('lcd_pages_stats','brand/lcd_pages_stats', token, switchRenderer);
 	getProperty('lcd_pages_admin','brand/lcd_pages_admin', token, switchRenderer);
 
-    const lmsCourseSelectRender = (element, value) => appendOptionsToSelect(element, value, 'fullname', 'id');
-    getProperty('moodle_courses-input', 'lms/courses', token, lmsCourseSelectRender);
-    getProperty('moodle_courses_functions-input', 'lms/courses', token, lmsCourseSelectRender);
-    const lmsUserSelectRender = (element, value) => {
-        if (!('users' in value)) {
-            console.error('No users were found!', value);
-        }
-        const users = value.users;
-        appendOptionsToSelect(element, users, 'fullname', 'id');
-    };
-    getProperty('moodle_users-input', 'lms/users', token, lmsUserSelectRender);
-
     //getScreenEnable(token);  //todo removed for using getProperty for screen enable
 }
