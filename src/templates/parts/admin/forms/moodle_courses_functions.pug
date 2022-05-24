@@ -1,5 +1,6 @@
 extends ../../../layout/form
 include ../../../mixins/button-save
+include ../../../mixins/button-remove-file
 
 block variables
     - var id = 'moodle_courses_functions'
@@ -14,10 +15,8 @@ block form
     div.position-relative
         select.input-text.lms-course-selector(name="moodle_courses" id="moodle_courses_functions-input")
             option(value="") --- Choose Course
-        br
-        span
-            | Rename
-            br
-            | Delete
-            br
-            | More??
+        div.d-none#moodle_course-update-form
+            input.w-100.hiden.input-text#moodle_update_course_name-input(placeholder='Course Name', name='moodle_course')
+            input#moodle_update_course_id-input(type='hidden')
+            +button-save(id)
+            +button-remove-file('moodle_course_remove')

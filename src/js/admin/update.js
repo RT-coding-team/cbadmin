@@ -570,7 +570,37 @@ function attachLMSCallbacksForUpdatingCourses(token) {
  * @return {void}
  */
 function attachLMSCallbacksForDeletingCourses(token) {
-
+    const deleteButton = document.getElementById('moodle_course_remove-btn');
+    const wrapper = document.getElementById('moodle_course-update-form');
+    const deleteSuccessCallback = (data) => {
+        lmsUpdateCourseSelectors(token);
+        wrapper.classList.add('d-none');
+        hideLoader('moodle_course_remove');
+        deleteButton.classList.remove('d-none');
+        document.getElementById('moodle_update_course_name-input').value = '';
+        document.getElementById('moodle_update_course_id-input').value = '';
+        if ((typeof data === 'string') && (data.includes('deleted'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to delete the course.', 'error');
+    };
+    deleteButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const id = document.getElementById('moodle_update_course_id-input').value;
+        const courseSelector = document.getElementById('moodle_courses_functions-input');
+        const courseName = courseSelector.options[courseSelector.selectedIndex].text;
+        if (!id) {
+            return false;
+        }
+        if (confirm(`Are you sure you want to delete the course: ${courseName}?`)) {
+            deleteButton.classList.add('d-none');
+            showLoader('moodle_course_remove');
+            del(`${API_URL}/lms/courses/${id}`, token, deleteSuccessCallback, errorCallback);
+        }
+        return false;
+    });
 }
 
 /**
@@ -638,8 +668,23 @@ function attachLMSCallbacksForCourseRosterForm(token) {
  * @return {void}
  */
 function attachLMSCallbacksForCourseUpdateForm(token) {
+    const courseSelector = document.getElementById('moodle_courses_functions-input');
+    const wrapper = document.getElementById('moodle_course-update-form');
     attachLMSCallbacksForUpdatingCourses(token);
     attachLMSCallbacksForDeletingCourses(token);
+    courseSelector.addEventListener('change', () => {
+        const text = courseSelector.options[courseSelector.selectedIndex].text;
+        const courseId = courseSelector.value;
+        if (courseId) {
+            document.getElementById('moodle_update_course_name-input').value = text;
+            document.getElementById('moodle_update_course_id-input').value = courseId;
+            wrapper.classList.remove('d-none');
+        } else {
+            document.getElementById('moodle_update_course_name-input').value = '';
+            document.getElementById('moodle_update_course_id-input').value = '';
+            wrapper.classList.add('d-none');
+        }
+    });
 }
 
 /**
