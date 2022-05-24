@@ -560,7 +560,35 @@ function attachLMSCallbacksForEnrollingUser(token) {
  * @return {void}
  */
 function attachLMSCallbacksForUpdatingCourses(token) {
-
+    const saveButton = document.getElementById('moodle_courses_functions-btn');
+    const wrapper = document.getElementById('moodle_course-update-form');
+    const updateSuccessCallback = (data) => {
+        hideLoader('moodle_courses_functions');
+        saveButton.classList.remove('d-none');
+        lmsUpdateCourseSelectors(token);
+        wrapper.classList.add('d-none');
+        if ((typeof data === 'string') && (data.includes('updated'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to update the course.', 'error');
+    };
+    saveButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const payload = {};
+        const id = document.getElementById('moodle_update_course_id-input').value;
+        if (!id) {
+            return false;
+        }
+        saveButton.classList.add('d-none');
+        showLoader('moodle_courses_functions');
+        payload.fullname = document.getElementById('moodle_update_course_name-input').value;
+        payload.shortname = document.getElementById('moodle_update_course_short_name-input').value;
+        payload.summary = document.getElementById('moodle_update_course_summary-input').value;
+        put(`${API_URL}/lms/courses/${id}`, token, payload, updateSuccessCallback, errorCallback);
+        return false;
+    });
 }
 
 /**
@@ -672,15 +700,26 @@ function attachLMSCallbacksForCourseUpdateForm(token) {
     const wrapper = document.getElementById('moodle_course-update-form');
     attachLMSCallbacksForUpdatingCourses(token);
     attachLMSCallbacksForDeletingCourses(token);
+    const courseGetSuccessCallback = (data) => {
+      if (data.courses.length > 0) {
+        const course = data.courses[0];
+        document.getElementById('moodle_update_course_name-input').value = course.fullname;
+        document.getElementById('moodle_update_course_short_name-input').value = course.shortname;
+        document.getElementById('moodle_update_course_summary-input').value = course.summary;
+        document.getElementById('moodle_update_course_id-input').value = course.id;
+        wrapper.classList.remove('d-none');
+      } else {
+        openSnackBar('Sorry, we were unable to retrieve information about the course.', 'error');
+      }
+    };
     courseSelector.addEventListener('change', () => {
-        const text = courseSelector.options[courseSelector.selectedIndex].text;
         const courseId = courseSelector.value;
         if (courseId) {
-            document.getElementById('moodle_update_course_name-input').value = text;
-            document.getElementById('moodle_update_course_id-input').value = courseId;
-            wrapper.classList.remove('d-none');
+          get(`${API_URL}/lms/courses/${courseId}`, token, courseGetSuccessCallback, errorCallback);
         } else {
             document.getElementById('moodle_update_course_name-input').value = '';
+            document.getElementById('moodle_update_course_short_name-input').value = '';
+            document.getElementById('moodle_update_course_summary-input').value = '';
             document.getElementById('moodle_update_course_id-input').value = '';
             wrapper.classList.add('d-none');
         }
