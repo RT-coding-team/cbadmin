@@ -804,13 +804,17 @@ export default function attachUpdateCallbacks(token) {
     attachUpdateBrandCallbackToTextField('server_siteadmin_phone', 'server_siteadmin_phone', token);
     attachUpdateBrandCallbackToTextField('server_siteadmin_country', 'server_siteadmin_country', token);
 
-    // LMS forms and fields
-    lmsUpdateCourseSelectors(token);
-    lmsUpdateUserSelectors(token);
-    attachLMSCallbacksForAddUserForm(token);
-    attachLMSCallbacksForUpdateUserForm(token);
-    attachLMSCallbacksForCourseRosterForm(token);
-    attachLMSCallbacksForCourseUpdateForm(token);
+    // Load LMS forms and fields if is moodle.
+    const lmsSetUp = (data) => {
+      if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
+      lmsUpdateCourseSelectors(token);
+      lmsUpdateUserSelectors(token);
+      attachLMSCallbacksForAddUserForm(token);
+      attachLMSCallbacksForUpdateUserForm(token);
+      attachLMSCallbacksForCourseRosterForm(token);
+      attachLMSCallbacksForCourseUpdateForm(token);
+    };
+    get(`${API_URL}ismoodle`, token, lmsSetUp, errorCallback);
 
     attachUpdateBrandCallbackToTextField('g_device', 'g_device', token);
     attachUpdateBrandCallbackToTextField('enable_mass_storage', 'enable_mass_storage', token);
