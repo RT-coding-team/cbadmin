@@ -460,6 +460,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
     const courseSelect = document.getElementById('moodle_courses-input');
     const enrollButton = document.getElementById('moodle_courses_users_add-btn');
     const unenrollButton = document.getElementById('moodle_courses_users_remove-btn');
+    const roleSelector = document.getElementById('moodle_role-input');
     unenrollButton.classList.add('d-none');
     const studentSelector = document.getElementById('moodle_enrollees-input');
     const list = document.getElementById('course-users-list');
@@ -470,6 +471,8 @@ function attachLMSCallbacksForEnrollingUser(token) {
             lmsUpdateCourseRosterList(list, token, courseId);
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
+            roleSelector.classList.add('d-none');
+            roleSelector.value = 5;
             openSnackBar(data, 'success');
             return;
         }
@@ -482,6 +485,9 @@ function attachLMSCallbacksForEnrollingUser(token) {
         const userId = document.getElementById('moodle_enrollees-input').value;
         const errors = [];
         const enrolled = list.getAttribute('data-enrolled');
+        const payload = {
+          roleid: parseInt(roleSelector.value, 10),
+        };
         if (!courseId) {
             errors.push('Please select a course.');
         }
@@ -495,7 +501,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        put(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, {}, enrollSuccessCallback, errorCallback);
+        put(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, payload, enrollSuccessCallback, errorCallback);
         return false;
     });
     const unenrollSuccessCallback = (data) => {
@@ -505,6 +511,8 @@ function attachLMSCallbacksForEnrollingUser(token) {
             lmsUpdateCourseRosterList(list, token, courseId);
             enrollButton.classList.remove('d-none');
             unenrollButton.classList.add('d-none');
+            roleSelector.value = 5;
+            roleSelector.classList.remove('d-none');
             openSnackBar(data, 'success');
             return;
         }
@@ -536,6 +544,8 @@ function attachLMSCallbacksForEnrollingUser(token) {
     courseSelect.addEventListener('change', ()  =>  {
         const courseId = courseSelect.value;
         studentSelector.value = '';
+        roleSelector.classList.add('d-none');
+        roleSelector.value = 5;
         lmsUpdateCourseRosterList(list, token, courseId);
     });
     studentSelector.addEventListener('change', () => {
@@ -545,10 +555,14 @@ function attachLMSCallbacksForEnrollingUser(token) {
             // if user is enrolled, display the unenroll button
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
+            roleSelector.classList.add('d-none');
+            roleSelector.value = 5;
         } else {
             // if the user is not enrolled, display the enroll button
             enrollButton.classList.remove('d-none');
             unenrollButton.classList.add('d-none');
+            roleSelector.value = 5;
+            roleSelector.classList.remove('d-none');
         }
     });
 }
@@ -797,12 +811,6 @@ export default function attachUpdateCallbacks(token) {
     attachLMSCallbacksForUpdateUserForm(token);
     attachLMSCallbacksForCourseRosterForm(token);
     attachLMSCallbacksForCourseUpdateForm(token);
-
-    // attachLMSCallbacksForAddingUsers(token);
-
-    // attachLMSCallbacksForShowingCourseRoster(token);
-    // attachLMSCallbacksForUpdatingCourses(token);
-    // attachLMSCallbacksForDeletingCourses(token);
 
     attachUpdateBrandCallbackToTextField('g_device', 'g_device', token);
     attachUpdateBrandCallbackToTextField('enable_mass_storage', 'enable_mass_storage', token);

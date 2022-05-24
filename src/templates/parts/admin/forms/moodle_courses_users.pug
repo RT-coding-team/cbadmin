@@ -16,9 +16,14 @@ block form
     div.position-relative
         select.input-text.lms-course-selector.mb-1(name="moodle_courses" id="moodle_courses-input")
             option(value="") --- Choose Course
-        select.input-text.mb-2.lms-user-selector(name="moodle_enrollees" id="moodle_enrollees-input")
+        select.input-text.mb-1.lms-user-selector(name="moodle_enrollees" id="moodle_enrollees-input")
             option(value="") --- Choose a User
-        div.border-top.pt-1
+        select.input-text.mb-1.d-none.lms-role-selector(name="moodle_role" id="moodle_role-input")
+            option(value="4") Non-editing Teacher
+            option(value="1") Manager
+            option(value="5" selected=true) Student
+            option(value="3") Teacher
+        div.border-top.mt-1.pt-1
             p.fst-italic Current Members
             ul.mt-2(id="course-users-list")
         +button-add-to-class(id)
