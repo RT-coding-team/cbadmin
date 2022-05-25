@@ -16,11 +16,29 @@ function analyseResponse(req, callbackSuccess, callbackError) {
         const res = JSON.parse(req.responseText);
         if (res.code && res.code !== 0) return callbackError(req.status, req.responseText);
 
-        callbackSuccess(res?.result?.[0] !== undefined ? res.result[0] : res);
+        callbackSuccess(res?.result !== undefined ? res.result : res);
     } catch (e) {
         console.log(e)
         callbackError(req.status, req.responseText);
     }
+}
+
+/**
+ * Send a delete request and parse result
+ * @param url the url where to send the request (to the API)
+ * @param token to authenticate the request
+ * @param callback the callback if request succeed
+ * @param callbackError the callback if request (or parsing) fail
+ */
+export function del(url, token, callback, callbackError = console.error) {
+    const oReq = new XMLHttpRequest();
+    oReq.onload = () => {
+        analyseResponse(oReq, callback, callbackError)
+    }
+    oReq.open('delete', url, true);
+    if (token)
+        oReq.setRequestHeader('Authorization', token);
+    oReq.send();
 }
 
 /**

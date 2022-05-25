@@ -1,0 +1,5 @@
+mixin button-account-remove(id)
+    .button-account-remove.position-absolute.second-button
+        button.bg-transparent.border-0.p-0.text-primary(id=id+'-btn', type="button" title="Delete Account")
+            include ../icons/account-remove
+        .loader(id=id+'-loader')
