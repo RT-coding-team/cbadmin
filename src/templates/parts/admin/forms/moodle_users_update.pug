@@ -1,0 +1,23 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'moodle_users_update'
+
+block icon
+    include ../../../icons/admin
+
+block title
+    | Moodle Update User
+
+block form
+    div.position-relative
+        select.input-text(name="moodle_users" id="moodle_users-input")
+            option(value="") --- Choose User To Update
+        input.w-100.hiden.input-text#moodle_username-input(placeholder='Username', name='moodle_username')
+        input.w-100.hiden.input-text#moodle_password-input(placeholder='Password', name='moodle_password')
+        input.w-100.hiden.input-text#moodle_firstname-input(placeholder='First Name', name='moodle_firstname')
+        input.w-100.hiden.input-text#moodle_lastname-input(placeholder='Last Name', name='moodle_lastname')
+        input.w-100.hiden.input-text#moodle_email-input(placeholder='Email (optional / required for teachers)', name='moodle_email')
+        | Delete This User
+        +button-save(id)

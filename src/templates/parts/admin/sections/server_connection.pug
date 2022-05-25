@@ -2,13 +2,20 @@ extends ../../../layout/section
 
 block title
     include ../../../icons/server
-    | Server Connection
+    | Cloud Server Connection
 
 block content
-    include ../forms/server_url
-    include ../forms/server_authorization
-    include ../forms/server_sitename
-    include ../forms/server_siteadmin_country
-    include ../forms/server_siteadmin_name
-    include ../forms/server_siteadmin_email
-    include ../forms/server_siteadmin_phone
+    .regular
+        include ../forms/server_url
+    #serverauthregion.hidden.isAdvanced
+        include ../forms/server_authorization
+    .regular
+        include ../forms/server_sitename
+    .regular
+        include ../forms/server_siteadmin_country
+    .regular
+        include ../forms/server_siteadmin_name
+    .regular
+        include ../forms/server_siteadmin_email
+    .regular
+        include ../forms/server_siteadmin_phone

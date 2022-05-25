@@ -5,8 +5,13 @@ block variables
     - var id = 'wap'
 
 block items
-    include ./wap_status
-    include ./ssid
-    include ./channel
-    include ./wpa-passphrase
-    include ./wap-wifirestart
+    #hostnameregion.allUsers
+        include ./wap_status
+    #wapssidregion.allUsers.hidden.isAdvanced
+        include ./ssid
+    #wapchannelregion.allUsers.hidden.isAdvanced
+        include ./channel
+    #wappassphraseregion.allUsers.hidden.isAdvanced
+        include ./wpa-passphrase
+    #waprestartregion.allUsers.hidden.isAdvanced
+        include ./wap-wifirestart

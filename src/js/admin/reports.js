@@ -1,4 +1,4 @@
-import { ASSETS_URL, get} from "../api/api";
+import { API_URL, get} from "../api/api";
 
 const RESULTS_PER_PAGE = 5
 
@@ -104,7 +104,7 @@ export default function initReports() {
     renderReportList('stats', []);
 
     // Top ten requests
-    get(`${ASSETS_URL}stats.top10.json`, null, (stats) => {
+    get(`${API_URL}topten`, null, (stats) => {
         const periodSelector = document.getElementById('top10-period')
         renderReportList('top10', stats[periodSelector.value]);
         periodSelector.addEventListener('change', (e) => {
@@ -113,7 +113,7 @@ export default function initReports() {
     });
 
     // All requests
-    get(`${ASSETS_URL}stats.json`, null, (stats) => {
+    get(`${API_URL}stats`, null, (stats) => {
         // Get controls
         const periodTypeSelector = document.getElementById('stats-period-type')
         const periodSelector = document.getElementById('stats-period')

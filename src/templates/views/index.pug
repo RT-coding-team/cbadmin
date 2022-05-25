@@ -26,12 +26,12 @@ block content
                     #web
                         include ../parts/admin/sections/web_server
                 .col
-                    #server.noMoodle.hidden
+                    #moodle.hiden.isMoodle
+                        include ../parts/admin/sections/moodle
+                    #server
                         include ../parts/admin/sections/server_connection
                     #otg
                         include ../parts/admin/sections/on_the_go
-                    #lcd
-                        include ../parts/admin/sections/lcd_configuration
                     #system
                         include  ../parts/admin/sections/system
                 .col
@@ -39,9 +39,11 @@ block content
                         include  ../parts/admin/sections/logs
                     #reports
                         include  ../parts/admin/sections/reports
+                    #lcd.hidden.isAdvanced
+                        include ../parts/admin/sections/lcd_configuration
                     #about
                         include  ../parts/admin/sections/about
-                    #wipe
+                    #wipe.hidden.isAdvanced
                         include  ../parts/admin/sections/wipe
 
 block scripts

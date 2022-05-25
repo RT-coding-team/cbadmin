@@ -1,0 +1,21 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'moodle_courses_users'
+
+block icon
+    include ../../../icons/admin
+
+block title
+    | Moodle Course Users
+
+block form
+    div.position-relative
+        select.input-text(name="moodle_courses" id="moodle_courses-input")
+            option(value="") --- Choose Course
+        br
+        span
+            | Derek Maxson (teacher)
+            br
+            | Brian Ward (student)
