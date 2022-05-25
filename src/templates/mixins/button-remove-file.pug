@@ -1,0 +1,5 @@
+mixin button-remove-file(id)
+    .button-remove-file.position-absolute.second-button
+        button.bg-transparent.border-0.p-0.text-primary(id=id+'-btn', type="button", title="Remove")
+            include ../icons/file-remove
+        .loader(id=id+'-loader')

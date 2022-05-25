@@ -1,0 +1,5 @@
+mixin button-remove-from-class(id)
+    .button-remove-from-class.position-absolute.end--5.top-0
+        button.bg-transparent.border-0.p-0.text-primary(id=id+'-btn', type="button", title="Remove User from Class")
+            include ../icons/remove-from-class
+        .loader(id=id+'-loader')

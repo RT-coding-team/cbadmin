@@ -104,7 +104,8 @@ export default function initReports() {
     renderReportList('stats', []);
 
     // Top ten requests
-    get(`${API_URL}topten`, null, (stats) => {
+    get(`${API_URL}topten`, null, (data) => {
+        const stats = data[0];
         const periodSelector = document.getElementById('top10-period')
         renderReportList('top10', stats[periodSelector.value]);
         periodSelector.addEventListener('change', (e) => {
@@ -113,7 +114,8 @@ export default function initReports() {
     });
 
     // All requests
-    get(`${API_URL}stats`, null, (stats) => {
+    get(`${API_URL}stats`, null, (data) => {
+        const stats = data[0];
         // Get controls
         const periodTypeSelector = document.getElementById('stats-period-type')
         const periodSelector = document.getElementById('stats-period')
