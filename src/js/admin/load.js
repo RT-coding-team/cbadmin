@@ -195,6 +195,7 @@ function isMoodleRenderer(element, value) {
 function getProperty(id, name, token, renderer = defaultRenderer) {
     const successCallback = (prop) => {
         const element = document.getElementById(id);
+		if (prop[0] && prop[0][0]) { prop = prop[0]}  // When we have an array of an array of objects, make an array of objects (select renderers)
 	    console.log(`Getting: ${id} -- ${name}: ${prop}`);
         renderer(element, prop);
     }
