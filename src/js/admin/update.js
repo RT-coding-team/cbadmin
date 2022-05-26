@@ -21,7 +21,7 @@ function successCallback(name) {
  */
 function errorCallback(code) {
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar(`Unable to Save To Database: ${error}`);
+    openSnackBar(`Unable to Save To Database`);
 }
 
 function passwordMismatch() {
