@@ -1,5 +1,12 @@
-div.mb-3
+extends ../../../layout/form
+
+block icon
     include ../../../icons/chart
+
+block title
+    | Wireless Access Point Status
+
+block form
     label(for="connectedclients" style="font-weight: bold;" id="connectedclients")
         | Devices Connected To This Box: 
 
