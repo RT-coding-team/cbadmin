@@ -243,6 +243,7 @@ export default function (token) {
     getProperty('channel-input', 'apchannel', token);
     getProperty('clientwificonnection', 'clientwificonnection', token, textRenderer);
     getProperty('connectedclients', 'connectedclients', token, textRenderer);
+    getProperty('boxid', 'boxid', token, textRenderer);
     getProperty('logsources', 'logsources', token, logSourcesRenderer);
 
     getProperty('server_url-input', 'brand/server_url', token, stringParserRenderer);
