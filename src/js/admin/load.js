@@ -267,7 +267,8 @@ export default function (token) {
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
-	getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);
+	// Don't get clientwifiscan on load because it takes too long.
+	//getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);  
     getProperty('client-ssid-input', 'clientssid', token);
     getProperty('client-wifipassword-input', 'clientpassphrase', token);
     getProperty('client-wificountry-input', 'clientcountry', token);
