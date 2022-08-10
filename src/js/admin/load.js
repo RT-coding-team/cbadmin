@@ -95,13 +95,12 @@ function wifiScanRenderer(element, value) {
 		option.value = record.ssid;
 		option.text = `${record.ssid}:     (${encText[record.encryption]})`;
 		element.appendChild(option);
-		// Show the select list now
-		element.classList.remove('hidden');
-		// Now hide the "Loading" message
-		var label = document.getElementById(`load-clientwifiscan`);
-		label.classList.add('hidden');
-
 	}
+	// Show the select list now
+	element.classList.remove('hidden');
+	// Now hide the "Loading" message
+	var label = document.getElementById(`load-clientwifiscan`);
+	label.classList.add('hidden');
 }
 
 /**
@@ -248,7 +247,6 @@ function attachListenerForClientWifiScan() {
     form.addEventListener('click', function() {
 		form.textContent = 'Loading...';
 		getProperty('client-wifiscan-input','clientwifiscan', null, wifiScanRenderer);  
-		form.classList.add('hidden');
     }, false);
 }
 
