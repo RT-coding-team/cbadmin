@@ -46,22 +46,68 @@ function attachSystemScript(id, token) {
         get(`${API_URL}do/${id}`,token,()=>successCallback(id), (code)=>errorCallback(id, code))
     })
 }
-
+/**
+ * Enable the advance options
+ *
+ * @return {void}
+ */
+function enableAdvancedOptions() {
+	openSnackBar('Enabling Advanced Options','success');
+	console.log("Enabling Advanced Options -- show hidden regions");
+	var elements = document.getElementsByClassName('isAdvanced');
+	for (var element of elements) {
+		element.classList.remove('hidden');
+	}
+}
 function attachAdvanced(id,token) {
     const button = document.getElementById(`${id}-button`)
-	console.log(`attachSystemScript: ${id}-button`);
+		console.log(`attachSystemScript: ${id}-button`);
     button.addEventListener('click', () => {
-   		openSnackBar('Enabling Advanced Options','success');
-		console.log("Enabling Advanced Options -- show hidden regions");
-		var elements = document.getElementsByClassName('isAdvanced')
-		for (var element of elements) {
-			console.log('Showing Advanced Option: ' + element.id)
-			var item = document.getElementById(element.id)
-			item.classList.remove('hidden'); 
+			const popup = document.getElementById('popup-sign-in');
+			popup.style.display = 'block';
+			// enableAdvancedOptions();
+		});
+}
+/**
+ * Attach common popup events
+ *
+ * @return {void}
+ */
+function attachPopup() {
+	/**
+	 * Any elements that have a class popup-close-trigger will close the popup.
+	 * Simply add a data-popup tag with the id of the popup to close
+	 */
+	const elements = document.getElementsByClassName('popup-close-trigger');
+	for (const element of elements) {
+		element.addEventListener('click', (event) => {
+			const target = event.target || event.srcElement;
+			document.getElementById(target.dataset.popup).style.display = 'none';
+		});
+	}
+}
+/**
+ * Attach sign in callbacks
+ *
+ * @return {void}
+ */
+function attachSignIn() {
+	const submit = document.querySelector('#popup-sign-in .check-login');
+	submit.addEventListener('click', (event) => {
+		const target = event.target || event.srcElement;
+		const popup = document.getElementById('popup-sign-in');
+		const input = popup.querySelector('input.password');
+		if (input.value === '') {
+			input.classList.add('has-error');
+			return;
 		}
-
-    })
-
+		/**
+		 * @TODO Check if password is valid
+		 */
+		input.classList.remove('has-error');
+		popup.style.display = 'none';
+		enableAdvancedOptions();
+	});
 }
 
 /**
@@ -75,5 +121,7 @@ export default function attachSystemScripts(token){
     attachSystemScript('reboot', token);
     attachSystemScript('sync', token);
     attachAdvanced('advanced', token);
+		attachPopup();
+		attachSignIn();
     //attachSystemScript('reset', token);
 }
