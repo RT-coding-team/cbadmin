@@ -233,6 +233,22 @@ function getScreenEnable(token) {
 }
 
 /**
+ * /clientwifiscan is triggered by click even on message "Load Available Networks"
+ *
+ * 
+ */
+function attachListenerForClientWifiScan() {
+    const form = document.getElementById(`load-clientwifiscan`);
+    form.addEventListener('click', function() {
+		form.textContent = 'Loading...';
+		getProperty('client-wifiscan-input','clientwifiscan', null, wifiScanRenderer);  
+		var item = document.getElementById('client-wifiscan-input');
+		item.classList.remove('hidden');
+		form.classList.add('hidden');
+    }, false);
+}
+
+/**
  * Get all readable params and set values of inputs
  *
  * @param token the authorization token
@@ -269,6 +285,8 @@ export default function (token) {
 
 	// Don't get clientwifiscan on load because it takes too long.
 	//getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);  
+	attachListenerForClientWifiScan();
+	
     getProperty('client-ssid-input', 'clientssid', token);
     getProperty('client-wifipassword-input', 'clientpassphrase', token);
     getProperty('client-wificountry-input', 'clientcountry', token);
