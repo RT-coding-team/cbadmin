@@ -1,6 +1,6 @@
 extends ../../../layout/form
 include ../../../mixins/button-save
-include ../../../mixins/button-account-remove
+include ../../../mixins/button-class-remove
 
 block variables
     - var id = 'moodle_classes_update'
@@ -19,4 +19,4 @@ block form
             input.w-100.hiden.input-text#moodle_update_class_name-input(placeholder='Name', name='moodle_class_name')
             input#moodle_update_class_id-input(type='hidden')
             +button-save(id)
-            +button-account-remove('moodle_class_account_remove')
+            +button-class-remove('moodle_class_remove')
