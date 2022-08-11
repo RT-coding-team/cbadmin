@@ -382,7 +382,7 @@ function lmsUpdateCourseSelectors(token, exclude = []) {
 function lmsUpdateUserSelectors(token, exclude = []) {
     const lmsUserSelectRender = (data) => {
         if (!('users' in data)) {
-            console.error('No users were found!', value);
+            console.error('No users were found!', data);
         }
         const users = data.users.filter((user) => (!exclude.includes(user.id)));
         const selectors = document.querySelectorAll('.lms-user-selector');
@@ -391,6 +391,24 @@ function lmsUpdateUserSelectors(token, exclude = []) {
     get(`${API_URL}lms/users`, token, lmsUserSelectRender, errorCallback);
 }
 
+/**
+ * Update the LMS class selectors
+ *
+ * @param   {string}    token       the token to authenticate the requests
+ * @param   {array}     exclude     an array of user ids that you want to exclude
+ * @return  {void}
+ */
+function lmsUpdateClassSelectors(token, exclude = []) {
+  const renderer = (data) => {
+      if (data.length === 0) {
+          console.error('No classes were found!', data);
+      }
+      const classes = data.filter((klass) => (!exclude.includes(klass.id)));
+      const selectors = document.querySelectorAll('.lms-class-selector');
+      selectors.forEach((selector) => appendOptionsToSelect(selector, classes, 'name', 'id'));
+  };
+  get(`${API_URL}lms/classes`, token, renderer, errorCallback);
+}
 /**
  * Attach the callbacks for deleting LMS users
  *
@@ -859,6 +877,7 @@ export default function attachUpdateCallbacks(token) {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       lmsUpdateCourseSelectors(token);
       lmsUpdateUserSelectors(token);
+      lmsUpdateClassSelectors(token);
       attachLMSCallbacksForAddUserForm(token);
       attachLMSCallbacksForAddClassForm(token);
       attachLMSCallbacksForUpdateUserForm(token);
