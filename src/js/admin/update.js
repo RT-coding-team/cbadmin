@@ -399,16 +399,53 @@ function lmsUpdateUserSelectors(token, exclude = []) {
  * @return  {void}
  */
 function lmsUpdateClassSelectors(token, exclude = []) {
-  const renderer = (data) => {
-      if (data.length === 0) {
-          console.error('No classes were found!', data);
-      }
-      const classes = data.filter((klass) => (!exclude.includes(klass.id)));
-      const selectors = document.querySelectorAll('.lms-class-selector');
-      selectors.forEach((selector) => appendOptionsToSelect(selector, classes, 'name', 'id'));
-  };
-  get(`${API_URL}lms/classes`, token, renderer, errorCallback);
+    const renderer = (data) => {
+        if (data.length === 0) {
+            console.error('No classes were found!', data);
+        }
+        const classes = data.filter((klass) => (!exclude.includes(klass.id)));
+        const selectors = document.querySelectorAll('.lms-class-selector');
+        selectors.forEach((selector) => appendOptionsToSelect(selector, classes, 'name', 'id'));
+    };
+    get(`${API_URL}lms/classes`, token, renderer, errorCallback);
 }
+
+function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
+    const saveButton = document.getElementById('moodle_classes_update-btn');
+    const success = (data) => {
+      wrapper.classList.add('d-none');
+      hideLoader('moodle_classes_update');
+      saveButton.classList.remove('d-none');
+      lmsUpdateClassSelectors(token);
+      if ((typeof data === 'string') && (data.includes('updated'))) {
+          openSnackBar(data, 'success');
+          return;
+      }
+      console.error(data);
+      openSnackBar('Sorry, we were unable to update the class.', 'error');
+    };
+    saveButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      const id = document.getElementById('moodle_update_class_id-input').value;
+      if (!id) {
+          return false;
+      }
+      const name = document.getElementById('moodle_update_class_name-input').value;
+      const payload = { name };
+      const errors = [
+        ...validateObjectValues(payload),
+      ];
+      if (errors.length > 0) {
+          openSnackBar(errors.join("\r\n"), 'error');
+          return false;
+      }
+      saveButton.classList.add('d-none');
+      showLoader('moodle_classes_update');
+      put(`${API_URL}lms/classes/${id}`, token, payload, success, errorCallback);
+      return false;
+    });
+}
+
 /**
  * Attach the callbacks for deleting LMS users
  *
@@ -494,7 +531,6 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
             ];
         }
         if (errors.length > 0) {
-            console.log('here', errors);
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
@@ -713,6 +749,30 @@ function attachLMSCallbacksForAddClassForm(token) {
 }
 
 /**
+ * Attach the callbacks for update LMS class form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForUpdateClassForm(token) {
+    const select = document.getElementById('moodle_classes-input');
+    const wrapper = document.getElementById('moodle_classes-update-form');
+    select.addEventListener('change', (event) => {
+      const selected = select.options[select.selectedIndex];
+      if (selected.value !== '') {
+        wrapper.classList.remove('d-none');
+        document.getElementById('moodle_update_class_name-input').value = selected.text;
+        document.getElementById('moodle_update_class_id-input').value = selected.value;
+      } else {
+        wrapper.classList.add('d-none');
+        document.getElementById('moodle_update_class_name-input').value = '';
+        document.getElementById('moodle_update_class_id-input').value = '';
+      }
+    });
+    attachLMSCallbacksForUpdatingClasses(token, wrapper);
+}
+
+/**
  * Attach the callbacks for the add LMS user form
  *
  * @param  {string} token   the token to authenticate the requests
@@ -878,8 +938,9 @@ export default function attachUpdateCallbacks(token) {
       lmsUpdateCourseSelectors(token);
       lmsUpdateUserSelectors(token);
       lmsUpdateClassSelectors(token);
-      attachLMSCallbacksForAddUserForm(token);
       attachLMSCallbacksForAddClassForm(token);
+      attachLMSCallbacksForAddUserForm(token);
+      attachLMSCallbacksForUpdateClassForm(token);
       attachLMSCallbacksForUpdateUserForm(token);
       attachLMSCallbacksForCourseRosterForm(token);
       attachLMSCallbacksForCourseUpdateForm(token);

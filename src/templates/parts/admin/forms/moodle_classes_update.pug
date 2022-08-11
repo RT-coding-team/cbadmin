@@ -16,7 +16,7 @@ block form
         select.input-text.lms-class-selector(name="moodle_classes" id="moodle_classes-input")
             option(value="") --- Choose Class To Update
         div.d-none#moodle_classes-update-form
-            input.w-100.hiden.input-text#moodle_update_username-input(placeholder='Username', name='moodle_username')
+            input.w-100.hiden.input-text#moodle_update_class_name-input(placeholder='Name', name='moodle_class_name')
             input#moodle_update_class_id-input(type='hidden')
             +button-save(id)
             +button-account-remove('moodle_class_account_remove')
