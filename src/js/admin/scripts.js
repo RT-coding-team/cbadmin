@@ -1,4 +1,4 @@
-import {API_URL, get, post} from "../api/api";
+import {API_URL, get, post, put} from "../api/api";
 import openSnackBar from "../components/snackbar";
 import openPopup from "../components/popup";
 
@@ -102,11 +102,26 @@ function attachSignIn() {
 			return;
 		}
 		/**
-		 * @TODO Check if password is valid
+		 * Check if password is valid
 		 */
-		input.classList.remove('has-error');
-		popup.style.display = 'none';
-		enableAdvancedOptions();
+		const success = () => {
+			input.classList.remove('has-error');
+			popup.style.display = 'none';
+			enableAdvancedOptions();
+		};
+		const error = (status) => {
+			if (status === 401) {
+				input.value = '';
+				input.classList.add('has-error');
+			} else {
+				openSnackBar('Authentication request failed!', 'error');
+			}
+		};
+		const data = {
+			password:input.value,
+			permission: 'advanced_options',
+		};
+		put(`${API_URL}auth`, '', data, success, error);
 	});
 }
 
