@@ -1,0 +1,16 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+
+block variables
+    - var id = 'moodle_classes_add'
+
+block icon
+    include ../../../icons/admin
+
+block title
+    | Add a Class
+
+block form
+    div.position-relative
+        input.w-100.input-text#moodle_class_name-input(placeholder='Class Name', name='moodle_class_name')
+        +button-save(id)

@@ -238,6 +238,44 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 }
 
 /**
+ * Attach the callbacks for adding LMS classes
+ *
+ * @param  {string} token   the token to authenticate the requests
+ *
+ * @return {void}
+ */
+function attachLMSCallbacksForAddingClasses(token) {
+    const saveButton = document.getElementById('moodle_classes_add-btn');
+    const saveSuccessCallback = (data) => {
+      hideLoader('moodle_classes_add');
+      saveButton.classList.remove('d-none');
+      document.getElementById('moodle_class_name-input').value = '';
+      if ((Array.isArray(data)) && ('id' in data[0])) {
+          openSnackBar('The class has been added.', 'success');
+          return;
+      }
+      console.error(data);
+      openSnackBar('Sorry, we were unable to add the class.', 'error');
+    };
+    saveButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const name = document.getElementById('moodle_class_name-input').value;
+        let payload = { name };
+        const errors = [
+            ...validateObjectValues(payload)
+        ];
+        if (errors.length > 0) {
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
+        }
+        saveButton.classList.add('d-none');
+        showLoader('moodle_classes_add');
+        post(`${API_URL}lms/classes`, token, payload, saveSuccessCallback, errorCallback);
+        return false;
+    });
+}
+
+/**
  * Attach the callbacks for adding LMS users
  *
  * @param  {string} token   the token to authenticate the requests
@@ -281,7 +319,7 @@ function attachLMSCallbacksForAddingUsers(token) {
         }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_add');
-        post(`${API_URL}/lms/users`, token, payload, saveSuccessCallback, errorCallback);
+        post(`${API_URL}lms/users`, token, payload, saveSuccessCallback, errorCallback);
         return false;
     });
 
@@ -315,7 +353,7 @@ function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no
         });
         appendItemsToList(list, values, 'title');
     }
-    get(`${API_URL}/lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
+    get(`${API_URL}lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
 }
 
 /**
@@ -331,7 +369,7 @@ function lmsUpdateCourseSelectors(token, exclude = []) {
         const selectors = document.querySelectorAll('.lms-course-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, courses, 'fullname', 'id'));
     };
-    get(`${API_URL}/lms/courses`, token, lmsCourseSelectRender, errorCallback);
+    get(`${API_URL}lms/courses`, token, lmsCourseSelectRender, errorCallback);
 }
 
 /**
@@ -350,7 +388,7 @@ function lmsUpdateUserSelectors(token, exclude = []) {
         const selectors = document.querySelectorAll('.lms-user-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, users, 'fullname', 'id'));
     };
-    get(`${API_URL}/lms/users`, token, lmsUserSelectRender, errorCallback);
+    get(`${API_URL}lms/users`, token, lmsUserSelectRender, errorCallback);
 }
 
 /**
@@ -384,7 +422,7 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
         if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_users_account_remove');
-            del(`${API_URL}/lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
+            del(`${API_URL}lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
         }
         return false;
     });
@@ -444,7 +482,7 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_update');
-        put(`${API_URL}/lms/users/${id}`, token, payload, saveSuccessCallback, errorCallback);
+        put(`${API_URL}lms/users/${id}`, token, payload, saveSuccessCallback, errorCallback);
         return false;
     });
 }
@@ -501,7 +539,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        put(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, payload, enrollSuccessCallback, errorCallback);
+        put(`${API_URL}lms/courses/${courseId}/users/${userId}`, token, payload, enrollSuccessCallback, errorCallback);
         return false;
     });
     const unenrollSuccessCallback = (data) => {
@@ -538,7 +576,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        del(`${API_URL}/lms/courses/${courseId}/users/${userId}`, token, unenrollSuccessCallback, errorCallback);
+        del(`${API_URL}lms/courses/${courseId}/users/${userId}`, token, unenrollSuccessCallback, errorCallback);
         return false;
     });
     courseSelect.addEventListener('change', ()  =>  {
@@ -600,7 +638,7 @@ function attachLMSCallbacksForUpdatingCourses(token) {
         payload.fullname = document.getElementById('moodle_update_course_name-input').value;
         payload.shortname = document.getElementById('moodle_update_course_short_name-input').value;
         payload.summary = document.getElementById('moodle_update_course_summary-input').value;
-        put(`${API_URL}/lms/courses/${id}`, token, payload, updateSuccessCallback, errorCallback);
+        put(`${API_URL}lms/courses/${id}`, token, payload, updateSuccessCallback, errorCallback);
         return false;
     });
 }
@@ -639,16 +677,28 @@ function attachLMSCallbacksForDeletingCourses(token) {
         if (confirm(`Are you sure you want to delete the course: ${courseName}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_course_remove');
-            del(`${API_URL}/lms/courses/${id}`, token, deleteSuccessCallback, errorCallback);
+            del(`${API_URL}lms/courses/${id}`, token, deleteSuccessCallback, errorCallback);
         }
         return false;
     });
 }
 
 /**
+ * Attach the callbacks for the add LMS class form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ *
+ * @return {void}
+ */
+function attachLMSCallbacksForAddClassForm(token) {
+  attachLMSCallbacksForAddingClasses(token);
+}
+
+/**
  * Attach the callbacks for the add LMS user form
  *
  * @param  {string} token   the token to authenticate the requests
+ *
  * @return {void}
  */
 function attachLMSCallbacksForAddUserForm(token) {
@@ -678,7 +728,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
     userSelect.addEventListener('change', ()  =>  {
         const userId = userSelect.value;
         if (userId) {
-            get(`${API_URL}/lms/users/${userId}`, token, userSuccessCallback, errorCallback);
+            get(`${API_URL}lms/users/${userId}`, token, userSuccessCallback, errorCallback);
         } else {
             wrapper.classList.add('d-none');
             document.getElementById('moodle_update_username-input').value = '';
@@ -729,7 +779,7 @@ function attachLMSCallbacksForCourseUpdateForm(token) {
     courseSelector.addEventListener('change', () => {
         const courseId = courseSelector.value;
         if (courseId) {
-          get(`${API_URL}/lms/courses/${courseId}`, token, courseGetSuccessCallback, errorCallback);
+          get(`${API_URL}lms/courses/${courseId}`, token, courseGetSuccessCallback, errorCallback);
         } else {
             document.getElementById('moodle_update_course_name-input').value = '';
             document.getElementById('moodle_update_course_short_name-input').value = '';
@@ -810,6 +860,7 @@ export default function attachUpdateCallbacks(token) {
       lmsUpdateCourseSelectors(token);
       lmsUpdateUserSelectors(token);
       attachLMSCallbacksForAddUserForm(token);
+      attachLMSCallbacksForAddClassForm(token);
       attachLMSCallbacksForUpdateUserForm(token);
       attachLMSCallbacksForCourseRosterForm(token);
       attachLMSCallbacksForCourseUpdateForm(token);
