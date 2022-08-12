@@ -8,6 +8,13 @@ import {
 } from '../utils/utils';
 
 /**
+ * Store the LMS user for access
+ *
+ * @type {Array}
+ */
+const lmsUsers = [];
+
+/**
  * Open a snackbar and display a success message
  * @param name the updated field
  */
@@ -326,6 +333,40 @@ function attachLMSCallbacksForAddingUsers(token) {
 }
 
 /**
+ * Update the class roster list.  Adds a data-enrolled on the provided list with all the ids
+ * of enrolled users.
+ *
+ * @param  {object}     list        The list to update
+ * @param  {object}     users       An array of keyed with user id and username. The URL does not return them.
+ * @param  {token}      token       The API token
+ * @param  {integer}    classId     The class to retrieve the id for
+ * @param  {String}     emptyText   The text to display if no users are found
+ * @return {void}
+ */
+function lmsUpdateClassRosterList(list, users, token, classId, emptyText = 'Sorry, no users found.') {
+    const success = (data) => {
+        // The API passes an array of with a userids.
+        let ids = [];
+        if (data.length > 0) {
+            ids = data[0].userids;
+        }
+        list.innerHTML = '';
+        list.setAttribute('data-enrolled', ids.join('|'));
+        if (ids.length === 0) {
+            const li = document.createElement('li');
+            li.innerHTML = emptyText;
+            list.appendChild(li);
+            return;
+        }
+        const values = ids.map((id) => {
+          return {title: lmsUsers[id]};
+        });
+        appendItemsToList(list, values, 'title');
+    };
+    get(`${API_URL}lms/classes/${classId}/users`, token, success, errorCallback);
+}
+
+/**
  * Update the course roster list.  Adds a data-enrolled on the provided list with all the ids
  * of enrolled users.
  *
@@ -384,6 +425,8 @@ function lmsUpdateUserSelectors(token, exclude = []) {
         if (!('users' in data)) {
             console.error('No users were found!', data);
         }
+        // Cache the users
+        data.users.forEach((user) =>  lmsUsers[user.id] = user.fullname);
         const users = data.users.filter((user) => (!exclude.includes(user.id)));
         const selectors = document.querySelectorAll('.lms-user-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, users, 'fullname', 'id'));
@@ -444,6 +487,54 @@ function attachLMSCallbacksForDeletingClass(token, wrapper) {
           del(`${API_URL}lms/classes/${id}`, token, success, errorCallback);
       }
       return false;
+    });
+}
+
+/**
+ * Attach the callbacks for enrolling students into a class
+ *
+ * @param  {string}     token   the token to authenticate the requests
+ *
+ * @return {void}
+ */
+function attachLMSCallbacksForClassEnrollment(token) {
+    const classSelect = document.getElementById('moodle_classes_enroll-input');
+    const users = [];
+    const enrollButton = document.getElementById('moodle_class_enroll-btn');
+    const unenrollButton = document.getElementById('moodle_class_unenroll-btn');
+    const list = document.getElementById('class-users-list');
+    unenrollButton.classList.add('d-none');
+    const enrollSuccess = (data) => {
+        const classId = classSelect.value;
+        lmsUpdateClassRosterList(list, [], token, classId);
+        if ((typeof data === 'string') && (data.includes('enrolled'))) {
+            openSnackBar(data, 'success');
+            return;
+        }
+        console.error(data);
+        openSnackBar('Sorry, we were unable to enroll the user in the class.', 'error');
+    };
+    enrollButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const classId = classSelect.value;
+        const userId = document.getElementById('moodle_class_enrollee-input').value;
+        const errors = [];
+        if (!classId) {
+            errors.push('Please select a class.');
+        }
+        if (!userId) {
+            errors.push('Please select an enrollee.');
+        }
+        if (errors.length > 0) {
+            openSnackBar(errors.join("\r\n"), 'error');
+            return false;
+        }
+        put(`${API_URL}lms/classes/${classId}/users/${userId}`, token, {}, enrollSuccess, errorCallback);
+        return false;
+    });
+    classSelect.addEventListener('change', () => {
+      const classId = classSelect.value;
+      lmsUpdateClassRosterList(list, [], token, classId);
     });
 }
 
@@ -867,6 +958,16 @@ function attachLMSCallbacksForUpdateUserForm(token) {
 }
 
 /**
+ * Attach the callbacks for class roster form
+ *
+ * @param  {string} token   the token to authenticate the requests
+ * @return {void}
+ */
+function attachLMSCallbacksForClassRosterForm(token) {
+    attachLMSCallbacksForClassEnrollment(token);
+}
+
+/**
  * Attach the callbacks for course roster form
  *
  * @param  {string} token   the token to authenticate the requests
@@ -987,6 +1088,7 @@ export default function attachUpdateCallbacks(token) {
       attachLMSCallbacksForAddUserForm(token);
       attachLMSCallbacksForUpdateClassForm(token);
       attachLMSCallbacksForUpdateUserForm(token);
+      attachLMSCallbacksForClassRosterForm(token);
       attachLMSCallbacksForCourseRosterForm(token);
       attachLMSCallbacksForCourseUpdateForm(token);
     };
