@@ -6,6 +6,7 @@ import {
     alphaSortWithKey, appendItemsToList, appendOptionsToSelect, validateLMSEmail,
     validateLMSPassword, validateLMSUsername, validateObjectValues
 } from '../utils/utils';
+import { UserRepo } from '../repos/user-repo';
 
 /**
  * Store the LMS user for access
@@ -13,6 +14,12 @@ import {
  * @type {Array}
  */
 const lmsUsers = [];
+/**
+ * Our student repository
+ *
+ * @type {UserRepo}
+ */
+let userRepo = null;
 
 /**
  * Open a snackbar and display a success message
@@ -26,9 +33,9 @@ function successCallback(name) {
  * Open a snackbar and display an error message
  * @param name the updated field
  */
-function errorCallback(code) {
+function errorCallback(code, msg = 'Unable to Save To Database') {
     if (code === 401) window.location.href = "/admin/login.html";
-    openSnackBar(`Unable to Save To Database`);
+    openSnackBar(`${msg}`);
 }
 
 function passwordMismatch() {
@@ -299,7 +306,7 @@ function attachLMSCallbacksForAddingUsers(token) {
         document.getElementById('moodle_firstname-input').value = '';
         document.getElementById('moodle_lastname-input').value = '';
         document.getElementById('moodle_email-input').value = '';
-        lmsUpdateUserSelectors(token);
+        lmsUpdateUserSelectors();
         if ((Array.isArray(data)) && ('id' in data[0])) {
             openSnackBar('The user has been added', 'success');
             return;
@@ -424,22 +431,16 @@ function lmsUpdateCourseSelectors(token, exclude = []) {
 /**
  * Update the LMS user selectors
  *
- * @param   {string}    token       the token to authenticate the requests
  * @param   {array}     exclude     an array of user ids that you want to exclude
  * @return  {void}
  */
-function lmsUpdateUserSelectors(token, exclude = []) {
-    const lmsUserSelectRender = (data) => {
-        if (!('users' in data)) {
-            console.error('No users were found!', data);
-        }
-        // Cache the users
-        data.users.forEach((user) =>  lmsUsers[user.id] = user.fullname);
-        const users = data.users.filter((user) => (!exclude.includes(user.id)));
-        const selectors = document.querySelectorAll('.lms-user-selector');
-        selectors.forEach((selector) => appendOptionsToSelect(selector, users, 'fullname', 'id'));
-    };
-    get(`${API_URL}lms/users`, token, lmsUserSelectRender, errorCallback);
+function lmsUpdateUserSelectors(exclude = []) {
+    userRepo.all().then((users) => {
+      users.forEach((user) =>  lmsUsers[user.id] = user.fullname);
+      const filtered = users.filter((user) => (!exclude.includes(user.id)));
+      const selectors = document.querySelectorAll('.lms-user-selector');
+      selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
+  }).catch((code) => errorCallback(code, 'Unable to retrieve the users.'));
 }
 
 /**
@@ -652,18 +653,6 @@ function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
  */
 function attachLMSCallbacksForDeletingUser(token, wrapper) {
     const deleteButton = document.getElementById('moodle_users_account_remove-btn');
-    const deleteSuccessCallback = (data) => {
-        wrapper.classList.add('d-none');
-        lmsUpdateUserSelectors(token);
-        hideLoader('moodle_users_account_remove');
-        deleteButton.classList.remove('d-none');
-        if ((typeof data === 'string') && (data.includes('deleted'))) {
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to delete the user.', 'error');
-    };
     deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
         const id = document.getElementById('moodle_update_user_id-input').value;
@@ -674,7 +663,14 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
         if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_users_account_remove');
-            del(`${API_URL}lms/users/${id}`, token, deleteSuccessCallback, errorCallback);
+            userRepo.delete(id).then(() => {
+                wrapper.classList.add('d-none');
+                lmsUpdateUserSelectors();
+                hideLoader('moodle_users_account_remove');
+                deleteButton.classList.remove('d-none');
+                openSnackBar('The user has been deleted.', 'success');
+            })
+            .catch((code) =>  errorCallback(code, 'Sorry, we were unable to delete the user.'));
         }
         return false;
     });
@@ -691,7 +687,7 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
     const saveButton = document.getElementById('moodle_users_update-btn');
     const saveSuccessCallback = (data) => {
         wrapper.classList.add('d-none');
-        lmsUpdateUserSelectors(token);
+        lmsUpdateUserSelectors();
         hideLoader('moodle_users_update');
         saveButton.classList.remove('d-none');
         if ((typeof data === 'string') && (data.includes('updated'))) {
@@ -1170,8 +1166,9 @@ export default function attachUpdateCallbacks(token) {
     // Load LMS forms and fields if is moodle.
     const lmsSetUp = (data) => {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
+      userRepo = new UserRepo(token);
       lmsUpdateCourseSelectors(token);
-      lmsUpdateUserSelectors(token);
+      lmsUpdateUserSelectors();
       lmsUpdateClassSelectors(token);
       attachLMSCallbacksForAddClassForm(token);
       attachLMSCallbacksForAddUserForm(token);
