@@ -378,6 +378,13 @@ function lmsUpdateClassRosterList(list, users, token, classId, emptyText = 'Sorr
  * @return {void}
  */
 function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no users found.') {
+    if (courseId === '') {
+        list.innerHTML = '';
+        const li = document.createElement('li');
+        li.innerHTML = emptyText;
+        list.appendChild(li);
+        return;
+    }
     const courseSuccessCallback = (data) => {
         const ids = data.map((user) => user.id);
         list.innerHTML = '';
@@ -744,7 +751,9 @@ function attachLMSCallbacksForEnrollingUser(token) {
     const unenrollButton = document.getElementById('moodle_courses_users_remove-btn');
     const roleSelector = document.getElementById('moodle_role-input');
     unenrollButton.classList.add('d-none');
+    const enrolleeSelectors = document.getElementById('moodle_courses_enrollee_select');
     const studentSelector = document.getElementById('moodle_enrollees-input');
+    const classSelector = document.getElementById('moodle_classes_enrollees-input');
     const list = document.getElementById('course-users-list');
     const enrollSuccessCallback = (data) => {
         if ((typeof data === 'string') && (data.includes('enrolled'))) {
@@ -825,15 +834,25 @@ function attachLMSCallbacksForEnrollingUser(token) {
     });
     courseSelect.addEventListener('change', ()  =>  {
         const courseId = courseSelect.value;
-        studentSelector.value = '';
-        roleSelector.classList.add('d-none');
-        roleSelector.value = 5;
+        if (courseId === '') {
+            // Do not allow selection of role or who to enroll
+            enrolleeSelectors.classList.add('d-none');
+            roleSelector.value = 5;
+            roleSelector.classList.add('d-none');
+        } else {
+            studentSelector.value = '';
+            classSelector.value = '';
+            studentSelector.disabled = false;
+            classSelector.disabled = false;
+            enrolleeSelectors.classList.remove('d-none');
+        }
         lmsUpdateCourseRosterList(list, token, courseId);
     });
     studentSelector.addEventListener('change', () => {
         const enrolled = list.getAttribute('data-enrolled');
         const studentId = studentSelector.value;
-        if (enrolled.split('|').includes(studentId)) {
+        classSelector.disabled = (studentId !== '');
+        if ((enrolled) && (enrolled.split('|').includes(studentId))) {
             // if user is enrolled, display the unenroll button
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
@@ -844,7 +863,22 @@ function attachLMSCallbacksForEnrollingUser(token) {
             enrollButton.classList.remove('d-none');
             unenrollButton.classList.add('d-none');
             roleSelector.value = 5;
-            roleSelector.classList.remove('d-none');
+            if (studentId === '') {
+                roleSelector.classList.add('d-none');
+            } else {
+                roleSelector.classList.remove('d-none');
+            }
+        }
+    });
+    classSelector.addEventListener('change', () => {
+        const enrolled = list.getAttribute('data-enrolled');
+        const classId = classSelector.value;
+        if (classId === '') {
+          studentSelector.removeAttribute('disabled');
+          roleSelector.classList.add('d-none');
+        } else {
+          studentSelector.setAttribute('disabled', 'disabled');
+          roleSelector.classList.remove('d-none');
         }
     });
 }
