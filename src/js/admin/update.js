@@ -298,22 +298,6 @@ function attachLMSCallbacksForAddingClasses(token) {
  */
 function attachLMSCallbacksForAddingUsers(token) {
     const saveButton = document.getElementById('moodle_users_add-btn');
-    const saveSuccessCallback = (data) => {
-        hideLoader('moodle_users_add');
-        saveButton.classList.remove('d-none');
-        document.getElementById('moodle_username-input').value = '';
-        document.getElementById('moodle_password-input').value = '';
-        document.getElementById('moodle_firstname-input').value = '';
-        document.getElementById('moodle_lastname-input').value = '';
-        document.getElementById('moodle_email-input').value = '';
-        lmsUpdateUserSelectors();
-        if ((Array.isArray(data)) && ('id' in data[0])) {
-            openSnackBar('The user has been added', 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to add the user.', 'error');
-    };
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
         const username = document.getElementById('moodle_username-input').value;
@@ -321,20 +305,24 @@ function attachLMSCallbacksForAddingUsers(token) {
         const firstname = document.getElementById('moodle_firstname-input').value;
         const lastname = document.getElementById('moodle_lastname-input').value;
         const email = document.getElementById('moodle_email-input').value;
-        let payload = { username, firstname, lastname, email, password };
-        const errors = [
-            ...validateObjectValues(payload),
-            ...validateLMSPassword(password),
-            ...validateLMSUsername(username),
-            ...validateLMSEmail(email)
-        ];
-        if (errors.length > 0) {
-            openSnackBar(errors.join("\r\n"), 'error');
-            return false;
-        }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_add');
-        post(`${API_URL}lms/users`, token, payload, saveSuccessCallback, errorCallback);
+        userRepo.add(email, firstname, lastname, password, username).then(() => {
+            hideLoader('moodle_users_add');
+            saveButton.classList.remove('d-none');
+            document.getElementById('moodle_username-input').value = '';
+            document.getElementById('moodle_password-input').value = '';
+            document.getElementById('moodle_firstname-input').value = '';
+            document.getElementById('moodle_lastname-input').value = '';
+            document.getElementById('moodle_email-input').value = '';
+            lmsUpdateUserSelectors();
+            openSnackBar('The user has been added', 'success');
+            return;
+        }).catch((res) => {
+            errorCallback(res.code, res.errors.join("\r\n"));
+            hideLoader('moodle_users_add');
+            saveButton.classList.remove('d-none');
+        });
         return false;
     });
 
@@ -440,7 +428,7 @@ function lmsUpdateUserSelectors(exclude = []) {
       const filtered = users.filter((user) => (!exclude.includes(user.id)));
       const selectors = document.querySelectorAll('.lms-user-selector');
       selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
-  }).catch((code) => errorCallback(code, 'Unable to retrieve the users.'));
+  }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
 }
 
 /**
@@ -670,7 +658,11 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
                 deleteButton.classList.remove('d-none');
                 openSnackBar('The user has been deleted.', 'success');
             })
-            .catch((code) =>  errorCallback(code, 'Sorry, we were unable to delete the user.'));
+            .catch((res) =>  {
+                errorCallback(res.code, res.errors.join("\r\n"));
+                hideLoader('moodle_users_account_remove');
+                deleteButton.classList.remove('d-none');
+            });
         }
         return false;
     });
