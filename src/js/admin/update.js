@@ -677,18 +677,6 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
  */
 function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
     const saveButton = document.getElementById('moodle_users_update-btn');
-    const saveSuccessCallback = (data) => {
-        wrapper.classList.add('d-none');
-        lmsUpdateUserSelectors();
-        hideLoader('moodle_users_update');
-        saveButton.classList.remove('d-none');
-        if ((typeof data === 'string') && (data.includes('updated'))) {
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to update the user.', 'error');
-    };
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
         const id = document.getElementById('moodle_update_user_id-input').value;
@@ -700,28 +688,19 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         const firstname = document.getElementById('moodle_update_firstname-input').value;
         const lastname = document.getElementById('moodle_update_lastname-input').value;
         const email = document.getElementById('moodle_update_email-input').value;
-        let payload = { username, firstname, lastname, email };
-        let errors = [];
-        if (password !== '') {
-            payload['password'] = password;
-            errors = [
-                ...validateLMSPassword(password),
-                ...validateLMSUsername(username),
-                ...validateLMSEmail(email),
-            ];
-        } else {
-            errors = [
-                ...validateLMSUsername(username),
-                ...validateLMSEmail(email)
-            ];
-        }
-        if (errors.length > 0) {
-            openSnackBar(errors.join("\r\n"), 'error');
-            return false;
-        }
         saveButton.classList.add('d-none');
         showLoader('moodle_users_update');
-        put(`${API_URL}lms/users/${id}`, token, payload, saveSuccessCallback, errorCallback);
+        userRepo.update(id, email, firstname, lastname, password, username)
+        .then(() => {
+            lmsUpdateUserSelectors();
+            openSnackBar("The user has been updated.", 'success');
+        })
+        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .finally(() => {
+            wrapper.classList.add('d-none');
+            hideLoader('moodle_users_update');
+            saveButton.classList.remove('d-none');
+        });
         return false;
     });
 }

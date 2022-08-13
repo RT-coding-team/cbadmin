@@ -3,7 +3,7 @@
  */
 export class User {
     constructor(id, email, firstname, fullname, lastname, username) {
-        this.id = id;
+        this.id = parseInt(id, 10);
         this.email = email;
         this.firstname = firstname;
         this.fullname = fullname;

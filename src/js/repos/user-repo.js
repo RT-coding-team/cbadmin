@@ -1,4 +1,4 @@
-import {API_URL, del, get, post} from '../api/api';
+import {API_URL, del, get, post, put} from '../api/api';
 import openSnackBar from '../components/snackbar';
 import { User } from '../models/user';
 import {
@@ -29,6 +29,7 @@ export class UserRepo {
      */
     add(email, firstname, lastname, password, username) {
         return new Promise((resolve, reject) => {
+            const payload = { username, firstname, lastname, email, password };
             const errors = [
                 ...validateObjectValues(payload),
                 ...validateLMSPassword(password),
@@ -54,7 +55,6 @@ export class UserRepo {
                 return;
             };
             const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new user.']});
-            const payload = { username, firstname, lastname, email, password };
             post(`${API_URL}lms/users`, this.token, payload, success, error);
         });
     }
@@ -77,7 +77,7 @@ export class UserRepo {
     delete(id) {
         return new Promise((resolve, reject) => {
             const success = (data) => {
-                this.data = this.data.filter((user) => user.id !== id);
+                this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
                 if ((typeof data === 'string') && (data.includes('deleted'))) {
                     resolve();
                 } else {
@@ -86,6 +86,63 @@ export class UserRepo {
             };
             const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the user.']});
             del(`${API_URL}lms/users/${id}`, this.token, success, error);
+        });
+    }
+
+    /**
+     * Update the LMS user
+     *
+     * @param {string} id         The user's id
+     * @param {string} email      The user's email
+     * @param {string} firstname  The user's firstname
+     * @param {string} lastname   The user's last name
+     * @param {string} password   The user's password (set to '' if you do not want to change)
+     * @param {string} username   The user's username
+     *
+     * @return {Promise}          Returns the updated user
+     */
+    update(id, email, firstname, lastname, password, username) {
+        return new Promise((resolve, reject) => {
+            const payload = { username, firstname, lastname, email };
+            let errors = [];
+            if (password !== '') {
+                payload.password = password;
+                errors = [
+                    ...validateObjectValues(payload),
+                    ...validateLMSPassword(password),
+                    ...validateLMSUsername(username),
+                    ...validateLMSEmail(email),
+                ];
+            } else {
+                errors = [
+                    ...validateObjectValues(payload),
+                    ...validateLMSUsername(username),
+                    ...validateLMSEmail(email)
+                ];
+            }
+            if (errors.length > 0) {
+                reject({code: 0, errors});
+                return;
+            }
+            const success = (data) => {
+                console.log(data);
+                if ((typeof data === 'string') && (data.includes('updated'))) {
+                    this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
+                    const user = new User(id, email, firstname, `${firstname} ${lastname}`, lastname, username);
+                    this.data.push(user);
+                    this._sortData();
+                    resolve(user);
+                    return;
+                } else if ((typeof data === 'object') && ('debuginfo' in data)) {
+                    reject({code: 0, errors: [data.debuginfo]});
+                    return;
+                }
+                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                return;
+
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the user.']});
+            put(`${API_URL}lms/users/${id}`, this.token, payload, success, error);
         });
     }
 
