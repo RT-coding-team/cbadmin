@@ -43,6 +43,16 @@ export class CoursesRepo {
         );
     }
 
+    /**
+     * Update a course
+     *
+     * @param  {integer}    id          The id of the course to update
+     * @param  {string}     fullname    The fullname of the course
+     * @param  {string}     shortname   The shortname of the course
+     * @param  {string}     summary     The summary of the course
+     *
+     * @return {Promise}            Returns the updated course
+     */
     update(id, fullname, shortname, summary) {
         if (!id) {
             return Promise.resolve(null);
