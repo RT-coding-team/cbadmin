@@ -864,34 +864,29 @@ function attachLMSCallbacksForEnrollingUser(token) {
  * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForUpdatingCourses(token) {
+function attachLMSCallbacksForUpdatingCourses() {
     const saveButton = document.getElementById('moodle_courses_functions-btn');
     const wrapper = document.getElementById('moodle_course-update-form');
-    const updateSuccessCallback = (data) => {
-        hideLoader('moodle_courses_functions');
-        saveButton.classList.remove('d-none');
-        lmsUpdateCourseSelectors();
-        wrapper.classList.add('d-none');
-        if ((typeof data === 'string') && (data.includes('updated'))) {
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to update the course.', 'error');
-    };
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
-        const payload = {};
         const id = document.getElementById('moodle_update_course_id-input').value;
         if (!id) {
             return false;
         }
         saveButton.classList.add('d-none');
         showLoader('moodle_courses_functions');
-        payload.fullname = document.getElementById('moodle_update_course_name-input').value;
-        payload.shortname = document.getElementById('moodle_update_course_short_name-input').value;
-        payload.summary = document.getElementById('moodle_update_course_summary-input').value;
-        put(`${API_URL}lms/courses/${id}`, token, payload, updateSuccessCallback, errorCallback);
+        const fullname = document.getElementById('moodle_update_course_name-input').value;
+        const shortname = document.getElementById('moodle_update_course_short_name-input').value;
+        const summary = document.getElementById('moodle_update_course_summary-input').value;
+        coursesRepo.update(id, fullname, shortname, summary).then((course) => {
+            lmsUpdateCourseSelectors();
+            openSnackBar("The course has been updated.", 'success');
+        }).catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .finally(() => {
+            hideLoader('moodle_courses_functions');
+            saveButton.classList.remove('d-none');
+            wrapper.classList.add('d-none');
+        });
         return false;
     });
 }
@@ -1045,7 +1040,7 @@ function attachLMSCallbacksForCourseRosterForm(token) {
 function attachLMSCallbacksForCourseUpdateForm(token) {
     const courseSelector = document.getElementById('moodle_courses_functions-input');
     const wrapper = document.getElementById('moodle_course-update-form');
-    attachLMSCallbacksForUpdatingCourses(token);
+    attachLMSCallbacksForUpdatingCourses();
     attachLMSCallbacksForDeletingCourses(token);
     courseSelector.addEventListener('change', () => {
         const courseId = courseSelector.value;

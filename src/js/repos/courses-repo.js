@@ -1,5 +1,6 @@
 import {API_URL, del, get, post, put} from '../api/api';
 import { Course } from '../models/course';
+import { validateObjectValues } from '../utils/utils';
 
 /**
 * A class that stores and manages our LMS courses.  This was designed to reduce the
@@ -42,6 +43,35 @@ export class CoursesRepo {
         );
     }
 
+    update(id, fullname, shortname, summary) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+        return new Promise((resolve, reject) => {
+            const payload = { fullname, shortname, summary };
+            const errors = [
+                ...validateObjectValues(payload)
+            ];
+            if (errors.length > 0) {
+                reject({code: 0, errors});
+                return;
+            }
+            const success = (data) => {
+                if ((typeof data === 'string') && (data.includes('updated'))) {
+                    this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
+                    const course = new Course(id, fullname, shortname, summary);
+                    this.data.push(course);
+                    this._sortData();
+                    resolve(course);
+                }
+                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                return;
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the course.']});
+            put(`${API_URL}lms/courses/${id}`, this.token, payload, success, error);
+        });
+    }
+
     /**
      * Load the user data
      *
@@ -60,7 +90,7 @@ export class CoursesRepo {
                     return;
                 }
                 this.data = data.map(
-                    (course) => new Course(course.id, course.displayname, course.fullname, course.shortname, course.summary)
+                    (course) => new Course(course.id, course.fullname, course.shortname, course.summary)
                 );
                 this._sortData();
                 resolve(this.data);
