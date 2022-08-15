@@ -90,6 +90,19 @@ export class UserRepo {
     }
 
     /**
+     * Find by id
+     *
+     * @param  {integer}    id  The id of the user
+     *
+     * @return {Promise}        The user with the given id.
+     */
+    find(id) {
+        return this._load().then(
+            (users) => users.find((user) => user.id === parseInt(id, 10))
+        );
+    }
+
+    /**
      * Update the LMS user
      *
      * @param {string} id         The user's id

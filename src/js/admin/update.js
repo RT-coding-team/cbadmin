@@ -985,20 +985,18 @@ function attachLMSCallbacksForUpdateUserForm(token) {
     // Handle the user selector on the update form
     const userSelect = document.getElementById('moodle_users-input');
     const wrapper = document.getElementById('moodle_users-update-form');
-    const userSuccessCallback = (data) => {
-        const user = data[0];
-        document.getElementById('moodle_update_username-input').value = user.username;
-        document.getElementById('moodle_update_password-input').value = '';
-        document.getElementById('moodle_update_firstname-input').value = user.firstname;
-        document.getElementById('moodle_update_lastname-input').value = user.lastname;
-        document.getElementById('moodle_update_email-input').value = user.email;
-        document.getElementById('moodle_update_user_id-input').value = user.id;
-        wrapper.classList.remove('d-none');
-    };
     userSelect.addEventListener('change', ()  =>  {
         const userId = userSelect.value;
         if (userId) {
-            get(`${API_URL}lms/users/${userId}`, token, userSuccessCallback, errorCallback);
+            userRepo.find(userId).then((user) => {
+                document.getElementById('moodle_update_username-input').value = user.username;
+                document.getElementById('moodle_update_password-input').value = '';
+                document.getElementById('moodle_update_firstname-input').value = user.firstname;
+                document.getElementById('moodle_update_lastname-input').value = user.lastname;
+                document.getElementById('moodle_update_email-input').value = user.email;
+                document.getElementById('moodle_update_user_id-input').value = user.id;
+                wrapper.classList.remove('d-none');
+            }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
         } else {
             wrapper.classList.add('d-none');
             document.getElementById('moodle_update_username-input').value = '';
