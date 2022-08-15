@@ -85,8 +85,8 @@ export class UsersRepo {
         }
         return new Promise((resolve, reject) => {
             const success = (data) => {
-                this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
                 if ((typeof data === 'string') && (data.includes('deleted'))) {
+                    this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
                     resolve(true);
                 } else {
                     reject({code: 200, errors: ['Something went wrong on the LMS server.']});
