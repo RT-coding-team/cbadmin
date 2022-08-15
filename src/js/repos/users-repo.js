@@ -148,7 +148,6 @@ export class UsersRepo {
                 return;
             }
             const success = (data) => {
-                console.log(data);
                 if ((typeof data === 'string') && (data.includes('updated'))) {
                     this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
                     const user = new User(id, email, firstname, `${firstname} ${lastname}`, lastname, username);
