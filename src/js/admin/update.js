@@ -6,7 +6,7 @@ import {
     alphaSortWithKey, appendItemsToList, appendOptionsToSelect, validateLMSEmail,
     validateLMSPassword, validateLMSUsername, validateObjectValues
 } from '../utils/utils';
-import { UserRepo } from '../repos/user-repo';
+import { UsersRepo } from '../repos/users-repo';
 
 /**
  * Store the LMS user for access
@@ -17,7 +17,7 @@ const lmsUsers = [];
 /**
  * Our student repository
  *
- * @type {UserRepo}
+ * @type {UsersRepo}
  */
 let userRepo = null;
 
@@ -1135,7 +1135,7 @@ export default function attachUpdateCallbacks(token) {
     // Load LMS forms and fields if is moodle.
     const lmsSetUp = (data) => {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
-      userRepo = new UserRepo(token);
+      userRepo = new UsersRepo(token);
       lmsUpdateCourseSelectors(token);
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors(token);

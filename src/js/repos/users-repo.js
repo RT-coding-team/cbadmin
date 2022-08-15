@@ -9,7 +9,7 @@ import {
  * A class that stores and manages our LMS users.  This was designed to reduce the
  * number of requests made to the API by storing the data locally.
  */
-export class UserRepo {
+export class UsersRepo {
 
     constructor(token) {
         this.token = token;
@@ -168,7 +168,6 @@ export class UserRepo {
         return new Promise((resolve, reject) => {
             if (this.data.length > 0) {
                 resolve(this.data);
-                console.log('cache');
                 return;
             }
             const success = (data) => {
