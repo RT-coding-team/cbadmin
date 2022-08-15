@@ -113,7 +113,7 @@ export class CoursesRepo {
      * @return {Array} An array of all the courses
      */
     _load() {
-        return new Promise((resolve, revoke) => {
+        return new Promise((resolve, reject) => {
             if (this.data.length > 0) {
                 resolve(this.data);
                 return;
