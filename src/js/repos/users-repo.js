@@ -122,6 +122,9 @@ export class UsersRepo {
      * @return {Promise}          Returns the updated user
      */
     update(id, email, firstname, lastname, password, username) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
         return new Promise((resolve, reject) => {
             const payload = { username, firstname, lastname, email };
             let errors = [];
