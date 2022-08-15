@@ -7,6 +7,7 @@ import {
     validateLMSPassword, validateLMSUsername, validateObjectValues
 } from '../utils/utils';
 import { UsersRepo } from '../repos/users-repo';
+import { CohortsRepo } from '../repos/cohorts-repo';
 import { CoursesRepo } from '../repos/courses-repo';
 
 /**
@@ -16,13 +17,19 @@ import { CoursesRepo } from '../repos/courses-repo';
  */
 const lmsUsers = [];
 /**
- * Our student repository
+ * Our cohorts (classes) repository
+ *
+ * @type {CohortsRepo}
+ */
+let cohortsRepo = null;
+/**
+ * Our courses repository
  *
  * @type {CoursesRepo}
  */
 let coursesRepo = null;
 /**
- * Our student repository
+ * Our students repository
  *
  * @type {UsersRepo}
  */
@@ -268,7 +275,7 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 function attachLMSCallbacksForAddingClasses(token) {
     const saveButton = document.getElementById('moodle_classes_add-btn');
     const saveSuccessCallback = (data) => {
-        lmsUpdateClassSelectors(token);
+        lmsUpdateClassSelectors();
         hideLoader('moodle_classes_add');
         saveButton.classList.remove('d-none');
         document.getElementById('moodle_class_name-input').value = '';
@@ -441,21 +448,16 @@ function lmsUpdateUserSelectors(exclude = []) {
 /**
  * Update the LMS class selectors
  *
- * @param   {string}    token       the token to authenticate the requests
  * @param   {array}     exclude     an array of user ids that you want to exclude
  * @return  {void}
  */
-function lmsUpdateClassSelectors(token, exclude = []) {
+function lmsUpdateClassSelectors(exclude = []) {
     const excluded = exclude.map((i) => parseInt(i, 10));
-    const renderer = (data) => {
-        if (data.length === 0) {
-            console.error('No classes were found!', data);
-        }
-        const filtered = data.filter((klass) => (!excluded.includes(klass.id)));
+    cohortsRepo.all().then((cohorts) => {
+        const filtered = cohorts.filter((cohort) => (!excluded.includes(cohort.id)));
         const selectors = document.querySelectorAll('.lms-class-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'name', 'id'));
-    };
-    get(`${API_URL}lms/classes`, token, renderer, errorCallback);
+    }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
 }
 
 /**
@@ -469,7 +471,7 @@ function attachLMSCallbacksForDeletingClass(token, wrapper) {
     const deleteButton = document.getElementById('moodle_class_remove-btn');
     const success = (data) => {
       wrapper.classList.add('d-none');
-      lmsUpdateClassSelectors(token);
+      lmsUpdateClassSelectors();
       hideLoader('moodle_class_remove');
       deleteButton.classList.remove('d-none');
       if ((typeof data === 'string') && (data.includes('deleted'))) {
@@ -610,7 +612,7 @@ function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
       wrapper.classList.add('d-none');
       hideLoader('moodle_classes_update');
       saveButton.classList.remove('d-none');
-      lmsUpdateClassSelectors(token);
+      lmsUpdateClassSelectors();
       if ((typeof data === 'string') && (data.includes('updated'))) {
           openSnackBar(data, 'success');
           return;
@@ -1125,9 +1127,10 @@ export default function attachUpdateCallbacks(token) {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       usersRepo = new UsersRepo(token);
       coursesRepo = new CoursesRepo(token);
+      cohortsRepo = new CohortsRepo(token);
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
-      lmsUpdateClassSelectors(token);
+      lmsUpdateClassSelectors();
       attachLMSCallbacksForAddClassForm(token);
       attachLMSCallbacksForAddUserForm(token);
       attachLMSCallbacksForUpdateClassForm(token);
