@@ -76,14 +76,18 @@ export class UsersRepo {
      * Delete the specific user from the LMS
      *
      * @param  {integer}    id  The id of the user to delete
-     * @return {Promise}
+     *
+     * @return {Promise}        Did it successfuly delete?
      */
     delete(id) {
+        if (!id) {
+            return Promise.resolve(false);
+        }
         return new Promise((resolve, reject) => {
             const success = (data) => {
                 this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
                 if ((typeof data === 'string') && (data.includes('deleted'))) {
-                    resolve();
+                    resolve(true);
                 } else {
                     reject({code: 200, errors: ['Something went wrong on the LMS server.']});
                 }
