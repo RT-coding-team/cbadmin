@@ -1,5 +1,4 @@
 import {API_URL, del, get, post, put} from '../api/api';
-import openSnackBar from '../components/snackbar';
 import { User } from '../models/user';
 import {
     validateLMSEmail, validateLMSPassword, validateLMSUsername, validateObjectValues
