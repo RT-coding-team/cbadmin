@@ -7,6 +7,7 @@ import {
     validateLMSPassword, validateLMSUsername, validateObjectValues
 } from '../utils/utils';
 import { UsersRepo } from '../repos/users-repo';
+import { CoursesRepo } from '../repos/courses-repo';
 
 /**
  * Store the LMS user for access
@@ -17,9 +18,15 @@ const lmsUsers = [];
 /**
  * Our student repository
  *
+ * @type {CoursesRepo}
+ */
+let coursesRepo = null;
+/**
+ * Our student repository
+ *
  * @type {UsersRepo}
  */
-let userRepo = null;
+let usersRepo = null;
 
 /**
  * Open a snackbar and display a success message
@@ -307,7 +314,7 @@ function attachLMSCallbacksForAddingUsers(token) {
         const email = document.getElementById('moodle_email-input').value;
         saveButton.classList.add('d-none');
         showLoader('moodle_users_add');
-        userRepo.add(email, firstname, lastname, password, username).then(() => {
+        usersRepo.add(email, firstname, lastname, password, username).then(() => {
             hideLoader('moodle_users_add');
             saveButton.classList.remove('d-none');
             document.getElementById('moodle_username-input').value = '';
@@ -403,17 +410,16 @@ function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no
 /**
  * Update the LMS course selectors
  *
- * @param   {string}    token       the token to authenticate the requests
  * @param   {array}     exclude     an array of course ids that you want to exclude
  * @return  {void}
  */
-function lmsUpdateCourseSelectors(token, exclude = []) {
-    const lmsCourseSelectRender = (data) => {
-        const courses = data.filter((course) => (!exclude.includes(course.id)));
+function lmsUpdateCourseSelectors(exclude = []) {
+    const excluded = exclude.map((i) => parseInt(i, 10));
+    coursesRepo.all().then((courses) => {
+        const filtered = courses.filter((course) => (!excluded.includes(course.id)));
         const selectors = document.querySelectorAll('.lms-course-selector');
-        selectors.forEach((selector) => appendOptionsToSelect(selector, courses, 'fullname', 'id'));
-    };
-    get(`${API_URL}lms/courses`, token, lmsCourseSelectRender, errorCallback);
+        selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
+    }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
 }
 
 /**
@@ -423,9 +429,10 @@ function lmsUpdateCourseSelectors(token, exclude = []) {
  * @return  {void}
  */
 function lmsUpdateUserSelectors(exclude = []) {
-    userRepo.all().then((users) => {
+    const excluded = exclude.map((i) => parseInt(i, 10));
+    usersRepo.all().then((users) => {
       users.forEach((user) =>  lmsUsers[user.id] = user.fullname);
-      const filtered = users.filter((user) => (!exclude.includes(user.id)));
+      const filtered = users.filter((user) => (!excluded.includes(user.id)));
       const selectors = document.querySelectorAll('.lms-user-selector');
       selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
   }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
@@ -439,13 +446,15 @@ function lmsUpdateUserSelectors(exclude = []) {
  * @return  {void}
  */
 function lmsUpdateClassSelectors(token, exclude = []) {
+    const excluded = exclude.map((i) => parseInt(i, 10));
     const renderer = (data) => {
         if (data.length === 0) {
             console.error('No classes were found!', data);
         }
-        const classes = data.filter((klass) => (!exclude.includes(klass.id)));
+        const filtered = data.filter((klass) => (!excluded.includes(klass.id)));
+        console.log(filtered);
         const selectors = document.querySelectorAll('.lms-class-selector');
-        selectors.forEach((selector) => appendOptionsToSelect(selector, classes, 'name', 'id'));
+        selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'name', 'id'));
     };
     get(`${API_URL}lms/classes`, token, renderer, errorCallback);
 }
@@ -651,7 +660,7 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
         if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_users_account_remove');
-            userRepo.delete(id).then(() => {
+            usersRepo.delete(id).then(() => {
                 wrapper.classList.add('d-none');
                 lmsUpdateUserSelectors();
                 hideLoader('moodle_users_account_remove');
@@ -690,7 +699,7 @@ function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
         const email = document.getElementById('moodle_update_email-input').value;
         saveButton.classList.add('d-none');
         showLoader('moodle_users_update');
-        userRepo.update(id, email, firstname, lastname, password, username)
+        usersRepo.update(id, email, firstname, lastname, password, username)
         .then(() => {
             lmsUpdateUserSelectors();
             openSnackBar("The user has been updated.", 'success');
@@ -988,7 +997,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
     userSelect.addEventListener('change', ()  =>  {
         const userId = userSelect.value;
         if (userId) {
-            userRepo.find(userId).then((user) => {
+            usersRepo.find(userId).then((user) => {
                 document.getElementById('moodle_update_username-input').value = user.username;
                 document.getElementById('moodle_update_password-input').value = '';
                 document.getElementById('moodle_update_firstname-input').value = user.firstname;
@@ -1135,8 +1144,9 @@ export default function attachUpdateCallbacks(token) {
     // Load LMS forms and fields if is moodle.
     const lmsSetUp = (data) => {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
-      userRepo = new UsersRepo(token);
-      lmsUpdateCourseSelectors(token);
+      usersRepo = new UsersRepo(token);
+      coursesRepo = new CoursesRepo(token);
+      lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors(token);
       attachLMSCallbacksForAddClassForm(token);
