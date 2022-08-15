@@ -871,7 +871,7 @@ function attachLMSCallbacksForUpdatingCourses(token) {
     const updateSuccessCallback = (data) => {
         hideLoader('moodle_courses_functions');
         saveButton.classList.remove('d-none');
-        lmsUpdateCourseSelectors(token);
+        lmsUpdateCourseSelectors();
         wrapper.classList.add('d-none');
         if ((typeof data === 'string') && (data.includes('updated'))) {
             openSnackBar(data, 'success');
@@ -907,7 +907,7 @@ function attachLMSCallbacksForDeletingCourses(token) {
     const deleteButton = document.getElementById('moodle_course_remove-btn');
     const wrapper = document.getElementById('moodle_course-update-form');
     const deleteSuccessCallback = (data) => {
-        lmsUpdateCourseSelectors(token);
+        lmsUpdateCourseSelectors();
         wrapper.classList.add('d-none');
         hideLoader('moodle_course_remove');
         deleteButton.classList.remove('d-none');
