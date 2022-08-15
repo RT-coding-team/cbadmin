@@ -27,6 +27,22 @@ export class CoursesRepo {
     }
 
     /**
+     * Find by id
+     *
+     * @param  {integer}    id  The id of the course
+     *
+     * @return {Promise}        The user with the given id.
+     */
+    find(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+        return this._load().then(
+            (courses) => courses.find((course) => course.id === parseInt(id, 10))
+        );
+    }
+
+    /**
      * Load the user data
      *
      * @return {Array} An array of all the courses

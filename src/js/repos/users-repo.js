@@ -101,6 +101,9 @@ export class UsersRepo {
      * @return {Promise}        The user with the given id.
      */
     find(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
         return this._load().then(
             (users) => users.find((user) => user.id === parseInt(id, 10))
         );

@@ -452,7 +452,6 @@ function lmsUpdateClassSelectors(token, exclude = []) {
             console.error('No classes were found!', data);
         }
         const filtered = data.filter((klass) => (!excluded.includes(klass.id)));
-        console.log(filtered);
         const selectors = document.querySelectorAll('.lms-class-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'name', 'id'));
     };
@@ -996,25 +995,22 @@ function attachLMSCallbacksForUpdateUserForm(token) {
     const wrapper = document.getElementById('moodle_users-update-form');
     userSelect.addEventListener('change', ()  =>  {
         const userId = userSelect.value;
-        if (userId) {
-            usersRepo.find(userId).then((user) => {
-                document.getElementById('moodle_update_username-input').value = user.username;
-                document.getElementById('moodle_update_password-input').value = '';
-                document.getElementById('moodle_update_firstname-input').value = user.firstname;
-                document.getElementById('moodle_update_lastname-input').value = user.lastname;
-                document.getElementById('moodle_update_email-input').value = user.email;
-                document.getElementById('moodle_update_user_id-input').value = user.id;
-                wrapper.classList.remove('d-none');
-            }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
-        } else {
-            wrapper.classList.add('d-none');
-            document.getElementById('moodle_update_username-input').value = '';
-            document.getElementById('moodle_update_firstname-input').value = '';
-            document.getElementById('moodle_update_lastname-input').value = '';
+        usersRepo.find(userId).then((user) => {
+            document.getElementById('moodle_update_username-input').value = (user) ? user.username : '';
             document.getElementById('moodle_update_password-input').value = '';
-            document.getElementById('moodle_update_email-input').value = '';
-            document.getElementById('moodle_update_user_id-input').value = '';
-        }
+            document.getElementById('moodle_update_firstname-input').value = (user) ? user.firstname : '';
+            document.getElementById('moodle_update_lastname-input').value = (user) ? user.lastname : '';
+            document.getElementById('moodle_update_email-input').value = (user) ? user.email : '';
+            document.getElementById('moodle_update_user_id-input').value = (user) ? user.id : '';
+            if (user) {
+                wrapper.classList.remove('d-none');
+            } else {
+                wrapper.classList.add('d-none');
+            }
+        }).catch((res) => {
+            errorCallback(res.code, res.errors.join("\r\n"));
+            wrapper.classList.add('d-none');
+        });
     });
     attachLMSCallbacksForUpdatingUsers(token, wrapper);
     attachLMSCallbacksForDeletingUser(token, wrapper);
@@ -1051,29 +1047,22 @@ function attachLMSCallbacksForCourseUpdateForm(token) {
     const wrapper = document.getElementById('moodle_course-update-form');
     attachLMSCallbacksForUpdatingCourses(token);
     attachLMSCallbacksForDeletingCourses(token);
-    const courseGetSuccessCallback = (data) => {
-      if (data.courses.length > 0) {
-        const course = data.courses[0];
-        document.getElementById('moodle_update_course_name-input').value = course.fullname;
-        document.getElementById('moodle_update_course_short_name-input').value = course.shortname;
-        document.getElementById('moodle_update_course_summary-input').value = course.summary;
-        document.getElementById('moodle_update_course_id-input').value = course.id;
-        wrapper.classList.remove('d-none');
-      } else {
-        openSnackBar('Sorry, we were unable to retrieve information about the course.', 'error');
-      }
-    };
     courseSelector.addEventListener('change', () => {
         const courseId = courseSelector.value;
-        if (courseId) {
-          get(`${API_URL}lms/courses/${courseId}`, token, courseGetSuccessCallback, errorCallback);
-        } else {
-            document.getElementById('moodle_update_course_name-input').value = '';
-            document.getElementById('moodle_update_course_short_name-input').value = '';
-            document.getElementById('moodle_update_course_summary-input').value = '';
-            document.getElementById('moodle_update_course_id-input').value = '';
+        coursesRepo.find(courseId).then((course) => {
+            document.getElementById('moodle_update_course_name-input').value = (course) ? course.fullname : '';
+            document.getElementById('moodle_update_course_short_name-input').value = (course) ? course.shortname : '';
+            document.getElementById('moodle_update_course_summary-input').value = (course) ? course.summary : '';
+            document.getElementById('moodle_update_course_id-input').value = (course) ? course.id : '';
+            if (course) {
+                wrapper.classList.remove('d-none');
+            } else {
+                wrapper.classList.add('d-none');
+            }
+        }).catch((res) => {
+            errorCallback(res.code, res.errors.join("\r\n"));
             wrapper.classList.add('d-none');
-        }
+        });
     });
 }
 
