@@ -108,7 +108,7 @@ export class CoursesRepo {
     }
 
     /**
-     * Load the user data
+     * Load the course data
      *
      * @return {Array} An array of all the courses
      */
