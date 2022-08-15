@@ -10,6 +10,11 @@ import {
  */
 export class UsersRepo {
 
+    /**
+     * Build the repository
+     *
+     * @param {string} token  The API token
+     */
     constructor(token) {
         this.token = token;
         this.data = [];
