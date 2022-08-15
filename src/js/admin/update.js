@@ -643,11 +643,11 @@ function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
 /**
  * Attach the callbacks for deleting LMS users
  *
- * @param   {string}    token   the token to authenticate the requests
  * @param   {object}    wrapper the form wrapper
+ *
  * @return {void}
  */
-function attachLMSCallbacksForDeletingUser(token, wrapper) {
+function attachLMSCallbacksForDeletingUser(wrapper) {
     const deleteButton = document.getElementById('moodle_users_account_remove-btn');
     deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -660,14 +660,12 @@ function attachLMSCallbacksForDeletingUser(token, wrapper) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_users_account_remove');
             usersRepo.delete(id).then(() => {
-                wrapper.classList.add('d-none');
-                lmsUpdateUserSelectors();
-                hideLoader('moodle_users_account_remove');
-                deleteButton.classList.remove('d-none');
                 openSnackBar('The user has been deleted.', 'success');
             })
-            .catch((res) =>  {
-                errorCallback(res.code, res.errors.join("\r\n"));
+            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+            .finally(() => {
+                lmsUpdateUserSelectors();
+                wrapper.classList.add('d-none');
                 hideLoader('moodle_users_account_remove');
                 deleteButton.classList.remove('d-none');
             });
@@ -900,20 +898,6 @@ function attachLMSCallbacksForUpdatingCourses() {
 function attachLMSCallbacksForDeletingCourses(token) {
     const deleteButton = document.getElementById('moodle_course_remove-btn');
     const wrapper = document.getElementById('moodle_course-update-form');
-    const deleteSuccessCallback = (data) => {
-        lmsUpdateCourseSelectors();
-        wrapper.classList.add('d-none');
-        hideLoader('moodle_course_remove');
-        deleteButton.classList.remove('d-none');
-        document.getElementById('moodle_update_course_name-input').value = '';
-        document.getElementById('moodle_update_course_id-input').value = '';
-        if ((typeof data === 'string') && (data.includes('deleted'))) {
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to delete the course.', 'error');
-    };
     deleteButton.addEventListener('click', (event) => {
         event.preventDefault();
         const id = document.getElementById('moodle_update_course_id-input').value;
@@ -925,7 +909,18 @@ function attachLMSCallbacksForDeletingCourses(token) {
         if (confirm(`Are you sure you want to delete the course: ${courseName}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_course_remove');
-            del(`${API_URL}lms/courses/${id}`, token, deleteSuccessCallback, errorCallback);
+            coursesRepo.delete(id).then(() => {
+                openSnackBar('The course has been deleted.', 'success');
+            })
+            .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+            .finally(() => {
+                lmsUpdateCourseSelectors();
+                wrapper.classList.add('d-none');
+                hideLoader('moodle_course_remove');
+                deleteButton.classList.remove('d-none');
+                document.getElementById('moodle_update_course_name-input').value = '';
+                document.getElementById('moodle_update_course_id-input').value = '';
+            });
         }
         return false;
     });
@@ -1008,7 +1003,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
         });
     });
     attachLMSCallbacksForUpdatingUsers(token, wrapper);
-    attachLMSCallbacksForDeletingUser(token, wrapper);
+    attachLMSCallbacksForDeletingUser(wrapper);
 }
 
 /**

@@ -28,6 +28,31 @@ export class CoursesRepo {
     }
 
     /**
+     * Delete a course
+     *
+     * @param  {integer}    id  The id of the course to delete
+     *
+     * @return {Promise}        Did it successfuly delete?
+     */
+    delete(id) {
+        if (!id) {
+            return Promise.resolve(false);
+        }
+        return new Promise((resolve, reject) => {
+            const success = (data) => {
+                if ((typeof data === 'string') && (data.includes('deleted'))) {
+                    this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
+                    resolve(true);
+                    return;
+                }
+                reject({code: 200, errors: ['Something went wrong on the LMS server.']});
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the course.']});
+            del(`${API_URL}lms/courses/${id}`, this.token, success, error);
+        });
+    }
+
+    /**
      * Find by id
      *
      * @param  {integer}    id  The id of the course
