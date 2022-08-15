@@ -463,24 +463,11 @@ function lmsUpdateClassSelectors(exclude = []) {
 /**
  * Attach the callbacks for deleting LMS classes
  *
- * @param  {string}     token   the token to authenticate the requests
  * @param   {object}    wrapper the form wrapper
  * @return {void}
  */
-function attachLMSCallbacksForDeletingClass(token, wrapper) {
+function attachLMSCallbacksForDeletingClass(wrapper) {
     const deleteButton = document.getElementById('moodle_class_remove-btn');
-    const success = (data) => {
-      wrapper.classList.add('d-none');
-      lmsUpdateClassSelectors();
-      hideLoader('moodle_class_remove');
-      deleteButton.classList.remove('d-none');
-      if ((typeof data === 'string') && (data.includes('deleted'))) {
-          openSnackBar(data, 'success');
-          return;
-      }
-      console.error(data);
-      openSnackBar('Sorry, we were unable to delete the class.', 'error');
-    };
     deleteButton.addEventListener('click', (event) => {
       event.preventDefault();
       const id = document.getElementById('moodle_update_class_id-input').value;
@@ -491,7 +478,16 @@ function attachLMSCallbacksForDeletingClass(token, wrapper) {
       if (confirm(`Are you sure you want to delete the class: ${name}?`)) {
           deleteButton.classList.add('d-none');
           showLoader('moodle_class_remove');
-          del(`${API_URL}lms/classes/${id}`, token, success, errorCallback);
+          cohortsRepo.delete(id).then(() => {
+              openSnackBar('The class has been deleted.', 'success');
+          })
+          .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+          .finally(() => {
+              wrapper.classList.add('d-none');
+              lmsUpdateClassSelectors();
+              hideLoader('moodle_class_remove');
+              deleteButton.classList.remove('d-none');
+          });
       }
       return false;
     });
@@ -961,7 +957,7 @@ function attachLMSCallbacksForUpdateClassForm(token) {
       }
     });
     attachLMSCallbacksForUpdatingClasses(token, wrapper);
-    attachLMSCallbacksForDeletingClass(token, wrapper);
+    attachLMSCallbacksForDeletingClass(wrapper);
 }
 
 /**

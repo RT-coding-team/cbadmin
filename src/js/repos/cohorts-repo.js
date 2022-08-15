@@ -28,6 +28,30 @@ export class CohortsRepo {
     }
 
     /**
+     * Delete the given cohort (class)
+     *
+     * @param  {integer}    id      The id of the cohort
+     * @return {Promise<boolean>}   Was it deleted?
+     */
+    delete(id) {
+        if (!id) {
+            return Promise.resolve(false);
+        }
+        return new Promise((resolve, reject) => {
+            const success = (data) => {
+                if ((typeof data === 'string') && (data.includes('deleted'))) {
+                    this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
+                    resolve(true);
+                    return;
+                }
+                reject({code: 200, errors: ['Something went wrong on the LMS server.']});
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the class.']});
+            del(`${API_URL}lms/classes/${id}`, this.token, success, error);
+        });
+    }
+
+    /**
      * Load the cohorts data
      *
      * @return {Array} An array of all the cohorts
@@ -50,7 +74,7 @@ export class CohortsRepo {
                 this._sortData();
                 resolve(this.data);
             };
-            const error = (code) => reject({code, errors: ['Unable to retrieve the cohorts (classes) from the API.']});
+            const error = (code) => reject({code, errors: ['Unable to retrieve the classes from the API.']});
             get(`${API_URL}lms/classes`, this.token, success, error);
         });
     }
