@@ -118,6 +118,23 @@ export class UsersRepo {
     }
 
     /**
+     * Find the users by an array of ids.
+     *
+     * @param  {Array} ids  An array of ids
+     *
+     * @return {Array}      An array of users
+     */
+    findByIds(ids) {
+        if (ids.length === 0) {
+            return Promise.resolve([]);
+        }
+        const converted = ids.map((id) => parseInt(id, 10));
+        return this._load().then(
+            (users) => users.filter((user) => converted.includes(user.id))
+        );
+    }
+
+    /**
      * Update the LMS user
      *
      * @param {string} id         The user's id
