@@ -91,6 +91,41 @@ export class CohortsRepo {
     }
 
     /**
+     * Get a list of user's that belong to the cohort (class).
+     *
+     * @param  {integer}    id      The id of the cohort
+     * @return {Promise<User>}      A list of Users
+     */
+    roster(id) {
+        if (!id) {
+            return Promise.reject({code: 200, errors: ['The class could not be found.']});
+        }
+        return this._load().then(() => {
+            const currentIndex = this.data.findIndex((cohort) => (cohort.id === parseInt(id, 10)));
+            if (currentIndex === -1) {
+                return Promise.reject({code: 200, errors: ['The class could not be found.']});
+            }
+            if (this.data[currentIndex].studentsAdded) {
+                return this.usersRepo.findByIds(this.data[currentIndex].enrolled());
+            }
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if (data.length === 0) {
+                        // We do not want to request the API again, but there are no students
+                        this.data[currentIndex].studentsAdded = true;
+                        resolve([]);
+                        return;
+                    }
+                    data[0].userids.forEach((studentId) => this.data[currentIndex].enroll(studentId));
+                    this.usersRepo.findByIds(this.data[currentIndex].enrolled()).then((students) => resolve(students));
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to retrieve the class roster.']});
+                get(`${API_URL}lms/classes/${id}/users`, this.token, success, error);
+            });
+        });
+    }
+
+    /**
      * Update the given cohort (class)
      * @param  {integer}    id      The id of the cohort to update
      * @param  {string}     name    The new name for the cohort

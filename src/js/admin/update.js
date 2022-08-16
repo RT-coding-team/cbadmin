@@ -328,33 +328,30 @@ function attachLMSCallbacksForAddingUsers() {
  * of enrolled users.
  *
  * @param  {object}     list        The list to update
- * @param  {object}     users       An array of keyed with user id and username. The URL does not return them.
- * @param  {token}      token       The API token
  * @param  {integer}    classId     The class to retrieve the id for
  * @param  {String}     emptyText   The text to display if no users are found
  * @return {void}
  */
-function lmsUpdateClassRosterList(list, users, token, classId, emptyText = 'Sorry, no users found.') {
-    const success = (data) => {
-        // The API passes an array of with a userids.
-        let ids = [];
-        if (data.length > 0) {
-            ids = data[0].userids;
-        }
+function lmsUpdateClassRosterList(list, classId, emptyText = 'Sorry, no users found.') {
+    cohortsRepo.roster(classId).then((users) => {
+        const ids = users.map((user) => user.id);
         list.innerHTML = '';
         list.setAttribute('data-enrolled', ids.join('|'));
-        if (ids.length === 0) {
+        if (users.length === 0) {
             const li = document.createElement('li');
             li.innerHTML = emptyText;
             list.appendChild(li);
             return;
         }
-        const values = ids.map((id) => {
-          return {title: lmsUsers[id]};
-        });
-        appendItemsToList(list, values, 'title');
-    };
-    get(`${API_URL}lms/classes/${classId}/users`, token, success, errorCallback);
+        appendItemsToList(list, users, 'fullname');
+    })
+    .catch((res) => {
+        errorCallback(res.code, res.errors.join("\r\n"));
+        list.innerHTML = '';
+        const li = document.createElement('li');
+        li.innerHTML = emptyText;
+        list.appendChild(li);
+    });
 }
 
 /**
@@ -492,7 +489,7 @@ function attachLMSCallbacksForClassEnrollment(token) {
     const enrollSuccess = (data) => {
         if ((typeof data === 'string') && (data.includes('enrolled'))) {
             const classId = classSelect.value;
-            lmsUpdateClassRosterList(list, [], token, classId);
+            lmsUpdateClassRosterList(list, classId);
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
             openSnackBar(data, 'success');
@@ -526,7 +523,7 @@ function attachLMSCallbacksForClassEnrollment(token) {
     const unenrollSuccess = (data) => {
       if ((typeof data === 'string') && (data.includes('unenrolled'))) {
           const classId = classSelect.value;
-          lmsUpdateClassRosterList(list, [], token, classId);
+          lmsUpdateClassRosterList(list, classId);
           enrollButton.classList.remove('d-none');
           unenrollButton.classList.add('d-none');
           openSnackBar(data, 'success');
@@ -559,7 +556,7 @@ function attachLMSCallbacksForClassEnrollment(token) {
     });
     classSelect.addEventListener('change', () => {
       const classId = classSelect.value;
-      lmsUpdateClassRosterList(list, [], token, classId);
+      lmsUpdateClassRosterList(list, classId);
     });
     studentSelect.addEventListener('change', () => {
         const enrolled = list.getAttribute('data-enrolled');
@@ -1082,7 +1079,7 @@ export default function attachUpdateCallbacks(token) {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       usersRepo = new UsersRepo(token);
       coursesRepo = new CoursesRepo(token);
-      cohortsRepo = new CohortsRepo(token);
+      cohortsRepo = new CohortsRepo(token, usersRepo);
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors();
