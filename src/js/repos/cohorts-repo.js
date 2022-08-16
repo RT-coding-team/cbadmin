@@ -52,6 +52,43 @@ export class CohortsRepo {
     }
 
     /**
+     * Update the given cohort (class)
+     * @param  {integer}    id      The id of the cohort to update
+     * @param  {string}     name    The new name for the cohort
+     *
+     * @return {Promise<Cohort>}    The updated cohort
+     */
+    update(id, name) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+        return new Promise((resolve, reject) => {
+            const payload = { name };
+            const errors = [
+                ...validateObjectValues(payload)
+            ];
+            if (errors.length > 0) {
+                reject({code: 0, errors});
+                return;
+            }
+            const success = (data) => {
+                if ((typeof data === 'string') && (data.includes('updated'))) {
+                    this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
+                    const cohort = new Cohort(id, name);
+                    this.data.push(cohort);
+                    this._sortData();
+                    resolve(cohort);
+                    return;
+                }
+                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                return;
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the class.']});
+            put(`${API_URL}lms/classes/${id}`, this.token, payload, success, error);
+        });
+    }
+
+    /**
      * Load the cohorts data
      *
      * @return {Array} An array of all the cohorts

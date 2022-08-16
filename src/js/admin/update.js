@@ -598,24 +598,11 @@ function attachLMSCallbacksForClassEnrollment(token) {
 /**
  * Attach the callbacks for updating LMS classes
  *
- * @param  {string}     token   the token to authenticate the requests
  * @param   {object}    wrapper the form wrapper
  * @return {void}
  */
-function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
+function attachLMSCallbacksForUpdatingClasses(wrapper) {
     const saveButton = document.getElementById('moodle_classes_update-btn');
-    const success = (data) => {
-      wrapper.classList.add('d-none');
-      hideLoader('moodle_classes_update');
-      saveButton.classList.remove('d-none');
-      lmsUpdateClassSelectors();
-      if ((typeof data === 'string') && (data.includes('updated'))) {
-          openSnackBar(data, 'success');
-          return;
-      }
-      console.error(data);
-      openSnackBar('Sorry, we were unable to update the class.', 'error');
-    };
     saveButton.addEventListener('click', (event) => {
       event.preventDefault();
       const id = document.getElementById('moodle_update_class_id-input').value;
@@ -623,17 +610,18 @@ function attachLMSCallbacksForUpdatingClasses(token, wrapper) {
           return false;
       }
       const name = document.getElementById('moodle_update_class_name-input').value;
-      const payload = { name };
-      const errors = [
-        ...validateObjectValues(payload),
-      ];
-      if (errors.length > 0) {
-          openSnackBar(errors.join("\r\n"), 'error');
-          return false;
-      }
       saveButton.classList.add('d-none');
       showLoader('moodle_classes_update');
-      put(`${API_URL}lms/classes/${id}`, token, payload, success, errorCallback);
+      cohortsRepo.update(id, name)
+        .then(() => openSnackBar('The class has been updated.', 'success'))
+        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .finally(() => {
+            wrapper.classList.add('d-none');
+            hideLoader('moodle_classes_update');
+            saveButton.classList.remove('d-none');
+            document.getElementById('moodle_update_class_name-input').value = '';
+            lmsUpdateClassSelectors();
+      });
       return false;
     });
 }
@@ -956,7 +944,7 @@ function attachLMSCallbacksForUpdateClassForm(token) {
         document.getElementById('moodle_update_class_id-input').value = '';
       }
     });
-    attachLMSCallbacksForUpdatingClasses(token, wrapper);
+    attachLMSCallbacksForUpdatingClasses(wrapper);
     attachLMSCallbacksForDeletingClass(wrapper);
 }
 
