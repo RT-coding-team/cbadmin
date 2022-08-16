@@ -474,11 +474,9 @@ function attachLMSCallbacksForDeletingClass(wrapper) {
 /**
  * Attach the callbacks for enrolling students into a class
  *
- * @param  {string}     token   the token to authenticate the requests
- *
  * @return {void}
  */
-function attachLMSCallbacksForClassEnrollment(token) {
+function attachLMSCallbacksForClassEnrollment() {
     const classSelect = document.getElementById('moodle_classes_enroll-input');
     const users = [];
     const enrollButton = document.getElementById('moodle_class_enroll-btn');
@@ -511,7 +509,7 @@ function attachLMSCallbacksForClassEnrollment(token) {
                     openSnackBar('The user has been enrolled in the class.', 'success');
                     return;
                 }
-                openSnackBar('Sorry, we were unable to enroll the student in the class.', 'error');
+                openSnackBar('Sorry, we were unable to enroll the user in the class.', 'error');
             })
             .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
             .finally(() => {
@@ -521,18 +519,6 @@ function attachLMSCallbacksForClassEnrollment(token) {
             });
         return false;
     });
-    const unenrollSuccess = (data) => {
-      if ((typeof data === 'string') && (data.includes('unenrolled'))) {
-          const classId = classSelect.value;
-          lmsUpdateClassRosterList(list, classId);
-          enrollButton.classList.remove('d-none');
-          unenrollButton.classList.add('d-none');
-          openSnackBar(data, 'success');
-          return;
-      }
-      console.error(data);
-      openSnackBar('Sorry, we were unable to remove the user in the course.', 'error');
-    };
     unenrollButton.addEventListener('click', (event) => {
       event.preventDefault();
       const classId = classSelect.value;
@@ -552,7 +538,20 @@ function attachLMSCallbacksForClassEnrollment(token) {
           openSnackBar(errors.join("\r\n"), 'error');
           return false;
       }
-      del(`${API_URL}lms/classes/${classId}/users/${userId}`, token, unenrollSuccess, errorCallback);
+      cohortsRepo.unenroll(classId, userId)
+          .then((success) => {
+              if (success) {
+                  openSnackBar('The user has been removed from the class.', 'success');
+                  return;
+              }
+              openSnackBar('Sorry, we were unable to remove the user from the class.', 'error');
+          })
+          .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+          .finally(() => {
+              lmsUpdateClassRosterList(list, classId);
+              enrollButton.classList.remove('d-none');
+              unenrollButton.classList.add('d-none');
+          });
       return false;
     });
     classSelect.addEventListener('change', () => {
@@ -965,11 +964,10 @@ function attachLMSCallbacksForUpdateUserForm() {
 /**
  * Attach the callbacks for class roster form
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForClassRosterForm(token) {
-    attachLMSCallbacksForClassEnrollment(token);
+function attachLMSCallbacksForClassRosterForm() {
+    attachLMSCallbacksForClassEnrollment();
 }
 
 /**
@@ -1088,7 +1086,7 @@ export default function attachUpdateCallbacks(token) {
       attachLMSCallbacksForAddUserForm();
       attachLMSCallbacksForUpdateClassForm();
       attachLMSCallbacksForUpdateUserForm();
-      attachLMSCallbacksForClassRosterForm(token);
+      attachLMSCallbacksForClassRosterForm();
       attachLMSCallbacksForCourseRosterForm(token);
       attachLMSCallbacksForCourseUpdateForm();
     };

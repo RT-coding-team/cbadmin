@@ -16,7 +16,7 @@ export class Cohort {
     }
 
     /**
-     * An id to the student ids array
+     * Enroll a student in the class
      *
      * @param {integer} id  The student id
      */
@@ -46,5 +46,21 @@ export class Cohort {
     isEnrolled(id) {
         const converted = parseInt(id, 10);
         return (this._studentIds.includes(converted));
+    }
+
+    /**
+     * Unenroll a student in a class
+     *
+     * @param {integer} id  The student id
+     */
+    unenroll(id) {
+        const converted = parseInt(id, 10);
+        if (!this.isEnrolled(converted)) {
+            return;
+        }
+        const index = this._studentIds.indexOf(converted);
+        if (index > -1) {
+            this._studentIds.splice(index, 1);
+        }
     }
 }
