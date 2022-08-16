@@ -112,8 +112,8 @@ export class CohortsRepo {
                 return true;
             }
             return new Promise((resolve, reject) => {
-                const success = (data) => {
-                    if ((typeof data === 'string') && (data.includes('enrolled'))) {
+                const success = (results) => {
+                    if ((typeof results === 'string') && (results.includes('enrolled'))) {
                         this.data[currentIndex].enroll(userId);
                         resolve(true);
                         return;
@@ -146,14 +146,14 @@ export class CohortsRepo {
                 return this.usersRepo.findByIds(this.data[currentIndex].enrolled());
             }
             return new Promise((resolve, reject) => {
-                const success = (data) => {
-                    if (data.length === 0) {
+                const success = (results) => {
+                    if (results.length === 0) {
                         // We do not want to request the API again, but there are no students
                         this.data[currentIndex].studentsAdded = true;
                         resolve([]);
                         return;
                     }
-                    data[0].userids.forEach((studentId) => this.data[currentIndex].enroll(studentId));
+                    results[0].userids.forEach((studentId) => this.data[currentIndex].enroll(studentId));
                     this.usersRepo.findByIds(this.data[currentIndex].enrolled()).then((students) => resolve(students));
                 };
                 const error = (code) => reject({code, errors: ['Sorry, we were unable to retrieve the class roster.']});
@@ -184,8 +184,8 @@ export class CohortsRepo {
                 return true;
             }
             return new Promise((resolve, reject) => {
-                const success = (data) => {
-                    if ((typeof data === 'string') && (data.includes('unenrolled'))) {
+                const success = (results) => {
+                    if ((typeof results === 'string') && (results.includes('unenrolled'))) {
                         this.data[currentIndex].unenroll(userId);
                         resolve(true);
                         return;
