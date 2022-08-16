@@ -486,18 +486,6 @@ function attachLMSCallbacksForClassEnrollment(token) {
     const studentSelect = document.getElementById('moodle_class_enrollee-input');
     const list = document.getElementById('class-users-list');
     unenrollButton.classList.add('d-none');
-    const enrollSuccess = (data) => {
-        if ((typeof data === 'string') && (data.includes('enrolled'))) {
-            const classId = classSelect.value;
-            lmsUpdateClassRosterList(list, classId);
-            enrollButton.classList.add('d-none');
-            unenrollButton.classList.remove('d-none');
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to enroll the user in the class.', 'error');
-    };
     enrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const classId = classSelect.value;
@@ -517,7 +505,20 @@ function attachLMSCallbacksForClassEnrollment(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        put(`${API_URL}lms/classes/${classId}/users/${userId}`, token, {}, enrollSuccess, errorCallback);
+        cohortsRepo.enroll(classId, userId)
+            .then((success) => {
+                if (success) {
+                    openSnackBar('The user has been enrolled in the class.', 'success');
+                    return;
+                }
+                openSnackBar('Sorry, we were unable to enroll the student in the class.', 'error');
+            })
+            .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+            .finally(() => {
+                lmsUpdateClassRosterList(list, classId);
+                enrollButton.classList.add('d-none');
+                unenrollButton.classList.remove('d-none');
+            });
         return false;
     });
     const unenrollSuccess = (data) => {

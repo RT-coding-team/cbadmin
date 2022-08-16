@@ -91,9 +91,45 @@ export class CohortsRepo {
     }
 
     /**
+     * Enroll a student into a class
+     *
+     * @param  {integer}    id          The class id
+     * @param  {integer}    userId      The user's id to add
+     *
+     * @return {Promise<boolean>}       Were they successfully enrolled?
+     */
+    enroll(id, userId) {
+        if ((!id) || (!userId)) {
+            return Promise.resolve(false);
+        }
+        return this._load().then(() => {
+            const currentIndex = this.data.findIndex((cohort) => (cohort.id === parseInt(id, 10)));
+            if (currentIndex === -1) {
+                return Promise.reject({code: 200, errors: ['The class could not be found.']});
+            }
+            if (this.data[currentIndex].isEnrolled(userId)) {
+                return true;
+            }
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('enrolled'))) {
+                        this.data[currentIndex].enroll(userId);
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the student in the class.']});
+                put(`${API_URL}lms/classes/${id}/users/${userId}`, this.token, {}, success, error);
+            });
+        });
+    }
+
+    /**
      * Get a list of user's that belong to the cohort (class).
      *
      * @param  {integer}    id      The id of the cohort
+     *
      * @return {Promise<User>}      A list of Users
      */
     roster(id) {
