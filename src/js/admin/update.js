@@ -359,12 +359,11 @@ function lmsUpdateClassRosterList(list, classId, emptyText = 'Sorry, no users fo
  * of enrolled users.
  *
  * @param  {object}     list        The list to update
- * @param  {token}      token       The API token
  * @param  {integer}    courseId    The course to retrieve the id for
  * @param  {String}     emptyText   The text to display if no users are found
  * @return {void}
  */
-function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no users found.') {
+function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users found.') {
     if (courseId === '') {
         list.innerHTML = '';
         const li = document.createElement('li');
@@ -372,24 +371,24 @@ function lmsUpdateCourseRosterList(list, token, courseId, emptyText = 'Sorry, no
         list.appendChild(li);
         return;
     }
-    const courseSuccessCallback = (data) => {
-        const ids = data.map((user) => user.id);
+    coursesRepo.roster(courseId).then((members) => {
+        const ids = members.map((member) => member.id);
         list.innerHTML = '';
         list.setAttribute('data-enrolled', ids.join('|'));
-        if (data.length == 0) {
+        if (members.length == 0) {
             const li = document.createElement('li');
             li.innerHTML = emptyText;
             list.appendChild(li);
             return;
         }
-        const values = data.map((user) => {
-            const roles = user.roles.map((role) =>  role.shortname);
-            const roleText = (roles.length > 0) ? ` (${roles.join(', ')})` : '';
-            return { title: `${user.fullname}${roleText}` };
-        });
-        appendItemsToList(list, values, 'title');
-    }
-    get(`${API_URL}lms/courses/${courseId}/users`, token, courseSuccessCallback, errorCallback);
+        appendItemsToList(list, members, 'label');
+    }).catch((res) => {
+        errorCallback(res.code, res.errors.join("\r\n"));
+        list.innerHTML = '';
+        const li = document.createElement('li');
+        li.innerHTML = emptyText;
+        list.appendChild(li);
+    });
 }
 
 /**
@@ -694,7 +693,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
         if ((typeof data === 'string') && (data.includes('enrolled'))) {
             // update the list of enrollees
             const courseId = courseSelect.value;
-            lmsUpdateCourseRosterList(list, token, courseId);
+            lmsUpdateCourseRosterList(list, courseId);
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
             roleSelector.classList.add('d-none');
@@ -734,7 +733,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
         if ((typeof data === 'string') && (data.includes('unenrolled'))) {
             // update the list of enrollees
             const courseId = courseSelect.value;
-            lmsUpdateCourseRosterList(list, token, courseId);
+            lmsUpdateCourseRosterList(list, courseId);
             enrollButton.classList.remove('d-none');
             unenrollButton.classList.add('d-none');
             roleSelector.value = 5;
@@ -781,7 +780,7 @@ function attachLMSCallbacksForEnrollingUser(token) {
             classSelector.disabled = false;
             enrolleeSelectors.classList.remove('d-none');
         }
-        lmsUpdateCourseRosterList(list, token, courseId);
+        lmsUpdateCourseRosterList(list, courseId);
     });
     studentSelector.addEventListener('change', () => {
         const enrolled = list.getAttribute('data-enrolled');
