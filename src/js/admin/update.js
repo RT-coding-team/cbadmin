@@ -279,7 +279,10 @@ function attachLMSCallbacksForAddingClasses() {
         showLoader('moodle_classes_add');
         cohortsRepo.add(name)
             .then(() => openSnackBar('The class has been added.', 'success'))
-            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+            .catch((res) =>  {
+                console.error(res);
+                errorCallback(res.code, res.errors.join("\r\n"));
+            })
             .finally(() => {
                 lmsUpdateClassSelectors();
                 hideLoader('moodle_classes_add');
@@ -308,7 +311,10 @@ function attachLMSCallbacksForAddingUsers() {
         showLoader('moodle_users_add');
         usersRepo.add(email, firstname, lastname, password, username)
             .then(() => openSnackBar('The user has been added', 'success'))
-            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+            .catch((res) =>  {
+                console.error(res);
+                errorCallback(res.code, res.errors.join("\r\n"));
+            })
             .finally(() => {
                 hideLoader('moodle_users_add');
                 saveButton.classList.remove('d-none');
@@ -346,6 +352,7 @@ function lmsUpdateClassRosterList(list, classId, emptyText = 'Sorry, no users fo
         appendItemsToList(list, users, 'fullname');
     })
     .catch((res) => {
+        console.error(res);
         errorCallback(res.code, res.errors.join("\r\n"));
         list.innerHTML = '';
         const li = document.createElement('li');
@@ -383,6 +390,7 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
         }
         appendItemsToList(list, members, 'label');
     }).catch((res) => {
+        console.error(res);
         errorCallback(res.code, res.errors.join("\r\n"));
         list.innerHTML = '';
         const li = document.createElement('li');
@@ -403,7 +411,10 @@ function lmsUpdateCourseSelectors(exclude = []) {
         const filtered = courses.filter((course) => (!excluded.includes(course.id)));
         const selectors = document.querySelectorAll('.lms-course-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
-    }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
+    }).catch((res) =>  {
+        console.error(res);
+        errorCallback(res.code, res.errors.join("\r\n"));
+    });
 }
 
 /**
@@ -419,7 +430,10 @@ function lmsUpdateUserSelectors(exclude = []) {
       const filtered = users.filter((user) => (!excluded.includes(user.id)));
       const selectors = document.querySelectorAll('.lms-user-selector');
       selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
-  }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
+  }).catch((res) =>  {
+      console.error(res);
+      errorCallback(res.code, res.errors.join("\r\n"));
+  });
 }
 
 /**
@@ -434,7 +448,10 @@ function lmsUpdateClassSelectors(exclude = []) {
         const filtered = cohorts.filter((cohort) => (!excluded.includes(cohort.id)));
         const selectors = document.querySelectorAll('.lms-class-selector');
         selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'name', 'id'));
-    }).catch((res) => errorCallback(res.code, res.errors.join("\r\n")));
+    }).catch((res) =>  {
+        console.error(res);
+        errorCallback(res.code, res.errors.join("\r\n"));
+    });
 }
 
 /**
@@ -458,7 +475,10 @@ function attachLMSCallbacksForDeletingClass(wrapper) {
           cohortsRepo.delete(id).then(() => {
               openSnackBar('The class has been deleted.', 'success');
           })
-          .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+          .catch((res) =>  {
+              console.error(res);
+              errorCallback(res.code, res.errors.join("\r\n"));
+          })
           .finally(() => {
               wrapper.classList.add('d-none');
               lmsUpdateClassSelectors();
@@ -510,7 +530,10 @@ function attachLMSCallbacksForClassEnrollment() {
                 }
                 openSnackBar('Sorry, we were unable to enroll the user in the class.', 'error');
             })
-            .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+            .catch((res) =>  {
+                console.error(res);
+                errorCallback(res.code, res.errors.join("\r\n"));
+            })
             .finally(() => {
                 lmsUpdateClassRosterList(list, classId);
                 enrollButton.classList.add('d-none');
@@ -545,7 +568,10 @@ function attachLMSCallbacksForClassEnrollment() {
               }
               openSnackBar('Sorry, we were unable to remove the user from the class.', 'error');
           })
-          .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+          .catch((res) =>  {
+              console.error(res);
+              errorCallback(res.code, res.errors.join("\r\n"));
+          })
           .finally(() => {
               lmsUpdateClassRosterList(list, classId);
               enrollButton.classList.remove('d-none');
@@ -591,7 +617,10 @@ function attachLMSCallbacksForUpdatingClasses(wrapper) {
       showLoader('moodle_classes_update');
       cohortsRepo.update(id, name)
         .then(() => openSnackBar('The class has been updated.', 'success'))
-        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .catch((res) =>  {
+            console.error(res);
+            errorCallback(res.code, res.errors.join("\r\n"));
+        })
         .finally(() => {
             wrapper.classList.add('d-none');
             hideLoader('moodle_classes_update');
@@ -624,7 +653,10 @@ function attachLMSCallbacksForDeletingUser(wrapper) {
             showLoader('moodle_users_account_remove');
             usersRepo.delete(id)
                 .then(() => openSnackBar('The user has been deleted.', 'success'))
-                .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+                .catch((res) =>  {
+                    console.error(res);
+                    errorCallback(res.code, res.errors.join("\r\n"));
+                })
                 .finally(() => {
                     lmsUpdateUserSelectors();
                     wrapper.classList.add('d-none');
@@ -662,7 +694,10 @@ function attachLMSCallbacksForUpdatingUsers(wrapper) {
             lmsUpdateUserSelectors();
             openSnackBar("The user has been updated.", 'success');
         })
-        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .catch((res) =>  {
+            console.error(res);
+            errorCallback(res.code, res.errors.join("\r\n"));
+        })
         .finally(() => {
             wrapper.classList.add('d-none');
             hideLoader('moodle_users_update');
@@ -689,30 +724,13 @@ function attachLMSCallbacksForEnrollingUser(token) {
     const studentSelector = document.getElementById('moodle_enrollees-input');
     const classSelector = document.getElementById('moodle_classes_enrollees-input');
     const list = document.getElementById('course-users-list');
-    const enrollSuccessCallback = (data) => {
-        if ((typeof data === 'string') && (data.includes('enrolled'))) {
-            // update the list of enrollees
-            const courseId = courseSelect.value;
-            lmsUpdateCourseRosterList(list, courseId);
-            enrollButton.classList.add('d-none');
-            unenrollButton.classList.remove('d-none');
-            roleSelector.classList.add('d-none');
-            roleSelector.value = 5;
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to enroll the user in the course.', 'error');
-    };
     enrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const courseId = courseSelect.value;
         const userId = document.getElementById('moodle_enrollees-input').value;
         const errors = [];
         const enrolled = list.getAttribute('data-enrolled');
-        const payload = {
-          roleid: parseInt(roleSelector.value, 10),
-        };
+        const roleId = roleSelector.value;
         if (!courseId) {
             errors.push('Please select a course.');
         }
@@ -726,7 +744,23 @@ function attachLMSCallbacksForEnrollingUser(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        put(`${API_URL}lms/courses/${courseId}/users/${userId}`, token, payload, enrollSuccessCallback, errorCallback);
+        coursesRepo.enroll(courseId, userId, roleId)
+            .then((success) => {
+                if (success) {
+                    lmsUpdateCourseRosterList(list, courseId);
+                    enrollButton.classList.add('d-none');
+                    unenrollButton.classList.remove('d-none');
+                    roleSelector.classList.add('d-none');
+                    roleSelector.value = 5;
+                    openSnackBar('The user has been enrolled in the course.', 'success');
+                    return;
+                }
+                openSnackBar('Sorry, we were unable to enroll the user in the course.', 'error');
+            })
+            .catch((res) =>  {
+                console.error(res);
+                errorCallback(res.code, res.errors.join("\r\n"));
+            });
         return false;
     });
     const unenrollSuccessCallback = (data) => {
@@ -841,7 +875,10 @@ function attachLMSCallbacksForUpdatingCourses() {
             lmsUpdateCourseSelectors();
             openSnackBar("The course has been updated.", 'success');
         })
-        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        .catch((res) =>  {
+            console.error(res);
+            errorCallback(res.code, res.errors.join("\r\n"));
+        })
         .finally(() => {
             hideLoader('moodle_courses_functions');
             saveButton.classList.remove('d-none');
@@ -872,7 +909,10 @@ function attachLMSCallbacksForDeletingCourses() {
             showLoader('moodle_course_remove');
             coursesRepo.delete(id)
                 .then(() => openSnackBar('The course has been deleted.', 'success'))
-                .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+                .catch((res) =>  {
+                    console.error(res);
+                    errorCallback(res.code, res.errors.join("\r\n"));
+                })
                 .finally(() => {
                     lmsUpdateCourseSelectors();
                     wrapper.classList.add('d-none');
@@ -952,6 +992,7 @@ function attachLMSCallbacksForUpdateUserForm() {
                 wrapper.classList.add('d-none');
             }
         }).catch((res) => {
+            console.error(res);
             errorCallback(res.code, res.errors.join("\r\n"));
             wrapper.classList.add('d-none');
         });
@@ -1002,6 +1043,7 @@ function attachLMSCallbacksForCourseUpdateForm() {
                 wrapper.classList.add('d-none');
             }
         }).catch((res) => {
+            console.error(res);
             errorCallback(res.code, res.errors.join("\r\n"));
             wrapper.classList.add('d-none');
         });
@@ -1076,7 +1118,7 @@ export default function attachUpdateCallbacks(token) {
     const lmsSetUp = (data) => {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       usersRepo = new UsersRepo(token);
-      coursesRepo = new CoursesRepo(token);
+      coursesRepo = new CoursesRepo(token, usersRepo);
       cohortsRepo = new CohortsRepo(token, usersRepo);
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();

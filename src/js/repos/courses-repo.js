@@ -13,11 +13,19 @@ export class CoursesRepo {
     /**
      * Build the repository
      *
-     * @param {string} token  The API token
+     * @param {string}      token       The API token
+     * @param {UsersRepo}   usersRepo   The User's repository
      */
-    constructor(token) {
+    constructor(token, usersRepo) {
         this.token = token;
+        this.usersRepo = usersRepo;
         this.data = [];
+        this.roles = {
+            1: 'Manager',
+            4: 'Non-editing Teacher',
+            5: 'Student',
+            3: 'Teacher',
+        };
     }
 
     /**
@@ -70,6 +78,47 @@ export class CoursesRepo {
         return this._load().then(
             (courses) => courses.find((course) => course.id === parseInt(id, 10))
         );
+    }
+
+    /**
+     * Enroll a user into a course
+     *
+     * @param  {integer}    id                  The id of the course
+     * @param  {integer}    userId              The user id to enroll
+     * @param  {integer}    roleId              The role id for the user
+     *
+     * @return {Promise<boolean>}   Were they successfuly enrolled?
+     */
+    enroll(id, userId, roleId) {
+        if ((!id) || (!userId) || (!roleId)) {
+            return Promise.resolve(false);
+        }
+        // Make sure the list of users for the course is loaded before enrolling
+        return this.roster(id).then(() => {
+            const currentIndex = this.data.findIndex((course) => (course.id === parseInt(id, 10)));
+            if (currentIndex === -1) {
+                return Promise.reject({code: 200, errors: ['The course could not be found.']});
+            }
+            if (this.data[currentIndex].isEnrolled(userId)) {
+                return true;
+            }
+            return new Promise((resolve, reject) => {
+                const success = (results) => {
+                    if ((typeof results === 'string') && (results.includes('enrolled'))) {
+                        return this.usersRepo.find(userId).then((user) => {
+                            const member = new CourseMember(user);
+                            member.addRole(roleId, this.roles[roleId]);
+                            this.data[currentIndex].enroll(member);
+                            console.log(this.data);
+                            resolve(true);
+                        });
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the user in the course.']});
+                put(`${API_URL}lms/courses/${id}/users/${userId}`, this.token, { roleid: parseInt(roleId, 10) }, success, error);
+            });
+        })
     }
 
     /**
