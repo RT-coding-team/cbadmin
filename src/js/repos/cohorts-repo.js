@@ -11,10 +11,12 @@ export class CohortsRepo {
     /**
      * Build the repository
      *
-     * @param {string} token  The API token
+     * @param {string}      token       The API token
+     * @param {UsersRepo}   usersRepo   The User's repository
      */
-    constructor(token) {
+    constructor(token, usersRepo) {
         this.token = token;
+        this.usersRepo = usersRepo;
         this.data = [];
     }
 
@@ -26,28 +28,30 @@ export class CohortsRepo {
      * @return {Promise<Cohort>}    Returns the new cohort
      */
     add(name) {
-        return new Promise((resolve, reject) => {
-            const payload = { name };
-            const errors = [
-                ...validateObjectValues(payload)
-            ];
-            if (errors.length > 0) {
-                reject({code: 0, errors});
-                return;
-            }
-            const success = (data) => {
-                if ((Array.isArray(data)) && ('id' in data[0])) {
-                    const cohort = new Cohort(data[0].id, name);
-                    this.data.push(cohort);
-                    this._sortData();
-                    resolve(cohort);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const payload = { name };
+                const errors = [
+                    ...validateObjectValues(payload)
+                ];
+                if (errors.length > 0) {
+                    reject({code: 0, errors});
                     return;
                 }
-                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
-                return;
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new class.']});
-            post(`${API_URL}lms/classes`, this.token, payload, success, error);
+                const success = (data) => {
+                    if ((Array.isArray(data)) && ('id' in data[0])) {
+                        const cohort = new Cohort(data[0].id, name);
+                        this.data.push(cohort);
+                        this._sortData();
+                        resolve(cohort);
+                        return;
+                    }
+                    reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                    return;
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new class.']});
+                post(`${API_URL}lms/classes`, this.token, payload, success, error);
+            });
         });
     }
 
@@ -70,17 +74,19 @@ export class CohortsRepo {
         if (!id) {
             return Promise.resolve(false);
         }
-        return new Promise((resolve, reject) => {
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('deleted'))) {
-                    this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
-                    resolve(true);
-                    return;
-                }
-                reject({code: 200, errors: ['Something went wrong on the LMS server.']});
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the class.']});
-            del(`${API_URL}lms/classes/${id}`, this.token, success, error);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('deleted'))) {
+                        this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
+                        resolve(true);
+                        return;
+                    }
+                    reject({code: 200, errors: ['Something went wrong on the LMS server.']});
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the class.']});
+                del(`${API_URL}lms/classes/${id}`, this.token, success, error);
+            });
         });
     }
 
@@ -95,29 +101,31 @@ export class CohortsRepo {
         if (!id) {
             return Promise.resolve(null);
         }
-        return new Promise((resolve, reject) => {
-            const payload = { name };
-            const errors = [
-                ...validateObjectValues(payload)
-            ];
-            if (errors.length > 0) {
-                reject({code: 0, errors});
-                return;
-            }
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('updated'))) {
-                    this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
-                    const cohort = new Cohort(id, name);
-                    this.data.push(cohort);
-                    this._sortData();
-                    resolve(cohort);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const payload = { name };
+                const errors = [
+                    ...validateObjectValues(payload)
+                ];
+                if (errors.length > 0) {
+                    reject({code: 0, errors});
                     return;
                 }
-                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
-                return;
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the class.']});
-            put(`${API_URL}lms/classes/${id}`, this.token, payload, success, error);
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('updated'))) {
+                        this.data = this.data.filter((cohort) => cohort.id !== parseInt(id, 10));
+                        const cohort = new Cohort(id, name);
+                        this.data.push(cohort);
+                        this._sortData();
+                        resolve(cohort);
+                        return;
+                    }
+                    reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                    return;
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to update the class.']});
+                put(`${API_URL}lms/classes/${id}`, this.token, payload, success, error);
+            });
         });
     }
 

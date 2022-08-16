@@ -38,17 +38,19 @@ export class CoursesRepo {
         if (!id) {
             return Promise.resolve(false);
         }
-        return new Promise((resolve, reject) => {
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('deleted'))) {
-                    this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
-                    resolve(true);
-                    return;
-                }
-                reject({code: 200, errors: ['Something went wrong on the LMS server.']});
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the course.']});
-            del(`${API_URL}lms/courses/${id}`, this.token, success, error);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('deleted'))) {
+                        this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
+                        resolve(true);
+                        return;
+                    }
+                    reject({code: 200, errors: ['Something went wrong on the LMS server.']});
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the course.']});
+                del(`${API_URL}lms/courses/${id}`, this.token, success, error);
+            });
         });
     }
 
@@ -82,28 +84,30 @@ export class CoursesRepo {
         if (!id) {
             return Promise.resolve(null);
         }
-        return new Promise((resolve, reject) => {
-            const payload = { fullname, shortname, summary };
-            const errors = [
-                ...validateObjectValues(payload)
-            ];
-            if (errors.length > 0) {
-                reject({code: 0, errors});
-                return;
-            }
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('updated'))) {
-                    this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
-                    const course = new Course(id, fullname, shortname, summary);
-                    this.data.push(course);
-                    this._sortData();
-                    resolve(course);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const payload = { fullname, shortname, summary };
+                const errors = [
+                    ...validateObjectValues(payload)
+                ];
+                if (errors.length > 0) {
+                    reject({code: 0, errors});
+                    return;
                 }
-                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
-                return;
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the course.']});
-            put(`${API_URL}lms/courses/${id}`, this.token, payload, success, error);
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('updated'))) {
+                        this.data = this.data.filter((course) => course.id !== parseInt(id, 10));
+                        const course = new Course(id, fullname, shortname, summary);
+                        this.data.push(course);
+                        this._sortData();
+                        resolve(course);
+                    }
+                    reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                    return;
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to update the course.']});
+                put(`${API_URL}lms/courses/${id}`, this.token, payload, success, error);
+            });
         });
     }
 

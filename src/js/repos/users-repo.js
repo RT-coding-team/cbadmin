@@ -32,34 +32,36 @@ export class UsersRepo {
      * @return {Promise}          Returns the new user
      */
     add(email, firstname, lastname, password, username) {
-        return new Promise((resolve, reject) => {
-            const payload = { username, firstname, lastname, email, password };
-            const errors = [
-                ...validateObjectValues(payload),
-                ...validateLMSPassword(password),
-                ...validateLMSUsername(username),
-                ...validateLMSEmail(email)
-            ];
-            if (errors.length > 0) {
-                reject({code: 0, errors});
-                return;
-            }
-            const success = (data) => {
-                if ((Array.isArray(data)) && ('id' in data[0])) {
-                    const user = new User(data[0].id, email, firstname, `${firstname} ${lastname}`, lastname, username);
-                    this.data.push(user);
-                    this._sortData();
-                    resolve(user);
-                    return;
-                } else if ((typeof data === 'object') && ('debuginfo' in data)) {
-                    reject({code: 0, errors: [data.debuginfo]});
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const payload = { username, firstname, lastname, email, password };
+                const errors = [
+                    ...validateObjectValues(payload),
+                    ...validateLMSPassword(password),
+                    ...validateLMSUsername(username),
+                    ...validateLMSEmail(email)
+                ];
+                if (errors.length > 0) {
+                    reject({code: 0, errors});
                     return;
                 }
-                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
-                return;
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new user.']});
-            post(`${API_URL}lms/users`, this.token, payload, success, error);
+                const success = (data) => {
+                    if ((Array.isArray(data)) && ('id' in data[0])) {
+                        const user = new User(data[0].id, email, firstname, `${firstname} ${lastname}`, lastname, username);
+                        this.data.push(user);
+                        this._sortData();
+                        resolve(user);
+                        return;
+                    } else if ((typeof data === 'object') && ('debuginfo' in data)) {
+                        reject({code: 0, errors: [data.debuginfo]});
+                        return;
+                    }
+                    reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                    return;
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new user.']});
+                post(`${API_URL}lms/users`, this.token, payload, success, error);
+            });
         });
     }
 
@@ -83,17 +85,19 @@ export class UsersRepo {
         if (!id) {
             return Promise.resolve(false);
         }
-        return new Promise((resolve, reject) => {
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('deleted'))) {
-                    this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
-                    resolve(true);
-                } else {
-                    reject({code: 200, errors: ['Something went wrong on the LMS server.']});
-                }
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the user.']});
-            del(`${API_URL}lms/users/${id}`, this.token, success, error);
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('deleted'))) {
+                        this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
+                        resolve(true);
+                    } else {
+                        reject({code: 200, errors: ['Something went wrong on the LMS server.']});
+                    }
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to delete the user.']});
+                del(`${API_URL}lms/users/${id}`, this.token, success, error);
+            });
         });
     }
 
@@ -129,46 +133,48 @@ export class UsersRepo {
         if (!id) {
             return Promise.resolve(null);
         }
-        return new Promise((resolve, reject) => {
-            const payload = { username, firstname, lastname, email };
-            let errors = [];
-            if (password !== '') {
-                payload.password = password;
-                errors = [
-                    ...validateObjectValues(payload),
-                    ...validateLMSPassword(password),
-                    ...validateLMSUsername(username),
-                    ...validateLMSEmail(email),
-                ];
-            } else {
-                errors = [
-                    ...validateObjectValues(payload),
-                    ...validateLMSUsername(username),
-                    ...validateLMSEmail(email)
-                ];
-            }
-            if (errors.length > 0) {
-                reject({code: 0, errors});
-                return;
-            }
-            const success = (data) => {
-                if ((typeof data === 'string') && (data.includes('updated'))) {
-                    this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
-                    const user = new User(id, email, firstname, `${firstname} ${lastname}`, lastname, username);
-                    this.data.push(user);
-                    this._sortData();
-                    resolve(user);
-                    return;
-                } else if ((typeof data === 'object') && ('debuginfo' in data)) {
-                    reject({code: 0, errors: [data.debuginfo]});
+        return this._load().then(() => {
+            return new Promise((resolve, reject) => {
+                const payload = { username, firstname, lastname, email };
+                let errors = [];
+                if (password !== '') {
+                    payload.password = password;
+                    errors = [
+                        ...validateObjectValues(payload),
+                        ...validateLMSPassword(password),
+                        ...validateLMSUsername(username),
+                        ...validateLMSEmail(email),
+                    ];
+                } else {
+                    errors = [
+                        ...validateObjectValues(payload),
+                        ...validateLMSUsername(username),
+                        ...validateLMSEmail(email)
+                    ];
+                }
+                if (errors.length > 0) {
+                    reject({code: 0, errors});
                     return;
                 }
-                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
-                return;
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('updated'))) {
+                        this.data = this.data.filter((user) => user.id !== parseInt(id, 10));
+                        const user = new User(id, email, firstname, `${firstname} ${lastname}`, lastname, username);
+                        this.data.push(user);
+                        this._sortData();
+                        resolve(user);
+                        return;
+                    } else if ((typeof data === 'object') && ('debuginfo' in data)) {
+                        reject({code: 0, errors: [data.debuginfo]});
+                        return;
+                    }
+                    reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                    return;
 
-            };
-            const error = (code) => reject({code, errors: ['Sorry, we were unable to update the user.']});
-            put(`${API_URL}lms/users/${id}`, this.token, payload, success, error);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to update the user.']});
+                put(`${API_URL}lms/users/${id}`, this.token, payload, success, error);
+            });
         });
     }
 
