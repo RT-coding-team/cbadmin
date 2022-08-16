@@ -102,7 +102,8 @@ export class CohortsRepo {
         if ((!id) || (!userId)) {
             return Promise.resolve(false);
         }
-        return this._load().then(() => {
+        // Make sure the list of users for the course is loaded before enrolling
+        return this.roster(id).then(() => {
             const currentIndex = this.data.findIndex((cohort) => (cohort.id === parseInt(id, 10)));
             if (currentIndex === -1) {
                 return Promise.reject({code: 200, errors: ['The class could not be found.']});
@@ -173,7 +174,8 @@ export class CohortsRepo {
         if ((!id) || (!userId)) {
             return Promise.resolve(false);
         }
-        return this._load().then(() => {
+        // Make sure the list of users for the course is loaded before removing
+        return this.roster(id).then(() => {
             const currentIndex = this.data.findIndex((cohort) => (cohort.id === parseInt(id, 10)));
             if (currentIndex === -1) {
                 return Promise.reject({code: 200, errors: ['The class could not be found.']});
@@ -184,9 +186,7 @@ export class CohortsRepo {
             return new Promise((resolve, reject) => {
                 const success = (data) => {
                     if ((typeof data === 'string') && (data.includes('unenrolled'))) {
-                        console.log('before', this.data[currentIndex].enrolled());
                         this.data[currentIndex].unenroll(userId);
-                        console.log('after', this.data[currentIndex].enrolled());
                         resolve(true);
                         return;
                     }
