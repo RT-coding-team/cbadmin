@@ -65,22 +65,6 @@ export class CoursesRepo {
     }
 
     /**
-     * Find by id
-     *
-     * @param  {integer}    id  The id of the course
-     *
-     * @return {Promise}        The user with the given id.
-     */
-    find(id) {
-        if (!id) {
-            return Promise.resolve(null);
-        }
-        return this._load().then(
-            (courses) => courses.find((course) => course.id === parseInt(id, 10))
-        );
-    }
-
-    /**
      * Enroll a user into a course
      *
      * @param  {integer}    id                  The id of the course
@@ -109,7 +93,6 @@ export class CoursesRepo {
                             const member = new CourseMember(user);
                             member.addRole(roleId, this.roles[roleId]);
                             this.data[currentIndex].enroll(member);
-                            console.log(this.data);
                             resolve(true);
                         });
                     }
@@ -119,6 +102,22 @@ export class CoursesRepo {
                 put(`${API_URL}lms/courses/${id}/users/${userId}`, this.token, { roleid: parseInt(roleId, 10) }, success, error);
             });
         })
+    }
+
+    /**
+     * Find by id
+     *
+     * @param  {integer}    id  The id of the course
+     *
+     * @return {Promise}        The user with the given id.
+     */
+    find(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+        return this._load().then(
+            (courses) => courses.find((course) => course.id === parseInt(id, 10))
+        );
     }
 
     /**
@@ -169,6 +168,40 @@ export class CoursesRepo {
         });
     }
 
+    /**
+     * Remove a student from a course
+     *
+     * @param  {integer}    id                  The id of the course
+     * @param  {integer}    userId              The user id to unenroll
+     *
+     * @return {Promise<boolean>}               Was it successful?
+     */
+    unenroll(id, userId) {
+        if ((!id) || (!userId)) {
+            return Promise.resolve(false);
+        }
+        return this.roster(id).then(() => {
+            const currentIndex = this.data.findIndex((course) => (course.id === parseInt(id, 10)));
+            if (currentIndex === -1) {
+                return Promise.reject({code: 200, errors: ['The course could not be found.']});
+            }
+            if (!this.data[currentIndex].isEnrolled(userId)) {
+                return true;
+            }
+            return new Promise((resolve, reject) => {
+                const success = (results) => {
+                    if ((typeof results === 'string') && (results.includes('unenrolled'))) {
+                        this.data[currentIndex].unenroll(userId);
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the user in the course.']});
+                del(`${API_URL}lms/courses/${id}/users/${userId}`, this.token, success, error);
+            });
+        });
+    }
     /**
      * Update a course
      *

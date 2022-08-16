@@ -11,12 +11,6 @@ import { CohortsRepo } from '../repos/cohorts-repo';
 import { CoursesRepo } from '../repos/courses-repo';
 
 /**
- * Store the LMS user for access
- *
- * @type {Array}
- */
-const lmsUsers = [];
-/**
  * Our cohorts (classes) repository
  *
  * @type {CohortsRepo}
@@ -379,7 +373,7 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
         return;
     }
     coursesRepo.roster(courseId).then((members) => {
-        const ids = members.map((member) => member.id);
+        const ids = members.map((member) => member.user.id);
         list.innerHTML = '';
         list.setAttribute('data-enrolled', ids.join('|'));
         if (members.length == 0) {
@@ -426,7 +420,6 @@ function lmsUpdateCourseSelectors(exclude = []) {
 function lmsUpdateUserSelectors(exclude = []) {
     const excluded = exclude.map((i) => parseInt(i, 10));
     usersRepo.all().then((users) => {
-      users.forEach((user) =>  lmsUsers[user.id] = user.fullname);
       const filtered = users.filter((user) => (!excluded.includes(user.id)));
       const selectors = document.querySelectorAll('.lms-user-selector');
       selectors.forEach((selector) => appendOptionsToSelect(selector, filtered, 'fullname', 'id'));
@@ -710,11 +703,10 @@ function attachLMSCallbacksForUpdatingUsers(wrapper) {
 /**
  * Attach callbacks for enrolling students
  *
- * @param  {string} token   the token to authenticate the requests
  * @param  {object} list    the list to update
  * @return {void}
  */
-function attachLMSCallbacksForEnrollingUser(token) {
+function attachLMSCallbacksForEnrollingUser() {
     const courseSelect = document.getElementById('moodle_courses-input');
     const enrollButton = document.getElementById('moodle_courses_users_add-btn');
     const unenrollButton = document.getElementById('moodle_courses_users_remove-btn');
@@ -763,21 +755,6 @@ function attachLMSCallbacksForEnrollingUser(token) {
             });
         return false;
     });
-    const unenrollSuccessCallback = (data) => {
-        if ((typeof data === 'string') && (data.includes('unenrolled'))) {
-            // update the list of enrollees
-            const courseId = courseSelect.value;
-            lmsUpdateCourseRosterList(list, courseId);
-            enrollButton.classList.remove('d-none');
-            unenrollButton.classList.add('d-none');
-            roleSelector.value = 5;
-            roleSelector.classList.remove('d-none');
-            openSnackBar(data, 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to remove the user in the course.', 'error');
-    };
     unenrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const courseId = courseSelect.value;
@@ -797,7 +774,23 @@ function attachLMSCallbacksForEnrollingUser(token) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        del(`${API_URL}lms/courses/${courseId}/users/${userId}`, token, unenrollSuccessCallback, errorCallback);
+        coursesRepo.unenroll(courseId, userId)
+            .then((success) => {
+                if (success) {
+                    lmsUpdateCourseRosterList(list, courseId);
+                    enrollButton.classList.remove('d-none');
+                    unenrollButton.classList.add('d-none');
+                    roleSelector.value = 5;
+                    roleSelector.classList.remove('d-none');
+                    openSnackBar('The user has been removed from the course.', 'success');
+                    return;
+                }
+                openSnackBar('Sorry, we were unable to remove the user in the course.', 'error');
+            })
+            .catch((res) =>  {
+                console.error(res);
+                errorCallback(res.code, res.errors.join("\r\n"));
+            });
         return false;
     });
     courseSelect.addEventListener('change', ()  =>  {
@@ -1013,11 +1006,10 @@ function attachLMSCallbacksForClassRosterForm() {
 /**
  * Attach the callbacks for course roster form
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForCourseRosterForm(token) {
-    attachLMSCallbacksForEnrollingUser(token);
+function attachLMSCallbacksForCourseRosterForm() {
+    attachLMSCallbacksForEnrollingUser();
 }
 
 /**
@@ -1128,7 +1120,7 @@ export default function attachUpdateCallbacks(token) {
       attachLMSCallbacksForUpdateClassForm();
       attachLMSCallbacksForUpdateUserForm();
       attachLMSCallbacksForClassRosterForm();
-      attachLMSCallbacksForCourseRosterForm(token);
+      attachLMSCallbacksForCourseRosterForm();
       attachLMSCallbacksForCourseUpdateForm();
     };
     get(`${API_URL}ismoodle`, token, lmsSetUp, errorCallback);
