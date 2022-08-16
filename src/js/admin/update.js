@@ -268,38 +268,24 @@ function attacheUpdateCallbackToScreenEnable(id, token) {
 /**
  * Attach the callbacks for adding LMS classes
  *
- * @param  {string} token   the token to authenticate the requests
- *
  * @return {void}
  */
-function attachLMSCallbacksForAddingClasses(token) {
+function attachLMSCallbacksForAddingClasses() {
     const saveButton = document.getElementById('moodle_classes_add-btn');
-    const saveSuccessCallback = (data) => {
-        lmsUpdateClassSelectors();
-        hideLoader('moodle_classes_add');
-        saveButton.classList.remove('d-none');
-        document.getElementById('moodle_class_name-input').value = '';
-        if ((Array.isArray(data)) && ('id' in data[0])) {
-            openSnackBar('The class has been added.', 'success');
-            return;
-        }
-        console.error(data);
-        openSnackBar('Sorry, we were unable to add the class.', 'error');
-    };
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
         const name = document.getElementById('moodle_class_name-input').value;
-        let payload = { name };
-        const errors = [
-            ...validateObjectValues(payload)
-        ];
-        if (errors.length > 0) {
-            openSnackBar(errors.join("\r\n"), 'error');
-            return false;
-        }
         saveButton.classList.add('d-none');
         showLoader('moodle_classes_add');
-        post(`${API_URL}lms/classes`, token, payload, saveSuccessCallback, errorCallback);
+        cohortsRepo.add(name)
+            .then(() => openSnackBar('The class has been added.', 'success'))
+            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+            .finally(() => {
+                lmsUpdateClassSelectors();
+                hideLoader('moodle_classes_add');
+                saveButton.classList.remove('d-none');
+                document.getElementById('moodle_class_name-input').value = '';
+            });
         return false;
     });
 }
@@ -307,10 +293,9 @@ function attachLMSCallbacksForAddingClasses(token) {
 /**
  * Attach the callbacks for adding LMS users
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForAddingUsers(token) {
+function attachLMSCallbacksForAddingUsers() {
     const saveButton = document.getElementById('moodle_users_add-btn');
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -321,25 +306,21 @@ function attachLMSCallbacksForAddingUsers(token) {
         const email = document.getElementById('moodle_email-input').value;
         saveButton.classList.add('d-none');
         showLoader('moodle_users_add');
-        usersRepo.add(email, firstname, lastname, password, username).then(() => {
-            hideLoader('moodle_users_add');
-            saveButton.classList.remove('d-none');
-            document.getElementById('moodle_username-input').value = '';
-            document.getElementById('moodle_password-input').value = '';
-            document.getElementById('moodle_firstname-input').value = '';
-            document.getElementById('moodle_lastname-input').value = '';
-            document.getElementById('moodle_email-input').value = '';
-            lmsUpdateUserSelectors();
-            openSnackBar('The user has been added', 'success');
-            return;
-        }).catch((res) => {
-            errorCallback(res.code, res.errors.join("\r\n"));
-            hideLoader('moodle_users_add');
-            saveButton.classList.remove('d-none');
-        });
+        usersRepo.add(email, firstname, lastname, password, username)
+            .then(() => openSnackBar('The user has been added', 'success'))
+            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+            .finally(() => {
+                hideLoader('moodle_users_add');
+                saveButton.classList.remove('d-none');
+                document.getElementById('moodle_username-input').value = '';
+                document.getElementById('moodle_password-input').value = '';
+                document.getElementById('moodle_firstname-input').value = '';
+                document.getElementById('moodle_lastname-input').value = '';
+                document.getElementById('moodle_email-input').value = '';
+                lmsUpdateUserSelectors();
+            });
         return false;
     });
-
 }
 
 /**
@@ -645,16 +626,15 @@ function attachLMSCallbacksForDeletingUser(wrapper) {
         if (confirm(`Are you sure you want to delete the account: ${username}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_users_account_remove');
-            usersRepo.delete(id).then(() => {
-                openSnackBar('The user has been deleted.', 'success');
-            })
-            .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
-            .finally(() => {
-                lmsUpdateUserSelectors();
-                wrapper.classList.add('d-none');
-                hideLoader('moodle_users_account_remove');
-                deleteButton.classList.remove('d-none');
-            });
+            usersRepo.delete(id)
+                .then(() => openSnackBar('The user has been deleted.', 'success'))
+                .catch((res) => errorCallback(res.code, res.errors.join("\r\n")))
+                .finally(() => {
+                    lmsUpdateUserSelectors();
+                    wrapper.classList.add('d-none');
+                    hideLoader('moodle_users_account_remove');
+                    deleteButton.classList.remove('d-none');
+                });
         }
         return false;
     });
@@ -663,11 +643,10 @@ function attachLMSCallbacksForDeletingUser(wrapper) {
 /**
  * Attach the callbacks for updating LMS users
  *
- * @param  {string}     token   the token to authenticate the requests
  * @param   {object}    wrapper the form wrapper
  * @return {void}
  */
-function attachLMSCallbacksForUpdatingUsers(token, wrapper) {
+function attachLMSCallbacksForUpdatingUsers(wrapper) {
     const saveButton = document.getElementById('moodle_users_update-btn');
     saveButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -865,7 +844,8 @@ function attachLMSCallbacksForUpdatingCourses() {
         coursesRepo.update(id, fullname, shortname, summary).then((course) => {
             lmsUpdateCourseSelectors();
             openSnackBar("The course has been updated.", 'success');
-        }).catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+        })
+        .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
         .finally(() => {
             hideLoader('moodle_courses_functions');
             saveButton.classList.remove('d-none');
@@ -878,10 +858,9 @@ function attachLMSCallbacksForUpdatingCourses() {
 /**
  * Attach the callbacks for deleting LMS courses
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForDeletingCourses(token) {
+function attachLMSCallbacksForDeletingCourses() {
     const deleteButton = document.getElementById('moodle_course_remove-btn');
     const wrapper = document.getElementById('moodle_course-update-form');
     deleteButton.addEventListener('click', (event) => {
@@ -895,18 +874,17 @@ function attachLMSCallbacksForDeletingCourses(token) {
         if (confirm(`Are you sure you want to delete the course: ${courseName}?`)) {
             deleteButton.classList.add('d-none');
             showLoader('moodle_course_remove');
-            coursesRepo.delete(id).then(() => {
-                openSnackBar('The course has been deleted.', 'success');
-            })
-            .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
-            .finally(() => {
-                lmsUpdateCourseSelectors();
-                wrapper.classList.add('d-none');
-                hideLoader('moodle_course_remove');
-                deleteButton.classList.remove('d-none');
-                document.getElementById('moodle_update_course_name-input').value = '';
-                document.getElementById('moodle_update_course_id-input').value = '';
-            });
+            coursesRepo.delete(id)
+                .then(() => openSnackBar('The course has been deleted.', 'success'))
+                .catch((res) =>  errorCallback(res.code, res.errors.join("\r\n")))
+                .finally(() => {
+                    lmsUpdateCourseSelectors();
+                    wrapper.classList.add('d-none');
+                    hideLoader('moodle_course_remove');
+                    deleteButton.classList.remove('d-none');
+                    document.getElementById('moodle_update_course_name-input').value = '';
+                    document.getElementById('moodle_update_course_id-input').value = '';
+                });
         }
         return false;
     });
@@ -915,21 +893,18 @@ function attachLMSCallbacksForDeletingCourses(token) {
 /**
  * Attach the callbacks for the add LMS class form
  *
- * @param  {string} token   the token to authenticate the requests
- *
  * @return {void}
  */
-function attachLMSCallbacksForAddClassForm(token) {
-  attachLMSCallbacksForAddingClasses(token);
+function attachLMSCallbacksForAddClassForm() {
+  attachLMSCallbacksForAddingClasses();
 }
 
 /**
  * Attach the callbacks for update LMS class form
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForUpdateClassForm(token) {
+function attachLMSCallbacksForUpdateClassForm() {
     const select = document.getElementById('moodle_classes-input');
     const wrapper = document.getElementById('moodle_classes-update-form');
     select.addEventListener('change', (event) => {
@@ -951,21 +926,18 @@ function attachLMSCallbacksForUpdateClassForm(token) {
 /**
  * Attach the callbacks for the add LMS user form
  *
- * @param  {string} token   the token to authenticate the requests
- *
  * @return {void}
  */
-function attachLMSCallbacksForAddUserForm(token) {
-    attachLMSCallbacksForAddingUsers(token);
+function attachLMSCallbacksForAddUserForm() {
+    attachLMSCallbacksForAddingUsers();
 }
 
 /**
  * Attach the callbacks for update LMS user form
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForUpdateUserForm(token) {
+function attachLMSCallbacksForUpdateUserForm() {
     // Handle the user selector on the update form
     const userSelect = document.getElementById('moodle_users-input');
     const wrapper = document.getElementById('moodle_users-update-form');
@@ -988,7 +960,7 @@ function attachLMSCallbacksForUpdateUserForm(token) {
             wrapper.classList.add('d-none');
         });
     });
-    attachLMSCallbacksForUpdatingUsers(token, wrapper);
+    attachLMSCallbacksForUpdatingUsers(wrapper);
     attachLMSCallbacksForDeletingUser(wrapper);
 }
 
@@ -1015,14 +987,13 @@ function attachLMSCallbacksForCourseRosterForm(token) {
 /**
  * Attach the callbacks for updating LMS course form
  *
- * @param  {string} token   the token to authenticate the requests
  * @return {void}
  */
-function attachLMSCallbacksForCourseUpdateForm(token) {
+function attachLMSCallbacksForCourseUpdateForm() {
     const courseSelector = document.getElementById('moodle_courses_functions-input');
     const wrapper = document.getElementById('moodle_course-update-form');
     attachLMSCallbacksForUpdatingCourses();
-    attachLMSCallbacksForDeletingCourses(token);
+    attachLMSCallbacksForDeletingCourses();
     courseSelector.addEventListener('change', () => {
         const courseId = courseSelector.value;
         coursesRepo.find(courseId).then((course) => {
@@ -1115,13 +1086,13 @@ export default function attachUpdateCallbacks(token) {
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors();
-      attachLMSCallbacksForAddClassForm(token);
-      attachLMSCallbacksForAddUserForm(token);
-      attachLMSCallbacksForUpdateClassForm(token);
-      attachLMSCallbacksForUpdateUserForm(token);
+      attachLMSCallbacksForAddClassForm();
+      attachLMSCallbacksForAddUserForm();
+      attachLMSCallbacksForUpdateClassForm();
+      attachLMSCallbacksForUpdateUserForm();
       attachLMSCallbacksForClassRosterForm(token);
       attachLMSCallbacksForCourseRosterForm(token);
-      attachLMSCallbacksForCourseUpdateForm(token);
+      attachLMSCallbacksForCourseUpdateForm();
     };
     get(`${API_URL}ismoodle`, token, lmsSetUp, errorCallback);
 

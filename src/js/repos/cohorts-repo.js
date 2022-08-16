@@ -19,6 +19,39 @@ export class CohortsRepo {
     }
 
     /**
+     * Add a new cohort (class)
+     *
+     * @param {string} name         The name of the cohort
+     *
+     * @return {Promise<Cohort>}    Returns the new cohort
+     */
+    add(name) {
+        return new Promise((resolve, reject) => {
+            const payload = { name };
+            const errors = [
+                ...validateObjectValues(payload)
+            ];
+            if (errors.length > 0) {
+                reject({code: 0, errors});
+                return;
+            }
+            const success = (data) => {
+                if ((Array.isArray(data)) && ('id' in data[0])) {
+                    const cohort = new Cohort(data[0].id, name);
+                    this.data.push(cohort);
+                    this._sortData();
+                    resolve(cohort);
+                    return;
+                }
+                reject({code: 0, errors: ['Something went wrong on the LMS server.']});
+                return;
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to create the new class.']});
+            post(`${API_URL}lms/classes`, this.token, payload, success, error);
+        });
+    }
+
+    /**
      * Find all cohorts
      *
      * @return {Promise<array>}     The array of users
