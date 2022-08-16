@@ -130,7 +130,7 @@ export class CohortsRepo {
      *
      * @param  {integer}    id      The id of the cohort
      *
-     * @return {Promise<User>}      A list of Users
+     * @return {Promise<User[]>}      A list of Users
      */
     roster(id) {
         if (!id) {
