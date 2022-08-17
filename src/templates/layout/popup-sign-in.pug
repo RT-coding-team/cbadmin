@@ -1,0 +1,15 @@
+.popup-backdrop.hidden#popup-sign-in
+    .popup.elevation-2
+        .p-2.bg-secondary.rounded-top.text-dark#popup-sign-in-title
+            | Sign In
+        .popup-close-trigger.popup-close.text-dark(data-popup='popup-sign-in')
+            | X
+        .p-2.poppup-content
+            form#sign-in(action='/')
+                div
+                    label.m-3(for='password') Password:
+                    input.input-text.password(name='password', placeholder='Password', type='password')
+                    .text-danger.small.mx-3.mb-3#message-error
+        .p-2.popup-footer
+            button.check-login
+                | Sign In

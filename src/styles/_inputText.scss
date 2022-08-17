@@ -4,6 +4,9 @@
   padding-bottom: 5px;
   border-radius: 0;
 }
+.input-text.has-error {
+  border-bottom: solid 1px #FF0000;
+}
 .input-text:focus{
   border-bottom: solid 3px $primary;
   padding-bottom: 3px;
