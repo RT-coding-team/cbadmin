@@ -96,6 +96,11 @@ function wifiScanRenderer(element, value) {
 		option.text = `${record.ssid}:     (${encText[record.encryption]})`;
 		element.appendChild(option);
 	}
+	// Show the select list now
+	element.classList.remove('hidden');
+	// Now hide the "Loading" message
+	var label = document.getElementById(`load-clientwifiscan`);
+	label.classList.add('hidden');
 }
 
 /**
@@ -233,6 +238,19 @@ function getScreenEnable(token) {
 }
 
 /**
+ * /clientwifiscan is triggered by click even on message "Load Available Networks"
+ *
+ * 
+ */
+function attachListenerForClientWifiScan() {
+    const form = document.getElementById(`load-clientwifiscan`);
+    form.addEventListener('click', function() {
+		form.textContent = 'Loading...';
+		getProperty('client-wifiscan-input','clientwifiscan', null, wifiScanRenderer);  
+    }, false);
+}
+
+/**
  * Get all readable params and set values of inputs
  *
  * @param token the authorization token
@@ -267,7 +285,10 @@ export default function (token) {
 
     getProperty('usb0nomount', 'brand/usb0nomount', token, switchRenderer);
 
-	getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);
+	// Don't get clientwifiscan on load because it takes too long.
+	//getProperty('client-wifiscan-input','clientwifiscan', token, wifiScanRenderer);  
+	attachListenerForClientWifiScan();
+	
     getProperty('client-ssid-input', 'clientssid', token);
     getProperty('client-wifipassword-input', 'clientpassphrase', token);
     getProperty('client-wificountry-input', 'clientcountry', token);

@@ -5,5 +5,7 @@ div.mb-3
 
 div.form-accordion-content.hidden.mb-4.ms-15-icon.me-5
     div.position-relative
-        select.input-text(name="client-wifiscan" id="client-wifiscan-input")
+        span.bg-transparent.border-0.text-primary.p-0(id="load-clientwifiscan")
+            | Scan For Available Networks
+        select.hidden.input-text(name="client-wifiscan" id="client-wifiscan-input")
             option(value="") --- Choose Available Network
