@@ -65,7 +65,6 @@ function attachAdvanced(id,token) {
     button.addEventListener('click', () => {
 			const popup = document.getElementById('popup-sign-in');
 			popup.style.display = 'block';
-			// enableAdvancedOptions();
 		});
 }
 /**
