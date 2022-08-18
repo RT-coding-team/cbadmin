@@ -401,14 +401,7 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
             list.setAttribute('data-enrolled-users', '');
             return;
         }
-        // Display the users
-        const ids = users.map((membership) => {
-            userLabels.push({ label: `${membership.member.fullname} ${membership.getRoleLabel()}` })
-            return membership.member.id;
-        });
-        list.setAttribute('data-enrolled-users', ids.join('|'));
-        appendItemsToList(list, userLabels, 'label');
-        // Displays the cohorts witth their users
+        // Retrieve the users in each cohort
         const promises = [];
         const cohortIds = [];
         cohorts.forEach((membership) => {
@@ -430,22 +423,34 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
         });
         list.setAttribute('data-enrolled-cohorts', cohortIds.join('|'));
         Promise.all(promises).then((results) => {
-            const cohortIds = [];
+            const userIds = [];
+            // Displays the cohorts witth their users
             results.forEach((data) => {
                 const parent = document.createElement('li');
-                parent.innerHTML = `<span "cohort-title">${data.title}</span>`;
+                parent.innerHTML = `<span class="cohort-title">${data.title}</span>`;
                 const ul = document.createElement('ul');
                 data.items.forEach((item) => {
                     const li = document.createElement('li');
                     li.innerHTML = `${item.title}`;
                     ul.appendChild(li);
-                    cohortIds.push(item.id);
+                    userIds.push(item.id);
                 });
                 parent.appendChild(ul)
                 list.appendChild(parent);
             });
-            const unique = cohortIds.filter((v, i, a) => a.indexOf(v) === i);
+            const unique = userIds.filter((v, i, a) => a.indexOf(v) === i);
             list.setAttribute('data-cohort-users', unique.join('|'));
+            // Display the users
+            // We need to hide users that belong to a cohort because memberships have all users
+            const ids = users
+                .filter((m) => (!unique.includes(m.member.id)))
+                .map((membership) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${membership.member.fullname} ${membership.getRoleLabel()}`;
+                    list.appendChild(li);
+                    return membership.member.id;
+                });
+            list.setAttribute('data-enrolled-users', ids.join('|'));
         });
     }).catch((res) => {
         console.error(res);

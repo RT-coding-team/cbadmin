@@ -125,7 +125,8 @@ export class CourseEnrollmentRepo {
     }
 
     /**
-     * Get a list of the users and cohorts in this course
+     * Get a list of the users and cohorts in this course. Note, the users key returns all users no matter
+     * if they are in a cohort or not.
      *
      * @param  {integer}    courseId        The id of the course to get the roster for
      *
