@@ -3,7 +3,6 @@ import { CourseMembership } from '../models/course-membership';
 
 /**
  * A class that stores and manages the enrollment of users and cohorts into a course.
- * This uses a polymorphic pattern to store the enrollment of both users and cohorts.
  *
  * TODO: Consider tracking empty enrollments to limit API requests
  */

@@ -1,5 +1,5 @@
 /**
- * A model for an LMS course memberships. This uses a Polymorphic Pattern
+ * A model for an LMS course memberships.
  */
 export class CourseMembership {
 
