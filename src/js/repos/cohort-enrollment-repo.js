@@ -1,4 +1,4 @@
-import {API_URL, get, put } from '../api/api';
+import {API_URL, del, get, put } from '../api/api';
 import { CohortMembership } from '../models/cohort-membership';
 
 /**
@@ -41,7 +41,6 @@ export class CohortEnrollmentRepo {
                     if ((typeof data === 'string') && (data.includes('enrolled'))) {
                         const membership = new CohortMembership(cohortId, userId);
                         this.memberships.push(membership);
-                        console.log(this.memberships);
                         resolve(true);
                         return;
                     }
@@ -53,7 +52,42 @@ export class CohortEnrollmentRepo {
         });
     }
 
-    unenroll(cohortId, userId) {}
+    /**
+     * Unenroll a user into a cohort
+     *
+     * @param  {integer}    cohortId    The cohort id
+     * @param  {integer}    userId      The user id
+     *
+     * @return {Promise<Boolean>}       Was the student successfully unenrolled?
+     */
+    unenroll(cohortId, userId) {
+        if ((!cohortId) || (!userId)) {
+            return Promise.resolve(false);
+        }
+        return this.isEnrolled(cohortId, userId).then((enrolled) => {
+            if (!enrolled) {
+                return true;
+            }
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('unenrolled'))) {
+                        const index = this.memberships.findIndex(
+                            (m) => ((m.cohortId === parseInt(cohortId, 10)) && (m.userId === parseInt(userId, 10)))
+                        );
+                        // This check is unneccessary because we check isEnrolled before it. But just to be safe.
+                        if (index > -1) {
+                            this.memberships.splice(index, 1);
+                        }
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to remove the user from the class.']});
+                del(`${API_URL}lms/classes/${cohortId}/users/${userId}`, this.token, success, error);
+            });
+        });
+    }
 
     /**
      * Is the user enrolled in the cohort?

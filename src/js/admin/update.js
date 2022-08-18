@@ -560,7 +560,7 @@ function attachLMSCallbacksForClassEnrollment() {
           openSnackBar(errors.join("\r\n"), 'error');
           return false;
       }
-      cohortsRepo.unenroll(classId, userId)
+      cohortEnrollmentRepo.unenroll(classId, userId)
           .then((success) => {
               if (success) {
                   openSnackBar('The user has been removed from the class.', 'success');
