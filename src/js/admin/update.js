@@ -8,6 +8,7 @@ import {
 } from '../utils/utils';
 import { UsersRepo } from '../repos/users-repo';
 import { CohortsRepo } from '../repos/cohorts-repo';
+import { CohortEnrollmentRepo } from '../repos/cohort-enrollment-repo';
 import { CoursesRepo } from '../repos/courses-repo';
 
 /**
@@ -16,6 +17,12 @@ import { CoursesRepo } from '../repos/courses-repo';
  * @type {CohortsRepo}
  */
 let cohortsRepo = null;
+/**
+ * The cohort (class) enrollment repository
+ *
+ * @type {CohortEnrollmentRepo}
+ */
+let cohortEnrollmentRepo = null;
 /**
  * Our courses repository
  *
@@ -333,7 +340,7 @@ function attachLMSCallbacksForAddingUsers() {
  * @return {void}
  */
 function lmsUpdateClassRosterList(list, classId, emptyText = 'Sorry, no users found.') {
-    cohortsRepo.roster(classId).then((users) => {
+    cohortEnrollmentRepo.roster(classId).then((users) => {
         const ids = users.map((user) => user.id);
         list.innerHTML = '';
         list.setAttribute('data-enrolled', ids.join('|'));
@@ -1111,7 +1118,8 @@ export default function attachUpdateCallbacks(token) {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       usersRepo = new UsersRepo(token);
       coursesRepo = new CoursesRepo(token, usersRepo);
-      cohortsRepo = new CohortsRepo(token, usersRepo);
+      cohortsRepo = new CohortsRepo(token);
+      cohortEnrollmentRepo = new CohortEnrollmentRepo(token, usersRepo);
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors();
