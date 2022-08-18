@@ -370,8 +370,11 @@ function lmsUpdateClassRosterList(list, classId, emptyText = 'Sorry, no users fo
 }
 
 /**
- * Update the course roster list.  Adds a data-enrolled on the provided list with all the ids
- * of enrolled users.
+ * Update the course roster list.  Adds several data attributes to the li:
+ *
+ * data-enrolled-users:     The ids of all enrolled users in the requested course
+ * data-enrolled-cohorts:   The ids of all enrolled cohorts in the requested course
+ * data-cohort-users:       The ids of user that are in an enrolled course
  *
  * @param  {object}     list        The list to update
  * @param  {integer}    courseId    The course to retrieve the id for
@@ -388,19 +391,62 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
     }
     courseEnrollmentRepo.roster(courseId).then((memberships) => {
         const userLabels = [];
-        const ids = memberships.users.map((membership) => {
-            userLabels.push({ label: `${membership.member.fullname} ${membership.getRoleLabel()}` })
-            return membership.member.id;
-        });
+        const users = memberships.users;
+        const cohorts = memberships.cohorts;
         list.innerHTML = '';
-        list.setAttribute('data-enrolled', ids.join('|'));
-        if (memberships.users.length == 0) {
+        if ((users.length == 0) && (cohorts.length == 0)) {
             const li = document.createElement('li');
             li.innerHTML = emptyText;
             list.appendChild(li);
+            list.setAttribute('data-enrolled-users', '');
             return;
         }
+        // Display the users
+        const ids = users.map((membership) => {
+            userLabels.push({ label: `${membership.member.fullname} ${membership.getRoleLabel()}` })
+            return membership.member.id;
+        });
+        list.setAttribute('data-enrolled-users', ids.join('|'));
         appendItemsToList(list, userLabels, 'label');
+        // Displays the cohorts witth their users
+        const promises = [];
+        const cohortIds = [];
+        cohorts.forEach((membership) => {
+            const promise = cohortEnrollmentRepo.roster(membership.memberId).then((members) => {
+                const data = {
+                    title: membership.member.name,
+                    items: []
+                };
+                members.forEach((member) => {
+                    data.items.push({
+                        title: `${member.fullname} ${membership.getRoleLabel()}`,
+                        id: member.id
+                    });
+                });
+                return data;
+            });
+            promises.push(promise);
+            cohortIds.push(membership.memberId);
+        });
+        list.setAttribute('data-enrolled-cohorts', cohortIds.join('|'));
+        Promise.all(promises).then((results) => {
+            const cohortIds = [];
+            results.forEach((data) => {
+                const parent = document.createElement('li');
+                parent.innerHTML = `<span "cohort-title">${data.title}</span>`;
+                const ul = document.createElement('ul');
+                data.items.forEach((item) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${item.title}`;
+                    ul.appendChild(li);
+                    cohortIds.push(item.id);
+                });
+                parent.appendChild(ul)
+                list.appendChild(parent);
+            });
+            const unique = cohortIds.filter((v, i, a) => a.indexOf(v) === i);
+            list.setAttribute('data-cohort-users', unique.join('|'));
+        });
     }).catch((res) => {
         console.error(res);
         errorCallback(res.code, res.errors.join("\r\n"));
@@ -739,7 +785,7 @@ function attachLMSCallbacksForEnrollingUser() {
         const courseId = courseSelect.value;
         const userId = document.getElementById('moodle_enrollees-input').value;
         const errors = [];
-        const enrolled = list.getAttribute('data-enrolled');
+        const enrolled = list.getAttribute('data-enrolled-users');
         const roleId = roleSelector.value;
         if (!courseId) {
             errors.push('Please select a course.');
@@ -778,7 +824,7 @@ function attachLMSCallbacksForEnrollingUser() {
         const courseId = courseSelect.value;
         const userId = document.getElementById('moodle_enrollees-input').value;
         const errors = [];
-        const enrolled = list.getAttribute('data-enrolled');
+        const enrolled = list.getAttribute('data-enrolled-users');
         if (!courseId) {
             errors.push('Please select a course.');
         }
@@ -828,7 +874,7 @@ function attachLMSCallbacksForEnrollingUser() {
         lmsUpdateCourseRosterList(list, courseId);
     });
     studentSelector.addEventListener('change', () => {
-        const enrolled = list.getAttribute('data-enrolled');
+        const enrolled = list.getAttribute('data-enrolled-users');
         const studentId = studentSelector.value;
         classSelector.disabled = (studentId !== '');
         if ((enrolled) && (enrolled.split('|').includes(studentId))) {
@@ -850,7 +896,7 @@ function attachLMSCallbacksForEnrollingUser() {
         }
     });
     classSelector.addEventListener('change', () => {
-        const enrolled = list.getAttribute('data-enrolled');
+        const enrolled = list.getAttribute('data-enrolled-users');
         const classId = classSelector.value;
         if (classId === '') {
           studentSelector.removeAttribute('disabled');
