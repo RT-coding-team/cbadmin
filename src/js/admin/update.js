@@ -522,7 +522,7 @@ function attachLMSCallbacksForClassEnrollment() {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        cohortsRepo.enroll(classId, userId)
+        cohortEnrollmentRepo.enroll(classId, userId)
             .then((success) => {
                 if (success) {
                     openSnackBar('The user has been enrolled in the class.', 'success');

@@ -1,4 +1,4 @@
-import {API_URL, get } from '../api/api';
+import {API_URL, get, put } from '../api/api';
 import { CohortMembership } from '../models/cohort-membership';
 
 /**
@@ -20,11 +20,58 @@ export class CohortEnrollmentRepo {
         this.memberships = [];
     }
 
-    enroll(cohortId, userId) {}
+    /**
+     * Enroll a user into a cohort
+     *
+     * @param  {integer}    cohortId    The cohort id
+     * @param  {integer}    userId      The user id
+     *
+     * @return {Promise<Boolean>}       Was the student successfully enrolled?
+     */
+    enroll(cohortId, userId) {
+        if ((!cohortId) || (!userId)) {
+            return Promise.resolve(false);
+        }
+        return this.isEnrolled(cohortId, userId).then((enrolled) => {
+            if (enrolled) {
+                return true;
+            }
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('enrolled'))) {
+                        const membership = new CohortMembership(cohortId, userId);
+                        this.memberships.push(membership);
+                        console.log(this.memberships);
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the user into the class.']});
+                put(`${API_URL}lms/classes/${cohortId}/users/${userId}`, this.token, {}, success, error);
+            });
+        });
+    }
 
     unenroll(cohortId, userId) {}
 
-    isEnrolled(cohortId, userId) {}
+    /**
+     * Is the user enrolled in the cohort?
+     *
+     * @param  {integer}    cohortId    The cohort id
+     * @param  {integer}    userId      The user id
+     *
+     * @return {Promise<Boolean>}       Are they enrolled?
+     */
+    isEnrolled(cohortId, userId) {
+        // Load the roster before checking the enrollment status
+        return this.roster(cohortId).then(() => {
+            const found = this.memberships.find(
+                (m) => ((m.cohortId === parseInt(cohortId, 10)) && (m.userId === parseInt(userId, 10)))
+            );
+            return (typeof found !== 'undefined');
+        });
+    }
 
     /**
      * Retrieve the roster of cohort memberships
