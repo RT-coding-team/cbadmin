@@ -50,8 +50,40 @@ export class CourseEnrollmentRepo {
      * @return {Promise<Cohort[]>}      The cohorts in the class
      */
     _cohortRoster(courseId) {
-        //NEED TO IMPLEMENT
-        return Promise.resolve([]);
+        const current = this.memberships.filter((m) => ((m.courseId === parseInt(courseId, 10) && (m.memberType === 'cohort'))));
+        if (current.length > 0) {
+            const promises = current.map((membership) => {
+                return this.cohortsRepo.find(membership.memberId).then((cohort) => {
+                    membership.member = cohort;
+                    return membership;
+                });
+            });
+            return Promise.all(promises);
+        }
+        return new Promise((resolve, reject) => {
+            const success = (data) => {
+                if (data.data.length === 0) {
+                    resolve([]);
+                    return;
+                }
+                const promises = [];
+                data.data.forEach((result) => {
+                    const membership = new CourseMembership(courseId, result.cohortid, 'cohort');
+                    if ('role' in result) {
+                        membership.addRole(result.role.id, result.role.shortname);
+                    }
+                    this.memberships.push(membership);
+                    const promise = this.cohortsRepo.find(result.cohortid).then((cohort) => {
+                        membership.member = cohort;
+                        return membership;
+                    });
+                    promises.push(promise);
+                });
+                Promise.all(promises).then((memberships) => resolve(memberships));
+            };
+            const error = (code) => reject({code, errors: ['Sorry, we were unable to retrieve classes for the course roster.']});
+            get(`${API_URL}lms/courses/${courseId}/classes`, this.token, success, error);
+        });
     }
 
     /**

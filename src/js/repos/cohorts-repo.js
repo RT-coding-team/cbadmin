@@ -89,6 +89,22 @@ export class CohortsRepo {
     }
 
     /**
+     * Find a cohort by id
+     *
+     * @param  {integer}    id      The id of the cohort
+     *
+     * @return {Promise<Cohort>}    The cohort
+     */
+    find(id) {
+        if (!id) {
+            return Promise.resolve(null);
+        }
+        return this._load().then(
+            (cohorts) => cohorts.find((cohort) => cohort.id === parseInt(id, 10))
+        );
+    }
+
+    /**
      * Update the given cohort (class)
      * @param  {integer}    id      The id of the cohort to update
      * @param  {string}     name    The new name for the cohort
