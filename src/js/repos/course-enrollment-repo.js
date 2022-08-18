@@ -85,6 +85,46 @@ export class CourseEnrollmentRepo {
     }
 
     /**
+     * Unenroll a member into the course
+     *
+     * @param  {integer}    courseId    The course id
+     * @param  {integer}    memberId    The member id
+     * @param  {string}     memberType  The type of member
+     *
+     * @return {Promise<Boolean>}       Were they successfully enrolled?
+     */
+    unenroll(courseId, memberId, memberType) {
+        if ((!courseId) || (!memberId) || (!this.memberTypes.includes(memberType))) {
+            return Promise.resolve(false);
+        }
+        return this.isEnrolled(courseId, memberId, memberType).then((enrolled) => {
+            if (!enrolled) {
+                return true;
+            }
+            const label = (memberType === 'cohort') ? 'class' : 'user';
+            const plural = (memberType === 'cohort') ? 'classes' : 'users';
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('unenrolled'))) {
+                        const index = this.memberships.findIndex(
+                            (m) => ((m.courseId === parseInt(courseId, 10)) && (m.memberType === memberType)  && (m.memberId === parseInt(memberId, 10)))
+                        );
+                        // This check is unneccessary because we check isEnrolled before it. But just to be safe.
+                        if (index > -1) {
+                            this.memberships.splice(index, 1);
+                        }
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: [`Sorry, we were unable to remove the ${label} from the course.`]});
+                del(`${API_URL}lms/courses/${courseId}/${plural}/${memberId}`, this.token, success, error);
+            });
+        });
+    }
+
+    /**
      * Get a list of the users and cohorts in this course
      *
      * @param  {integer}    courseId        The id of the course to get the roster for

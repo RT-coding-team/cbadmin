@@ -792,7 +792,7 @@ function attachLMSCallbacksForEnrollingUser() {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        coursesRepo.unenroll(courseId, userId)
+        courseEnrollmentRepo.unenroll(courseId, userId, 'user')
             .then((success) => {
                 if (success) {
                     lmsUpdateCourseRosterList(list, courseId);
@@ -1128,7 +1128,7 @@ export default function attachUpdateCallbacks(token) {
     const lmsSetUp = (data) => {
       if ((!data) || (data.length < 0) || (data[0] !== "1")) return;
       usersRepo = new UsersRepo(token);
-      coursesRepo = new CoursesRepo(token, usersRepo);
+      coursesRepo = new CoursesRepo(token);
       cohortsRepo = new CohortsRepo(token);
       cohortEnrollmentRepo = new CohortEnrollmentRepo(token, usersRepo);
       courseEnrollmentRepo = new CourseEnrollmentRepo(cohortsRepo, token, usersRepo);

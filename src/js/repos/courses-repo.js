@@ -1,6 +1,5 @@
 import {API_URL, del, get, post, put} from '../api/api';
 import { Course } from '../models/course';
-import { CourseMember } from '../models/course-member';
 import { User } from '../models/user';
 import { validateObjectValues } from '../utils/utils';
 
@@ -14,18 +13,10 @@ export class CoursesRepo {
      * Build the repository
      *
      * @param {string}      token       The API token
-     * @param {UsersRepo}   usersRepo   The User's repository
      */
-    constructor(token, usersRepo) {
+    constructor(token) {
         this.token = token;
-        this.usersRepo = usersRepo;
         this.data = [];
-        this.roles = {
-            1: 'Manager',
-            4: 'Non-editing Teacher',
-            5: 'Student',
-            3: 'Teacher',
-        };
     }
 
     /**
@@ -80,40 +71,6 @@ export class CoursesRepo {
         );
     }
 
-    /**
-     * Remove a student from a course
-     *
-     * @param  {integer}    id                  The id of the course
-     * @param  {integer}    userId              The user id to unenroll
-     *
-     * @return {Promise<boolean>}               Was it successful?
-     */
-    unenroll(id, userId) {
-        if ((!id) || (!userId)) {
-            return Promise.resolve(false);
-        }
-        return this.roster(id).then(() => {
-            const currentIndex = this.data.findIndex((course) => (course.id === parseInt(id, 10)));
-            if (currentIndex === -1) {
-                return Promise.reject({code: 200, errors: ['The course could not be found.']});
-            }
-            if (!this.data[currentIndex].isEnrolled(userId)) {
-                return true;
-            }
-            return new Promise((resolve, reject) => {
-                const success = (results) => {
-                    if ((typeof results === 'string') && (results.includes('unenrolled'))) {
-                        this.data[currentIndex].unenroll(userId);
-                        resolve(true);
-                        return;
-                    }
-                    resolve(false);
-                };
-                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the user in the course.']});
-                del(`${API_URL}lms/courses/${id}/users/${userId}`, this.token, success, error);
-            });
-        });
-    }
     /**
      * Update a course
      *
