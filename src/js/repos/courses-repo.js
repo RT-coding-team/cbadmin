@@ -65,46 +65,6 @@ export class CoursesRepo {
     }
 
     /**
-     * Enroll a user into a course
-     *
-     * @param  {integer}    id                  The id of the course
-     * @param  {integer}    userId              The user id to enroll
-     * @param  {integer}    roleId              The role id for the user
-     *
-     * @return {Promise<boolean>}   Were they successfuly enrolled?
-     */
-    enroll(id, userId, roleId) {
-        if ((!id) || (!userId) || (!roleId)) {
-            return Promise.resolve(false);
-        }
-        // Make sure the list of users for the course is loaded before enrolling
-        return this.roster(id).then(() => {
-            const currentIndex = this.data.findIndex((course) => (course.id === parseInt(id, 10)));
-            if (currentIndex === -1) {
-                return Promise.reject({code: 200, errors: ['The course could not be found.']});
-            }
-            if (this.data[currentIndex].isEnrolled(userId)) {
-                return true;
-            }
-            return new Promise((resolve, reject) => {
-                const success = (results) => {
-                    if ((typeof results === 'string') && (results.includes('enrolled'))) {
-                        return this.usersRepo.find(userId).then((user) => {
-                            const member = new CourseMember(user);
-                            member.addRole(roleId, this.roles[roleId]);
-                            this.data[currentIndex].enroll(member);
-                            resolve(true);
-                        });
-                    }
-                    resolve(false);
-                };
-                const error = (code) => reject({code, errors: ['Sorry, we were unable to enroll the user in the course.']});
-                put(`${API_URL}lms/courses/${id}/users/${userId}`, this.token, { roleid: parseInt(roleId, 10) }, success, error);
-            });
-        })
-    }
-
-    /**
      * Find by id
      *
      * @param  {integer}    id  The id of the course

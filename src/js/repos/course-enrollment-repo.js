@@ -21,6 +21,67 @@ export class CourseEnrollmentRepo {
         this.usersRepo = usersRepo;
         this.memberships = [];
         this.memberTypes = ['user', 'cohort'];
+        this.roles = {
+            1: 'Manager',
+            4: 'Non-editing Teacher',
+            5: 'Student',
+            3: 'Teacher',
+        };
+    }
+
+    /**
+     * Enroll a member into the course
+     *
+     * @param  {integer}    courseId    The course id
+     * @param  {integer}    memberId    The member id
+     * @param  {string}     memberType  The type of member
+     * @param  {integer}    roleId      The role id
+     *
+     * @return {Promise<Boolean>}       Were they successfully enrolled?
+     */
+    enroll(courseId, memberId, memberType, roleId) {
+        if ((!courseId) || (!memberId) || (!this.memberTypes.includes(memberType))) {
+            return Promise.resolve(false);
+        }
+        return this.isEnrolled(courseId, memberId, memberType).then((enrolled) => {
+            if (enrolled) {
+                return true;
+            }
+            const label = (memberType === 'cohort') ? 'class' : 'user';
+            const plural = (memberType === 'cohort') ? 'classes' : 'users';
+            return new Promise((resolve, reject) => {
+                const success = (data) => {
+                    if ((typeof data === 'string') && (data.includes('enrolled'))) {
+                        const membership = new CourseMembership(courseId, memberId, memberType);
+                        membership.addRole(roleId, this.roles[roleId]);
+                        this.memberships.push(membership);
+                        resolve(true);
+                        return;
+                    }
+                    resolve(false);
+                };
+                const error = (code) => reject({code, errors: [`Sorry, we were unable to enroll the ${label} in the course.`]});
+                put(`${API_URL}lms/courses/${courseId}/${plural}/${memberId}`, this.token, { roleid: parseInt(roleId, 10) }, success, error);
+            });
+        });
+    }
+
+    /**
+     * Is the member enrolled?
+     *
+     * @param  {integer}    courseId    The course id
+     * @param  {integer}    memberId    The member id
+     * @param  {string}     memberType  The type of member
+     *
+     * @return {Promise<Boolean>}       Are they enrolled?
+     */
+    isEnrolled(courseId, memberId, memberType) {
+        return this.roster(courseId).then(() => {
+            const found = this.memberships.find(
+                (m) => ((m.courseId === parseInt(courseId, 10)) && (m.memberType === memberType)  && (m.memberId === parseInt(memberId, 10)))
+            );
+            return (typeof found !== 'undefined');
+        });
     }
 
     /**
@@ -50,7 +111,7 @@ export class CourseEnrollmentRepo {
      * @return {Promise<Cohort[]>}      The cohorts in the class
      */
     _cohortRoster(courseId) {
-        const current = this.memberships.filter((m) => ((m.courseId === parseInt(courseId, 10) && (m.memberType === 'cohort'))));
+        const current = this.memberships.filter((m) => ((m.courseId === parseInt(courseId, 10)) && (m.memberType === 'cohort')));
         if (current.length > 0) {
             const promises = current.map((membership) => {
                 return this.cohortsRepo.find(membership.memberId).then((cohort) => {

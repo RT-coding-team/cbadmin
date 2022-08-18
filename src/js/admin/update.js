@@ -754,7 +754,7 @@ function attachLMSCallbacksForEnrollingUser() {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        coursesRepo.enroll(courseId, userId, roleId)
+        courseEnrollmentRepo.enroll(courseId, userId, 'user', roleId)
             .then((success) => {
                 if (success) {
                     lmsUpdateCourseRosterList(list, courseId);
