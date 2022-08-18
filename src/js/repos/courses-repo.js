@@ -121,54 +121,6 @@ export class CoursesRepo {
     }
 
     /**
-     * Get a list of the users in this course
-     *
-     * @param  {integer}    id  The id of the course to get the roster for
-     *
-     * @return {Promise<CourseMember[]>}      A list of Course Members
-     */
-    roster(id) {
-        if (!id) {
-            return Promise.reject({code: 200, errors: ['The course could not be found.']});
-        }
-        return this._load().then(() => {
-            const currentIndex = this.data.findIndex((course) => (course.id === parseInt(id, 10)));
-            if (currentIndex === -1) {
-                return Promise.reject({code: 200, errors: ['The course could not be found.']});
-            }
-            if (this.data[currentIndex].membersAdded) {
-                return this.data[currentIndex].enrolled();
-            }
-            return new Promise((resolve, reject) => {
-                const success = (results) => {
-                    if (results.length === 0) {
-                        // We do not want to request the API again, but there are no students
-                        this.data[currentIndex].membersAdded = true;
-                        resolve([]);
-                        return;
-                    }
-                    results.forEach((person) => {
-                        const user = new User(
-                            person.id,
-                            person.email,
-                            person.firstname,
-                            person.fullname,
-                            person.lastname,
-                            person.username
-                        );
-                        const member = new CourseMember(user);
-                        person.roles.forEach((role) => member.addRole(role.roleid, role.shortname));
-                        this.data[currentIndex].enroll(member);
-                        resolve(this.data[currentIndex].enrolled());
-                    });
-                };
-                const error = (code) => reject({code, errors: ['Sorry, we were unable to retrieve the course roster.']});
-                get(`${API_URL}lms/courses/${id}/users`, this.token, success, error);
-            });
-        });
-    }
-
-    /**
      * Remove a student from a course
      *
      * @param  {integer}    id                  The id of the course

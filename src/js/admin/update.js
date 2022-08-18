@@ -9,6 +9,7 @@ import {
 import { UsersRepo } from '../repos/users-repo';
 import { CohortsRepo } from '../repos/cohorts-repo';
 import { CohortEnrollmentRepo } from '../repos/cohort-enrollment-repo';
+import { CourseEnrollmentRepo } from '../repos/course-enrollment-repo';
 import { CoursesRepo } from '../repos/courses-repo';
 
 /**
@@ -23,6 +24,12 @@ let cohortsRepo = null;
  * @type {CohortEnrollmentRepo}
  */
 let cohortEnrollmentRepo = null;
+/**
+ * The course enrollment repo
+ *
+ * @type {CourseEnrollmentRepo}
+ */
+let courseEnrollmentRepo = null;
 /**
  * Our courses repository
  *
@@ -379,17 +386,21 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
         list.appendChild(li);
         return;
     }
-    coursesRepo.roster(courseId).then((members) => {
-        const ids = members.map((member) => member.user.id);
+    courseEnrollmentRepo.roster(courseId).then((memberships) => {
+        const userLabels = [];
+        const ids = memberships.users.map((membership) => {
+            userLabels.push({ label: `${membership.member.fullname} ${membership.getRoleLabel()}` })
+            return membership.member.id;
+        });
         list.innerHTML = '';
         list.setAttribute('data-enrolled', ids.join('|'));
-        if (members.length == 0) {
+        if (memberships.users.length == 0) {
             const li = document.createElement('li');
             li.innerHTML = emptyText;
             list.appendChild(li);
             return;
         }
-        appendItemsToList(list, members, 'label');
+        appendItemsToList(list, userLabels, 'label');
     }).catch((res) => {
         console.error(res);
         errorCallback(res.code, res.errors.join("\r\n"));
@@ -1120,6 +1131,7 @@ export default function attachUpdateCallbacks(token) {
       coursesRepo = new CoursesRepo(token, usersRepo);
       cohortsRepo = new CohortsRepo(token);
       cohortEnrollmentRepo = new CohortEnrollmentRepo(token, usersRepo);
+      courseEnrollmentRepo = new CourseEnrollmentRepo(cohortsRepo, token, usersRepo);
       lmsUpdateCourseSelectors();
       lmsUpdateUserSelectors();
       lmsUpdateClassSelectors();
