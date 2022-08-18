@@ -560,6 +560,20 @@ function attachLMSCallbacksForClassEnrollment() {
     const studentSelect = document.getElementById('moodle_class_enrollee-input');
     const list = document.getElementById('class-users-list');
     unenrollButton.classList.add('d-none');
+    enrollButton.disabled = true;
+    const resetForm = (classId) => {
+        lmsUpdateClassRosterList(list, classId);
+        studentSelect.value = '';
+        enrollButton.disabled = true;
+        enrollButton.classList.remove('d-none');
+        unenrollButton.classList.add('d-none');
+        // Update the Course Enrollment if it is open
+        const selectedCourse = document.getElementById('moodle_courses-input').value;
+        if (selectedCourse !== '') {
+            const courseEnrollList = document.getElementById('course-users-list');
+            lmsUpdateCourseRosterList(courseEnrollList, selectedCourse);
+        }
+    };
     enrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const classId = classSelect.value;
@@ -591,11 +605,7 @@ function attachLMSCallbacksForClassEnrollment() {
                 console.error(res);
                 errorCallback(res.code, res.errors.join("\r\n"));
             })
-            .finally(() => {
-                lmsUpdateClassRosterList(list, classId);
-                enrollButton.classList.add('d-none');
-                unenrollButton.classList.remove('d-none');
-            });
+            .finally(() => resetForm(classId));
         return false;
     });
     unenrollButton.addEventListener('click', (event) => {
@@ -629,11 +639,7 @@ function attachLMSCallbacksForClassEnrollment() {
               console.error(res);
               errorCallback(res.code, res.errors.join("\r\n"));
           })
-          .finally(() => {
-              lmsUpdateClassRosterList(list, classId);
-              enrollButton.classList.remove('d-none');
-              unenrollButton.classList.add('d-none');
-          });
+          .finally(() => resetForm(classId));
       return false;
     });
     classSelect.addEventListener('change', () => {
@@ -643,6 +649,7 @@ function attachLMSCallbacksForClassEnrollment() {
     studentSelect.addEventListener('change', () => {
         const enrolled = list.getAttribute('data-enrolled');
         const studentId = studentSelect.value;
+        enrollButton.disabled = (studentId === '');
         if (enrolled.split('|').includes(studentId)) {
             // if user is enrolled, display the unenroll button
             enrollButton.classList.add('d-none');

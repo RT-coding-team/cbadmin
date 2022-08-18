@@ -3,3 +3,6 @@
   margin-right: 12px;
   margin-top: -0.2rem;
 }
+button:disabled {
+    opacity: 0.7;
+}
