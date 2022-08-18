@@ -775,86 +775,99 @@ function attachLMSCallbacksForEnrollingUser() {
     const enrollButton = document.getElementById('moodle_courses_users_add-btn');
     const unenrollButton = document.getElementById('moodle_courses_users_remove-btn');
     const roleSelector = document.getElementById('moodle_role-input');
+    enrollButton.disabled = true;
     unenrollButton.classList.add('d-none');
     const enrolleeSelectors = document.getElementById('moodle_courses_enrollee_select');
     const studentSelector = document.getElementById('moodle_enrollees-input');
     const classSelector = document.getElementById('moodle_classes_enrollees-input');
     const list = document.getElementById('course-users-list');
+    const resetForm = (list, courseId) => {
+        lmsUpdateCourseRosterList(list, courseId);
+        enrollButton.classList.remove('d-none');
+        unenrollButton.classList.add('d-none');
+        roleSelector.classList.add('d-none');
+        roleSelector.value = 5;
+        enrollButton.disabled = true;
+        studentSelector.value = '';
+        classSelector.value = '';
+        studentSelector.disabled = false;
+        classSelector.disabled = false;
+    };
     enrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const courseId = courseSelect.value;
-        const userId = document.getElementById('moodle_enrollees-input').value;
+        const userId = studentSelector.value;
+        const cohortId = classSelector.value;
+        const memberId = (cohortId !== '') ? cohortId : userId;
+        const memberType = (cohortId !== '') ? 'cohort' : 'user';
+        const pluralType = (cohortId !== '') ? 'cohorts' : 'users';
+        const label = (cohortId !== '') ? 'class' : 'user';
         const errors = [];
-        const enrolled = list.getAttribute('data-enrolled-users');
+        const enrolled = list.getAttribute(`data-enrolled-${pluralType}`);
         const roleId = roleSelector.value;
         if (!courseId) {
             errors.push('Please select a course.');
         }
-        if (!userId) {
-            errors.push('Please select an enrollee.');
+        if (!memberId) {
+            errors.push(`Please select a vaild ${label}.`);
         }
-        if (enrolled.split('|').includes(userId)) {
-            errors.push('The user is already enrolled.');
+        if (enrolled.split('|').includes(memberId)) {
+            errors.push(`The ${label} is already enrolled.`);
         }
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        courseEnrollmentRepo.enroll(courseId, userId, 'user', roleId)
+        courseEnrollmentRepo.enroll(courseId, memberId, memberType, roleId)
             .then((success) => {
                 if (success) {
-                    lmsUpdateCourseRosterList(list, courseId);
-                    enrollButton.classList.add('d-none');
-                    unenrollButton.classList.remove('d-none');
-                    roleSelector.classList.add('d-none');
-                    roleSelector.value = 5;
-                    openSnackBar('The user has been enrolled in the course.', 'success');
+                    openSnackBar(`The ${label} has been enrolled in the course.`, 'success');
                     return;
                 }
-                openSnackBar('Sorry, we were unable to enroll the user in the course.', 'error');
+                openSnackBar(`Sorry, we were unable to enroll the ${label} in the course.`, 'error');
             })
             .catch((res) =>  {
                 console.error(res);
                 errorCallback(res.code, res.errors.join("\r\n"));
-            });
+            }).finally(() => resetForm(list, courseId));
         return false;
     });
     unenrollButton.addEventListener('click', (event) => {
         event.preventDefault();
         const courseId = courseSelect.value;
-        const userId = document.getElementById('moodle_enrollees-input').value;
+        const userId = studentSelector.value;
+        const cohortId = classSelector.value;
+        const memberId = (cohortId !== '') ? cohortId : userId;
+        const memberType = (cohortId !== '') ? 'cohort' : 'user';
+        const pluralType = (cohortId !== '') ? 'cohorts' : 'users';
+        const label = (cohortId !== '') ? 'class' : 'user';
         const errors = [];
-        const enrolled = list.getAttribute('data-enrolled-users');
+        const enrolled = list.getAttribute(`data-enrolled-${pluralType}`);
         if (!courseId) {
             errors.push('Please select a course.');
         }
-        if (!userId) {
-            errors.push('Please select an enrollee.');
+        if (!memberId) {
+            errors.push(`Please select a vaild ${label}.`);
         }
-        if (!enrolled.split('|').includes(userId)) {
-            errors.push('The user is not enrolled in the course.');
+        if (!enrolled.split('|').includes(memberId)) {
+            errors.push(`The ${label} is not enrolled in the course.`);
         }
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
             return false;
         }
-        courseEnrollmentRepo.unenroll(courseId, userId, 'user')
+        courseEnrollmentRepo.unenroll(courseId, memberId, memberType)
             .then((success) => {
                 if (success) {
-                    lmsUpdateCourseRosterList(list, courseId);
-                    enrollButton.classList.remove('d-none');
-                    unenrollButton.classList.add('d-none');
-                    roleSelector.value = 5;
-                    roleSelector.classList.remove('d-none');
-                    openSnackBar('The user has been removed from the course.', 'success');
+                    openSnackBar(`The ${label} has been removed from the course.`, 'success');
                     return;
                 }
-                openSnackBar('Sorry, we were unable to remove the user in the course.', 'error');
+                openSnackBar(`Sorry, we were unable to remove the ${label} in the course.`, 'error');
             })
             .catch((res) =>  {
                 console.error(res);
                 errorCallback(res.code, res.errors.join("\r\n"));
-            });
+            }).finally(() => resetForm(list, courseId));
         return false;
     });
     courseSelect.addEventListener('change', ()  =>  {
@@ -882,28 +895,42 @@ function attachLMSCallbacksForEnrollingUser() {
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
             roleSelector.classList.add('d-none');
-            roleSelector.value = 5;
         } else {
             // if the user is not enrolled, display the enroll button
             enrollButton.classList.remove('d-none');
             unenrollButton.classList.add('d-none');
-            roleSelector.value = 5;
-            if (studentId === '') {
-                roleSelector.classList.add('d-none');
-            } else {
-                roleSelector.classList.remove('d-none');
-            }
+            roleSelector.classList.remove('d-none');
+        }
+        roleSelector.value = 5;
+        if (((studentId === '') && (classSelector.value === ''))) {
+            enrollButton.disabled = true;
+            roleSelector.classList.add('d-none');
+        } else {
+            enrollButton.disabled = false;
         }
     });
     classSelector.addEventListener('change', () => {
-        const enrolled = list.getAttribute('data-enrolled-users');
+        const enrolled = list.getAttribute('data-enrolled-cohorts');
         const classId = classSelector.value;
-        if (classId === '') {
-          studentSelector.removeAttribute('disabled');
-          roleSelector.classList.add('d-none');
+        studentSelector.disabled = (classId !== '');
+        if ((enrolled) && (enrolled.split('|').includes(classId))) {
+            // if class is enrolled, display the unenroll button
+            enrollButton.classList.add('d-none');
+            unenrollButton.classList.remove('d-none');
+            roleSelector.classList.add('d-none');
+            roleSelector.value = 5;
         } else {
-          studentSelector.setAttribute('disabled', 'disabled');
-          roleSelector.classList.remove('d-none');
+            // if the class is not enrolled, display the enroll button
+            enrollButton.classList.remove('d-none');
+            unenrollButton.classList.add('d-none');
+            roleSelector.value = 5;
+            roleSelector.classList.remove('d-none');
+        }
+        if (((classId === '') && (classSelector.value === ''))) {
+            enrollButton.disabled = true;
+            roleSelector.classList.add('d-none');
+        } else {
+            enrollButton.disabled = false;
         }
     });
 }
