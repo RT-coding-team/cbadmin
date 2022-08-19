@@ -824,7 +824,7 @@ function attachLMSCallbacksForEnrollingUser() {
         if (!memberId) {
             errors.push(`Please select a vaild ${label}.`);
         }
-        if (enrolled.split('|').includes(memberId)) {
+        if ((enrolled) && (enrolled.split('|').includes(memberId))) {
             errors.push(`The ${label} is already enrolled.`);
         }
         if ((memberType === 'user') && (usersInCohorts.split('|').includes(memberId))) {
