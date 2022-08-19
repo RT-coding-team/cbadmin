@@ -389,6 +389,9 @@ function lmsUpdateCourseRosterList(list, courseId, emptyText = 'Sorry, no users 
         list.appendChild(li);
         return;
     }
+    list.setAttribute('data-enrolled-users', '');
+    list.setAttribute('data-enrolled-cohorts', '');
+    list.setAttribute('data-cohort-users', '');
     courseEnrollmentRepo.roster(courseId).then((memberships) => {
         const userLabels = [];
         const users = memberships.users;
