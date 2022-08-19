@@ -943,6 +943,8 @@ function attachLMSCallbacksForEnrollingUser() {
         const enrolled = list.getAttribute('data-enrolled-cohorts');
         const classId = classSelector.value;
         studentSelector.disabled = (classId !== '');
+        enrollButton.disabled = false;
+        unenrollButton.disabled = false;
         if ((enrolled) && (enrolled.split('|').includes(classId))) {
             // if class is enrolled, display the unenroll button
             enrollButton.classList.add('d-none');
@@ -958,9 +960,8 @@ function attachLMSCallbacksForEnrollingUser() {
         }
         if (((classId === '') && (classSelector.value === ''))) {
             enrollButton.disabled = true;
+            unenrollButton.disabled = true;
             roleSelector.classList.add('d-none');
-        } else {
-            enrollButton.disabled = false;
         }
     });
 }
