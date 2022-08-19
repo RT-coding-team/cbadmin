@@ -4,7 +4,8 @@ import { CourseMembership } from '../models/course-membership';
 /**
  * A class that stores and manages the enrollment of users and cohorts into a course.
  *
- * TODO: Consider tracking empty enrollments to limit API requests
+ * @TODO Consider tracking empty enrollments to limit API requests
+ * @TODO Is there a way to not clear the cache on enrolling/unenrolling. Where do we get user id's for a cohort?
  */
 export class CourseEnrollmentRepo {
 
@@ -52,9 +53,11 @@ export class CourseEnrollmentRepo {
             return new Promise((resolve, reject) => {
                 const success = (data) => {
                     if ((typeof data === 'string') && (data.includes('enrolled'))) {
-                        const membership = new CourseMembership(courseId, memberId, memberType);
-                        membership.addRole(roleId, this.roles[roleId]);
-                        this.memberships.push(membership);
+                        /**
+                         * Since we do not have access to the user ids of a cohort, we cannot remove the
+                         * user memberships from our memberships cache. So we will force a cache update.
+                         */
+                        this.memberships = [];
                         resolve(true);
                         return;
                     }
@@ -106,15 +109,13 @@ export class CourseEnrollmentRepo {
             return new Promise((resolve, reject) => {
                 const success = (data) => {
                     if ((typeof data === 'string') && (data.includes('unenrolled'))) {
-                        const index = this.memberships.findIndex(
-                            (m) => ((m.courseId === parseInt(courseId, 10)) && (m.memberType === memberType)  && (m.memberId === parseInt(memberId, 10)))
-                        );
-                        // This check is unneccessary because we check isEnrolled before it. But just to be safe.
-                        if (index > -1) {
-                            this.memberships.splice(index, 1);
-                        }
-                        resolve(true);
-                        return;
+                        /**
+                         * Since we do not have access to the user ids of a cohort, we cannot remove the
+                         * user memberships from our memberships cache. So we will force a cache update.
+                         */
+                         this.memberships = [];
+                         resolve(true);
+                         return;
                     }
                     resolve(false);
                 };
