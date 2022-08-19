@@ -816,6 +816,7 @@ function attachLMSCallbacksForEnrollingUser() {
         const label = (cohortId !== '') ? 'class' : 'user';
         const errors = [];
         const enrolled = list.getAttribute(`data-enrolled-${pluralType}`);
+        const usersInCohorts = list.getAttribute('data-cohort-users');
         const roleId = roleSelector.value;
         if (!courseId) {
             errors.push('Please select a course.');
@@ -825,6 +826,9 @@ function attachLMSCallbacksForEnrollingUser() {
         }
         if (enrolled.split('|').includes(memberId)) {
             errors.push(`The ${label} is already enrolled.`);
+        }
+        if ((memberType === 'user') && (usersInCohorts.split('|').includes(memberId))) {
+            errors.push('The user is enrolled in a class that is already enrolled in the course.');
         }
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
@@ -855,14 +859,19 @@ function attachLMSCallbacksForEnrollingUser() {
         const label = (cohortId !== '') ? 'class' : 'user';
         const errors = [];
         const enrolled = list.getAttribute(`data-enrolled-${pluralType}`);
+        const usersInCohorts = list.getAttribute('data-cohort-users');
         if (!courseId) {
             errors.push('Please select a course.');
         }
         if (!memberId) {
             errors.push(`Please select a vaild ${label}.`);
         }
-        if (!enrolled.split('|').includes(memberId)) {
-            errors.push(`The ${label} is not enrolled in the course.`);
+        if ((memberType === 'user') && (usersInCohorts.split('|').includes(memberId))) {
+            errors.push('The user is enrolled in a class in the course. You must remove the user from the class.');
+        } else {
+            if (!enrolled.split('|').includes(memberId)) {
+                errors.push(`The ${label} is not enrolled in the course.`);
+            }
         }
         if (errors.length > 0) {
             openSnackBar(errors.join("\r\n"), 'error');
@@ -900,10 +909,21 @@ function attachLMSCallbacksForEnrollingUser() {
     });
     studentSelector.addEventListener('change', () => {
         const enrolled = list.getAttribute('data-enrolled-users');
+        const usersInCohorts = list.getAttribute('data-cohort-users');
         const studentId = studentSelector.value;
+        enrollButton.disabled = false;
+        unenrollButton.disabled = false;
+        roleSelector.value = 5;
         classSelector.disabled = (studentId !== '');
         if ((enrolled) && (enrolled.split('|').includes(studentId))) {
             // if user is enrolled, display the unenroll button
+            enrollButton.classList.add('d-none');
+            unenrollButton.classList.remove('d-none');
+            roleSelector.classList.add('d-none');
+        } else if (usersInCohorts.split('|').includes(studentId)) {
+            // if the user is enrolled by a cohort, disabled the button
+            unenrollButton.disabled = true;
+            enrollButton.disabled= true;
             enrollButton.classList.add('d-none');
             unenrollButton.classList.remove('d-none');
             roleSelector.classList.add('d-none');
@@ -913,12 +933,10 @@ function attachLMSCallbacksForEnrollingUser() {
             unenrollButton.classList.add('d-none');
             roleSelector.classList.remove('d-none');
         }
-        roleSelector.value = 5;
         if (((studentId === '') && (classSelector.value === ''))) {
             enrollButton.disabled = true;
+            unenrollButton.disabled = true;
             roleSelector.classList.add('d-none');
-        } else {
-            enrollButton.disabled = false;
         }
     });
     classSelector.addEventListener('change', () => {
