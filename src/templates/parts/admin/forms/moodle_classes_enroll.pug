@@ -1,0 +1,26 @@
+extends ../../../layout/form
+include ../../../mixins/button-add-to-class
+include ../../../mixins/button-remove-from-class
+
+block variables
+    - var id = 'moodle_class_enroll'
+    - var remove_id = 'moodle_class_unenroll'
+
+block icon
+    include ../../../icons/account-multiple
+
+block title
+    | Class Enrollment
+
+block form
+    div.position-relative
+        select.input-text.lms-class-selector.mb-1(name="moodle_classes" id="moodle_classes_enroll-input")
+            option(value="") --- Choose a Class
+        select.input-text.mb-1.lms-user-selector(name="moodle_class_enrollee" id="moodle_class_enrollee-input")
+            option(value="") --- Choose a User
+        div.border-top.mt-1.pt-1
+            p.fst-italic Current Members
+            ul.mt-2(id="class-users-list")
+                li Sorry, no users found.
+        +button-add-to-class(id)
+        +button-remove-from-class(remove_id)

@@ -1,0 +1,22 @@
+extends ../../../layout/form
+include ../../../mixins/button-save
+include ../../../mixins/button-class-remove
+
+block variables
+    - var id = 'moodle_classes_update'
+
+block icon
+    include ../../../icons/account-multiple
+
+block title
+    | Update a Class
+
+block form
+    div.position-relative
+        select.input-text.lms-class-selector(name="moodle_classes" id="moodle_classes-input")
+            option(value="") --- Choose Class To Update
+        div.d-none#moodle_classes-update-form
+            input.w-100.hiden.input-text#moodle_update_class_name-input(placeholder='Name', name='moodle_class_name')
+            input#moodle_update_class_id-input(type='hidden')
+            +button-save(id)
+            +button-class-remove('moodle_class_remove')

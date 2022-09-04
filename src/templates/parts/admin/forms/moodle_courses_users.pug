@@ -7,7 +7,7 @@ block variables
     - var remove_id = 'moodle_courses_users_remove'
 
 block icon
-    include ../../../icons/admin
+    include ../../../icons/grad-hat
 
 block title
     | Course Enrollment
@@ -16,8 +16,12 @@ block form
     div.position-relative
         select.input-text.lms-course-selector.mb-1(name="moodle_courses" id="moodle_courses-input")
             option(value="") --- Choose Course
-        select.input-text.mb-1.lms-user-selector(name="moodle_enrollees" id="moodle_enrollees-input")
-            option(value="") --- Choose a User
+        div#moodle_courses_enrollee_select.d-none
+            select.input-text.mb-1.lms-user-selector(name="moodle_enrollees" id="moodle_enrollees-input")
+                option(value="") --- Choose a User
+            p.text-center OR
+            select.input-text.lms-class-selector.mb-1(name="moodle_classes" id="moodle_classes_enrollees-input")
+                option(value="") --- Choose a Class
         select.input-text.mb-1.d-none.lms-role-selector(name="moodle_role" id="moodle_role-input")
             option(value="4") Non-editing Teacher
             option(value="1") Manager
@@ -26,5 +30,6 @@ block form
         div.border-top.mt-1.pt-1
             p.fst-italic Current Members
             ul.mt-2(id="course-users-list")
+                li Sorry, no users found.
         +button-add-to-class(id)
         +button-remove-from-class(remove_id)

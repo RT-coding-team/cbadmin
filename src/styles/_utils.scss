@@ -11,7 +11,17 @@
     right: -2.2rem;
     top: 15%;
     width: 24px;
+
+    &.button-class-remove {
+        top: 40%;
+    }
 }
 #moodle_course-update-form .second-button {
     top: 20%;
+}
+.text-center {
+    text-align: center;
+}
+.cohort-title {
+    font-style: italic;
 }
